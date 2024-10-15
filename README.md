@@ -1,5 +1,4 @@
-deno install --name lost jsr:@lost-c3/cli --global -f -A
-![Lost by lostinmind.](./сover.png)
+![Lost by lostinmind.](https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/cover.png)
 <div align="center">
   <h3>
     Framework for easy making Construct 3 Addons. <br />
@@ -21,7 +20,7 @@ __Lost__ is a library for easy making Construct 3 addons using __[Deno (JavaScri
 # 🚀 Quickstart
 
 - Install __[Deno (JavaScript runtime)](https://docs.deno.com/runtime/)__
-- Install [__Lost CLI__](https://jsr.io/@lost-c3/cli) by using `deno install --name lost-c3 jsr:@lost-c3/cli --global -f -A`
+- Install [__Lost CLI__](https://jsr.io/@lost-c3/cli) by using `deno install --name lost jsr:@lost-c3/cli --global -f -A`
 
 
 <!-- Create a bare-bones Lost Addon for __plugin__ by using `lost-c3 init --plugin` -->
