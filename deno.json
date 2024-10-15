@@ -1,0 +1,30 @@
+{
+  "name": "@lost-c3/cli",
+  "version": "2.0.0",
+  "compilerOptions": {
+    "noImplicitOverride": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
+  },
+  "tasks": {
+    "build": "deno run -A --watch ./cli.ts build",
+    "dev": "deno run -A --watch ./cli.ts serve"
+  },
+  "exports": {
+    ".": "./cli.ts"
+  },
+  "publish": {
+    "exclude": [
+      "tsconfig.json",
+      ".gitignore",
+      "lost.config.ts",
+      "Addon",
+      "Builds",
+      "src",
+      "deno.lock"
+    ]
+  },
+  "imports": {
+    "@config": "./lost.config.ts"
+  }
+}
