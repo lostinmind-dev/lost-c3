@@ -13,8 +13,8 @@ __Lost__ is a framework for easy making Construct 3 addons using __[Deno (JavaSc
 - __[Quickstart](#-quickstart)__
 - __[Specifying plugin properties](#️-specifying-plugin-properties)__
 - __[Creating category](#-creating-category)__
-- __[Building addon](#-building-addon)__
-- __[Testing addon](#-testing-addons)__
+- __[Building addon](#️-building-addon)__
+- __[Testing addon](#-testing-addons-in-developer-mode)__
 
 # 💪 Advantages
 
@@ -614,7 +614,7 @@ class MyCategory {
 export const LostCategory = new MyCategory();
 ```
 
-## Building addon
+## 🏗️ Building addon
 
 To build addon into **`.c3addon`** file you can use one of the following commands:
 - `lost build`
@@ -622,7 +622,7 @@ To build addon into **`.c3addon`** file you can use one of the following command
 
 **`addon.c3addon`** file will be available at path: `./Builds/addon.c3addon`
 
-## Testing addons in Developer Mode
+## 🧪 Testing addons in Developer Mode
 
 To test your addon you can use one of the following commands:
 - `lost serve`
