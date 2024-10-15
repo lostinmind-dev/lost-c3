@@ -1,7 +1,14 @@
 import * as path from "jsr:@std/path@1.0.6";
 import { type Lost, zip, Project, walk, bold, yellow, green, magenta, join, Logger, ErrorMessage, WarningMessage } from "./deps.ts";
 
-const __dirname = path.dirname(path.fromFileUrl(import.meta.url));
+let __dirname: string //= path.dirname(path.fromFileUrl(import.meta.url));
+
+if (import.meta.url.startsWith('file:')) {
+    __dirname = path.fromFileUrl(import.meta.url);
+  } else {
+    // Обработка https: URL
+    __dirname = new URL(import.meta.url).pathname;
+  }
 
 const buildPath = `${Deno.cwd()}/Builds/Source`;
 const addonsCollectionPath = `${Deno.cwd()}/Builds`;
