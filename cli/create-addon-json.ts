@@ -1,14 +1,15 @@
-import type { AddonIcon, DefaultIcon } from "./get-addon-icon.ts";
+import type { AddonIcon } from "./get-addon-icon.ts";
 import type { LostConfig } from "../lib/common.ts";
 import type { AddonScript } from "./get-addon-scripts.ts";
 import type { AddonFile } from "./get-addon-files.ts";
-import { AddonJSON } from "../lib/json.ts";
+import type { AddonJSON } from "../lib/json.ts";
+
 import { BUILD_PATH } from "./paths.ts";
 
 
 export async function createAddonJSON(
     config: LostConfig<'plugin' | 'behavior'>,
-    icon: AddonIcon | DefaultIcon,
+    icon: AddonIcon,
     scripts: AddonScript[],
     files: AddonFile[]
 ) {

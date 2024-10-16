@@ -1,10 +1,9 @@
 {
     "name": "@lost-c3/lib",
-    "version": "1.0.7",
+    "version": "1.0.81",
     "exports": {
         ".": "./mod.ts",
-        "./cli": "./cli.ts",
-        "./addon_base/": "./cli/addon_base/"
+        "./cli": "./cli.ts"
     },
     "fmt": {
         "indentWidth": 4,
@@ -24,16 +23,18 @@
     },
     "publish": {
         "include": [
+            "deps.ts",
             "mod.ts",
             "cli.ts",
             "./lib/",
             "./cli/"
         ],
         "exclude": [
+            ".github",
+            "addon_base",
             "./cli/src/",
             "tsconfig.json",
-            "./cli/plugin_base/src",
-            ".github"
+            "./cli/plugin_base/src"
         ]
     }
 }

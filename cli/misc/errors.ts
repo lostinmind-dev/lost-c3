@@ -22,7 +22,7 @@ export enum ErrorMessage {
 }
 
 export enum WarningMessage {
-    ICON_NOT_DETECTED_OR_WRONG_FORMAT = `Addon icon was not detected or it has wrong format. (Set to default icon)`,
+    ICON_NOT_DETECTED_OR_WRONG_FORMAT = `Addon icon was not detected or it has wrong format!`,
     CATEGORY_DEPRECATED = `Сategory has Deprecated mode enabled. All Actions/Conditions/Expressions will not be available but added to the addon!`,
     CATEGORY_IN_DEVELOPMENT = `Сategory has InDevelopment mode enabled. All Actions/Conditions/Expressions was not added to the addon!`
 }

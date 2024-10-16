@@ -1,11 +1,3 @@
-import type { AddonType } from "../lib/common.ts";
-import { path } from "./cli-deps.ts";
-import { __dirname } from "./get-library-directory.ts";
-import { getLibraryDirectory } from './misc.ts';
-/**
- * Change in release to false
- */
-
 export const BUILD_PATH = `${Deno.cwd()}/Builds/Source`;
 
 export const ADDONS_COLLECTION_PATH = `${Deno.cwd()}/Builds`;

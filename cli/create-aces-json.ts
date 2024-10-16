@@ -1,5 +1,5 @@
 import type { LostCategoryBase } from "../lib/entities.ts";
-import { AcesJSON, AceAction, AceCondition, AceExpression, AceParam } from "../lib/json.ts";
+import type { AcesJSON, AceAction, AceCondition, AceExpression, AceParam } from "../lib/json.ts";
 
 import { BUILD_PATH } from "./paths.ts";
 
