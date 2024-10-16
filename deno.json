@@ -1,6 +1,6 @@
 {
     "name": "@lost-c3/lib",
-    "version": "1.0.81",
+    "version": "1.0.82",
     "exports": {
         ".": "./mod.ts",
         "./cli": "./cli.ts"
@@ -27,7 +27,9 @@
             "mod.ts",
             "cli.ts",
             "./lib/",
-            "./cli/"
+            "./cli/",
+            "README.md",
+            "cover.png"
         ],
         "exclude": [
             ".github",
