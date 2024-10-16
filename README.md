@@ -42,13 +42,13 @@ Here I've compiled some of the benefits from standard addon creation for __Const
 # 🚀 Quickstart
 
 - __Install [Deno (JavaScript runtime)](https://docs.deno.com/runtime/)__
-- __Install [Lost CLI](https://jsr.io/@lost-c3/lib) by using `deno install --name lost jsr:@lost-c3/lib@1.0.0/cli --global -f -A`__
+- __Install [Lost CLI](https://jsr.io/@lost-c3/lib) by using `deno install --name lost jsr:@lost-c3/lib@latest/cli --global -f -A`__
 - __Create empty folder which will be used as main folder for your addon.__
 - __Create a bare-bones for ***"plugin"*** addon type by using `lost create --plugin` OR `lost create -p`__
 
 
 ```bash
-deno install --name lost jsr:@lost-c3/cli@2.0.1 --global -f -A
+deno install --name lost jsr:@lost-c3/lib/cli --global -f -A
 lost create --plugin
 lost build
 ```

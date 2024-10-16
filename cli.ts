@@ -2,8 +2,9 @@
 import { parseArgs } from "jsr:@std/cli@1.0.6";
 import { Colors } from "./deps.ts";
 import { buildAddon } from "./cli/main.ts";
+import type { AddonType } from "./lib/common.ts";
 
-const LOST_VERSION = '1.0.3';
+const LOST_VERSION = '1.0.4';
 
 type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 
@@ -30,7 +31,7 @@ async function main() {
                 break;
             }
             if (flags.plugin) {
-                // await createBareBones('plugin');
+                await createBareBones('plugin');
                 break;
             }
             break;
@@ -50,6 +51,27 @@ async function main() {
 
 if (import.meta.main) {
     await main();
+}
+
+async function createBareBones(addonType: AddonType) {
+    console.log('⏳', Colors.bold(Colors.yellow((Colors.italic(`Creating bare-bones for ${Colors.magenta(`"${addonType}"`)} addon type`)))), '...');
+    await cloneRepo(`https://github.com/lostinmind-dev/lostc3-${addonType}-bare-bones.git`, addonType);
+}
+
+async function cloneRepo(url: string, addonType: AddonType) {
+    const command = new Deno.Command('git', {
+        args: ['clone', url, './'],
+        stdout: "piped",
+        stderr: "piped"
+    })
+
+    const { code, stdout, stderr } = await command.output();
+
+    if (code === 0) {
+        console.log('✅', Colors.bold(`${Colors.green('Successfully')} created bare-bones for ${Colors.magenta(`"${addonType}"`)} addon type!`));
+    } else {
+        console.error('❌', Colors.red(Colors.bold(`Error occured while creating bare-bones.`)));
+    }
 }
 
 function printHelp() {
