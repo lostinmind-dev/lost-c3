@@ -1,122 +1,65 @@
 #!/usr/bin/env deno run --allow-read --allow-write --unstable
-import { Lost } from "./deps.ts";
 import { parseArgs } from "jsr:@std/cli@1.0.6";
-// import { debounce } from "jsr:@std/async";
-import { build } from "./build.ts";
-import { red, bold, italic, yellow, blue, gray, magenta } from "./deps.ts";
-import { green } from "./deps.ts";
+import { Colors } from "./deps.ts";
+import { buildAddon } from "./cli/main.ts";
 
-type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve' | 'docs';
-
-const COMMANDS: LostCommand[] = ["help", "version", "build", "serve", 'create'];
-
-function printUsage() {
-    console.log('📃', bold("Usage: lost <command> [options]"));
-    console.log('✅', bold("Valid commands:"));
-    COMMANDS.forEach(cmd => console.log(`  ${yellow(cmd)}`));
-    console.log('\n⚙️', bold(" Options:"));
-    //console.log(gray('  --watch, -w'), '   Watch mode');
-    console.log(gray('  --plugin, -p'), '   Creates a bare-bones for "plugin" addon type.');
-  }
-
-// async function watchMode(serve: boolean) {
-//     const watcher = Deno.watchFs(["./Addon", "./lost.config.ts"]);
-//     const debouncedBuild = debounce(build, 100);
-  
-//     console.log(bold(blue("Watch mode started. Waiting for changes...")));
-  
-//     for await (const event of watcher) {
-//         if (event.kind === "modify" ) { // || event.kind === "create"
-//             await debouncedBuild({ serve });
-//         }
-//     }
-// }
-
-async function cloneRepo(url: string, addonType: Lost.AddonType) {
-    const command = new Deno.Command('git', {
-        args: ['clone', url, './'],
-        stdout: "piped",
-        stderr: "piped"
-    })
-
-    const { code, stdout, stderr } = await command.output();
-
-    if (code === 0) {
-        console.log('✅', bold(`${green('Successfully')} created bare-bones for ${magenta(`"${addonType}"`)} addon type!`));
-    } else {
-        console.error('❌', red(bold(`Error occured while creating bare-bones.`)));
-    }
-}
-
-async function createBareBones(addonType: Lost.AddonType) {
-    console.log('⏳', bold(yellow((italic(`Creating bare-bones for ${magenta(`"${addonType}"`)} addon type`)))), '...');
-    await cloneRepo(`https://github.com/lostinmind-dev/lostc3-${addonType}-bare-bones.git`, addonType);
-}
-
+type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
-        boolean: ["watch", "plugin"],
-        alias: { w: "watch", p: "plugin"},
+        boolean: ["plugin"],
+        alias: {p: "plugin"},
         "--": true,
       });
 
-    const command: LostCommand = (_[0]) ? String(_[0]) as LostCommand : 'none';
-
-    if (!COMMANDS.includes(command)) {
-        console.error('❌', red(bold(`Unknown command:`)), italic(command));
-        console.log(blue(italic('Enter')), italic(bold(`${yellow('lost')} help`)), italic(blue('to get of available commands.')))
-        Deno.exit(1);
-    }
+    const command = (_[0]) ? String(_[0]) as LostCommand : 'none';
 
     switch (command) {
         case 'help':
-            printUsage();
+            printHelp();
             break;
         case 'version':
-            console.log('✅', bold(`Lost ➜  ${yellow('2.0.0')} by ${italic(magenta('lostinmind.'))}`))
+            console.log('✅', Colors.bold(`Lost ➜  ${Colors.yellow('2.0.0')} by ${Colors.italic(Colors.magenta('lostinmind.'))}`))
             break;
         case 'create':
             if (!flags.plugin) {
-                console.log('🎓', blue(italic('Specify one of the available types of addon:')))
-                console.log(gray('  --plugin, -p'), '   Creates a bare-bones for "plugin" addon type.');
+                console.log('🎓', Colors.blue(Colors.italic('Specify one of the available types of addon:')))
+                console.log(Colors.gray('  --plugin, -p'), '   Creates a bare-bones for "plugin" addon type.');
                 break;
-                //printUsage();
             }
             if (flags.plugin) {
-                await createBareBones('plugin');
+                // await createBareBones('plugin');
                 break;
             }
             break;
         case 'build':
-            await build({ serve: false });
+            await buildAddon({ serve: false });
             break;
         case 'serve':
-            // if (flags.watch) {
-            //     // await watchMode(true);
-            //     break;
-            // } else {
-            //     await build({ serve: true });
-            // }
-            await build({ serve: true });
+            await buildAddon({ serve: true });
             break;
-        case 'docs':
-            console.log('🔃', 'In development', '🔃')
-            // build({ serve: false }).then((data) => {
-            //     console.log(data);
-            // })
-            // generateAddonDocs();
-            break;  
+        case 'none':
+            console.error('❌', Colors.red(Colors.bold(`Unknown command:`)), Colors.italic(command));
+            console.log(Colors.blue(Colors.italic('Enter')), Colors.italic(Colors.bold(`${Colors.yellow('lost')} help`)), Colors.italic(Colors.blue('to get of available commands.')))
+            Deno.exit(1);
     }
 
 }
 
 if (import.meta.main) {
-    main();
+    await main();
 }
 
-/**
- * 
- * Exports
- * 
- */
+function printHelp() {
+    console.log('📃', Colors.bold("Usage: lost <command> [options]"));
+
+    console.log('✅', Colors.bold("Valid commands:"));
+    console.log(`  ${Colors.yellow('help')}`);
+    console.log(`  ${Colors.yellow('version')}`);
+    
+    console.log(`  ${Colors.yellow('create')}`);
+    console.log('   ⚙️', Colors.gray('  --plugin, -p'), '   Creates a bare-bones for "plugin" addon type.');
+
+    console.log(`  ${Colors.yellow('build')}`);
+    console.log(`  ${Colors.yellow('serve')}`);
+}

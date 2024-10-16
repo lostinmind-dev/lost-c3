@@ -1,0 +1,13 @@
+{
+    "name": "@lost-c3/lib",
+    "version": "1.0.0",
+    "exports": {
+        ".": "./mod.ts",
+        "./cli": "./cli.ts"
+    },
+    "bin": "cli.ts",
+    "publish": {
+        "include": ["mod.ts", "cli.ts", "./lib/", "./cli/"],
+        "exclude": ["./cli/src/", "tsconfig.json", "./cli/plugin_base/src"]
+    }
+}
