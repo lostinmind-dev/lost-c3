@@ -1,1 +1,1 @@
-export { Param, type ParamOptions } from "./params/Params.ts";
+export { Param, type ParamOptions } from './params/Params.ts';

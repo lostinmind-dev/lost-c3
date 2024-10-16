@@ -1,1 +1,1 @@
-export { PluginProperty } from "./plugin-props/PluginProperties.ts";
+export { PluginProperty } from './plugin-props/PluginProperties.ts';
