@@ -4,26 +4,30 @@ export function getLibraryDirectory(): string {
     // Получаем URL текущего модуля
     const moduleUrl = new URL(import.meta.url);
     
-    // Проверяем, запущен ли скрипт из файловой системы или из сети
+    console.log("Debug: Module URL:", moduleUrl.toString());
+  
     if (moduleUrl.protocol === "file:") {
       // Если это файловая система, преобразуем URL в путь
       const modulePath = path.fromFileUrl(moduleUrl);
-      // Возвращаем директорию, в которой находится модуль
+      console.log("Debug: File path:", modulePath);
       return path.dirname(modulePath);
     } else if (moduleUrl.protocol === "https:") {
       // Если это HTTPS URL (например, при использовании через JSR)
-      const parts = moduleUrl.pathname.split("/");
-      const packageName = "@lost-c3/lib"; // Замените на имя вашего пакета
-      const index = parts.indexOf(packageName);
-      if (index !== -1) {
-        // Используем путь к кэшу JSR, основанный на DENO_DIR
-        const denoDir = Deno.env.get("DENO_DIR") || getDefaultDenoDir();
-        return path.join(denoDir, "deps", "https", "jsr.io", ...parts.slice(1, index + 2));
-      }
+      const denoDir = Deno.env.get("DENO_DIR") || getDefaultDenoDir();
+      console.log("Debug: Deno Dir:", denoDir);
+  
+      // Извлекаем относительный путь из URL
+      const relativePath = moduleUrl.pathname.split("/").slice(1).join("/");
+      console.log("Debug: Relative path:", relativePath);
+  
+      // Формируем путь к кэшированной версии пакета
+      const cachedPath = path.join(denoDir, "deps", "https", "jsr.io", relativePath);
+      console.log("Debug: Cached path:", cachedPath);
+  
+      return path.dirname(cachedPath);
     }
     
-    // Если не удалось определить директорию, выводим отладочную информацию
-    console.error("Debug info:");
+    console.error("Error: Unable to determine library directory");
     console.error("Module URL:", moduleUrl.toString());
     console.error("DENO_DIR:", Deno.env.get("DENO_DIR"));
     console.error("Default Deno Dir:", getDefaultDenoDir());
@@ -43,6 +47,4 @@ export function getLibraryDirectory(): string {
   }
   
   export const __dirname = getLibraryDirectory();
-  
-  // Добавляем отладочную информацию
-  console.log("Library directory:", __dirname);
+  console.log("Debug: Library directory:", __dirname);
