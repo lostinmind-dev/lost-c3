@@ -1,4 +1,10 @@
 {
+    "name": "@lost-c3/lib",
+    "version": "1.0.0",
+    "exports": {
+        ".": "./mod.ts",
+        "./cli": "./cli.ts"
+    },
     "tasks": {
         "uninstall:cli": "deno uninstall lost -g",
         "install:cli:local": "deno install --name lost ./cli.ts --global -f -A",
