@@ -4,7 +4,7 @@ import { getLibraryDirectory } from "./misc.ts";
 /**
  * Change in release to false
  */
-export const __dirname = getLibraryDirectory(true);
+export const __dirname = getLibraryDirectory();
 
 export const BUILD_PATH = `${Deno.cwd()}/Builds/Source`;
 
