@@ -10,19 +10,25 @@ export function getLibraryDirectory(): string {
       const modulePath = path.fromFileUrl(moduleUrl);
       // Возвращаем директорию, в которой находится модуль
       return path.dirname(modulePath);
-    } else {
-      // Если это сетевой URL (например, при использовании через JSR),
-      // возвращаем путь к кэшированной версии пакета
+    } else if (moduleUrl.protocol === "https:") {
+      // Если это HTTPS URL (например, при использовании через JSR)
       const parts = moduleUrl.pathname.split("/");
       const packageName = "@lost-c3/lib"; // Замените на имя вашего пакета
       const index = parts.indexOf(packageName);
       if (index !== -1) {
         // Используем путь к кэшу JSR, основанный на DENO_DIR
         const denoDir = Deno.env.get("DENO_DIR") || getDefaultDenoDir();
-        return path.join(denoDir, "deps", "jsr", ...parts.slice(0, index + 2));
+        return path.join(denoDir, "deps", "https", "jsr.io", ...parts.slice(1, index + 2));
       }
-      throw new Error("Не удалось определить директорию библиотеки");
     }
+    
+    // Если не удалось определить директорию, выводим отладочную информацию
+    console.error("Debug info:");
+    console.error("Module URL:", moduleUrl.toString());
+    console.error("DENO_DIR:", Deno.env.get("DENO_DIR"));
+    console.error("Default Deno Dir:", getDefaultDenoDir());
+    
+    throw new Error("Не удалось определить директорию библиотеки");
   }
   
   function getDefaultDenoDir(): string {
@@ -37,3 +43,6 @@ export function getLibraryDirectory(): string {
   }
   
   export const __dirname = getLibraryDirectory();
+  
+  // Добавляем отладочную информацию
+  console.log("Library directory:", __dirname);
