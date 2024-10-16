@@ -5,7 +5,7 @@ import type { AddonScript } from "./get-addon-scripts.ts";
 import type { AddonFile } from "./get-addon-files.ts";
 import { __dirname, BUILD_PATH } from "./paths.ts";
 import type { AddonIcon, DefaultIcon } from "./get-addon-icon.ts";
-import { Project } from "./cli-deps.ts";
+import { path, Project } from "./cli-deps.ts";
 
 export async function createAddonStructure(
     config: LostConfig<'plugin' | 'behavior'>, 
@@ -113,7 +113,7 @@ interface ReplaceLostConfig {
 
 async function copyBaseAddonFiles(addonType: AddonType, lostConfig: ReplaceLostConfig, entitiesFunctions: AllEntitiesFunctions) {
     const lostConfigVariableName = 'LOST_CONFIG';
-    const baseAddonPath = `${__dirname}/${addonType}_base/dist`;
+    const baseAddonPath = path.resolve(`${__dirname}/${addonType}_base/dist`);
     const lostConfigRegex = new RegExp(`const\\s+${lostConfigVariableName}\\s*=\\s*{\\s*};`);
     const configImportRegex = /import\s*{?\s*Config\s*}?\s*from\s*["'](?:@config|(?:\.\.\/)?lost\.config\.ts)["'];/;
     const lostConfigReplace = `const ${lostConfigVariableName} = ${JSON.stringify(lostConfig)};`;

@@ -19,7 +19,7 @@ async function main() {
             printHelp();
             break;
         case 'version':
-            console.log('✅', Colors.bold(`Lost ➜  ${Colors.yellow('2.0.0')} by ${Colors.italic(Colors.magenta('lostinmind.'))}`))
+            console.log('✅', Colors.bold(`Lost ➜  ${Colors.yellow('1.0.2')} by ${Colors.italic(Colors.magenta('lostinmind.'))}`))
             break;
         case 'create':
             if (!flags.plugin) {
