@@ -3,7 +3,7 @@ import type { PluginProperty } from "../lib/plugin-props.ts";
 import type { LostCategoryBase } from "../lib/entities.ts";
 import type { AddonScript } from "./get-addon-scripts.ts";
 import type { AddonFile } from "./get-addon-files.ts";
-import { __dirname, BUILD_PATH } from "./paths.ts";
+import { __dirname, BUILD_PATH, getBaseAddonFilePath } from "./paths.ts";
 import type { AddonIcon, DefaultIcon } from "./get-addon-icon.ts";
 import { path, Project } from "./cli-deps.ts";
 
@@ -113,7 +113,6 @@ interface ReplaceLostConfig {
 
 async function copyBaseAddonFiles(addonType: AddonType, lostConfig: ReplaceLostConfig, entitiesFunctions: AllEntitiesFunctions) {
     const lostConfigVariableName = 'LOST_CONFIG';
-    const baseAddonPath = path.resolve(`${__dirname}/${addonType}_base/dist`);
     const lostConfigRegex = new RegExp(`const\\s+${lostConfigVariableName}\\s*=\\s*{\\s*};`);
     const configImportRegex = /import\s*{?\s*Config\s*}?\s*from\s*["'](?:@config|(?:\.\.\/)?lost\.config\.ts)["'];/;
     const lostConfigReplace = `const ${lostConfigVariableName} = ${JSON.stringify(lostConfig)};`;
@@ -132,32 +131,32 @@ async function copyBaseAddonFiles(addonType: AddonType, lostConfig: ReplaceLostC
     /**
      * ./ folder
      */
-    instanceJSFile = await Deno.readTextFile(`${baseAddonPath}/instance.js`);
+    instanceJSFile = await Deno.readTextFile(getBaseAddonFilePath(addonType, 'instance.js'));
     instanceJSFile = instanceJSFile.replace(lostConfigRegex, lostConfigReplace);
     await Deno.writeTextFile(`${BUILD_PATH}/instance.js`, instanceJSFile);
 
-    pluginJSFile = await Deno.readTextFile(`${baseAddonPath}/plugin.js`);
+    pluginJSFile = await Deno.readTextFile(getBaseAddonFilePath(addonType, 'plugin.js'));
     pluginJSFile = pluginJSFile.replace(lostConfigRegex, lostConfigReplace);
     await Deno.writeTextFile(`${BUILD_PATH}/plugin.js`, pluginJSFile);
 
-    typeJSFile = await Deno.readTextFile(`${baseAddonPath}/type.js`);
+    typeJSFile = await Deno.readTextFile(getBaseAddonFilePath(addonType, 'type.js'));
     typeJSFile = typeJSFile.replace(lostConfigRegex, lostConfigReplace);
     await Deno.writeTextFile(`${BUILD_PATH}/type.js`, typeJSFile);
 
     /**
      * ./c3runtime folder
      */
-    _actionsJSFile = await Deno.readTextFile(`${baseAddonPath}/c3runtime/actions.js`);
+    _actionsJSFile = await Deno.readTextFile(getBaseAddonFilePath(addonType, 'c3runtime/actions.js'));
     _actionsJSFile = _actionsJSFile.replace(lostConfigRegex, lostConfigReplace);
     _actionsJSFile = _actionsJSFile.replace(/C3\.Plugins\[CONFIG\.AddonId\]\.Acts\s*=\s*\{\};/, `C3.Plugins[CONFIG.AddonId].Acts = ${entitiesFunctions.Actions}`)
     await Deno.writeTextFile(`${BUILD_PATH}/c3runtime/actions.js`, _actionsJSFile);
 
-    _conditionsJSFile = await Deno.readTextFile(`${baseAddonPath}/c3runtime/conditions.js`);
+    _conditionsJSFile = await Deno.readTextFile(getBaseAddonFilePath(addonType, 'c3runtime/conditions.js'));
     _conditionsJSFile = _conditionsJSFile.replace(lostConfigRegex, lostConfigReplace);
     _conditionsJSFile = _conditionsJSFile.replace(/C3\.Plugins\[CONFIG\.AddonId\]\.Cnds\s*=\s*\{\};/, `C3.Plugins[CONFIG.AddonId].Cnds = ${entitiesFunctions.Conditions}`);
     await Deno.writeTextFile(`${BUILD_PATH}/c3runtime/conditions.js`, _conditionsJSFile);
 
-    _expressionsJSFile = await Deno.readTextFile(`${baseAddonPath}/c3runtime/expressions.js`);
+    _expressionsJSFile = await Deno.readTextFile(getBaseAddonFilePath(addonType, 'c3runtime/expressions.js'));
     _expressionsJSFile = _expressionsJSFile.replace(lostConfigRegex, lostConfigReplace);
     _expressionsJSFile = _expressionsJSFile.replace(/C3\.Plugins\[CONFIG\.AddonId\]\.Exps\s*=\s*\{\};/, `C3.Plugins[CONFIG.AddonId].Exps = ${entitiesFunctions.Expressions}`);
     await Deno.writeTextFile(`${BUILD_PATH}/c3runtime/expressions.js`, _expressionsJSFile);
@@ -166,11 +165,11 @@ async function copyBaseAddonFiles(addonType: AddonType, lostConfig: ReplaceLostC
     _instanceJSFile = _instanceJSFile.replace(configImportRegex, `${lostConfigReplace}\nconst Config = ${lostConfigVariableName}.Config;\n`);
     await Deno.writeTextFile(`${BUILD_PATH}/c3runtime/instance.js`, _instanceJSFile);
 
-    _pluginJSFile = await Deno.readTextFile(`${baseAddonPath}/c3runtime/plugin.js`);
+    _pluginJSFile = await Deno.readTextFile(getBaseAddonFilePath(addonType, 'c3runtime/plugin.js'));
     _pluginJSFile = _pluginJSFile.replace(lostConfigRegex, lostConfigReplace);
     await Deno.writeTextFile(`${BUILD_PATH}/c3runtime/plugin.js`, _pluginJSFile);
 
-    _typeJSFile = await Deno.readTextFile(`${baseAddonPath}/c3runtime/type.js`);
+    _typeJSFile = await Deno.readTextFile(getBaseAddonFilePath(addonType, 'c3runtime/type.js'));
     _typeJSFile = _typeJSFile.replace(lostConfigRegex, lostConfigReplace);
     await Deno.writeTextFile(`${BUILD_PATH}/c3runtime/type.js`, _typeJSFile);
 }

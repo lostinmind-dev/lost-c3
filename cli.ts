@@ -3,6 +3,8 @@ import { parseArgs } from "jsr:@std/cli@1.0.6";
 import { Colors } from "./deps.ts";
 import { buildAddon } from "./cli/main.ts";
 
+const LOST_VERSION = '1.0.3';
+
 type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 
 async function main() {
@@ -19,7 +21,7 @@ async function main() {
             printHelp();
             break;
         case 'version':
-            console.log('✅', Colors.bold(`Lost ➜  ${Colors.yellow('1.0.2')} by ${Colors.italic(Colors.magenta('lostinmind.'))}`))
+            console.log('✅', Colors.bold(`Lost ➜  ${Colors.yellow(LOST_VERSION)} by ${Colors.italic(Colors.magenta('lostinmind.'))}`))
             break;
         case 'create':
             if (!flags.plugin) {
