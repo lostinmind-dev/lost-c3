@@ -1,4 +1,8 @@
 /**
+ * This module contains functions AND classes to create Construct 3 Addons.
+ * @module
+ */
+/**
  * Entities
  */
 export { Category, Action, Condition, Expression } from "./lib/entities.ts";

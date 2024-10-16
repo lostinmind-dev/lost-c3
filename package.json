@@ -8,6 +8,11 @@
     "bin": "cli.ts",
     "publish": {
         "include": ["mod.ts", "cli.ts", "./lib/", "./cli/"],
-        "exclude": ["./cli/src/", "tsconfig.json", "./cli/plugin_base/src"]
+        "exclude": [
+            "./cli/src/", 
+            "tsconfig.json", 
+            "./cli/plugin_base/src",
+            ".github"
+        ]
     }
 }

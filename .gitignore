@@ -1,4 +1,3 @@
 src/
-lost.config.ts
 deno.lock
 tsconfig.json
