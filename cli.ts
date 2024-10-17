@@ -1,13 +1,22 @@
 #!/usr/bin/env deno run --allow-read --allow-write --unstable
-import { getLibraryDirectory } from "./deps.ts"
+import { getLibraryDirectory, path } from "./deps.ts"
 import { parseArgs } from "jsr:@std/cli@1.0.6";
 import { Colors } from "./deps.ts";
 import { buildAddon } from "./cli/main.ts";
 import type { AddonType } from "./lib/common.ts";
 
-const __dirname: string = getLibraryDirectory();
+//const __dirname: string = getLibraryDirectory();
 
-const VERSION = '1.1.1'
+let __dirname: string //= path.dirname(path.fromFileUrl(import.meta.url));
+
+if (import.meta.url.startsWith('file:')) {
+    __dirname = path.fromFileUrl(import.meta.url);
+  } else {
+    // Обработка https: URL
+    __dirname = new URL(import.meta.url).pathname;
+  }
+
+const VERSION = '1.1.11'
 
 type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 

@@ -75,8 +75,8 @@ export async function createAddonStructure(options: CreateAddonStructureOptions)
     await Deno.writeTextFile(`${BUILD_PATH}/c3runtime/instance.js`, instanceFileData);
 
     ADDON_FILES[CONFIG.Type].forEach(async (file) => {
-
-        let data = await Deno.readTextFile(path.resolve(LIB_PATH, 'addon_base', CONFIG.Type, file));
+        const baseAddonDir = path.resolve(LIB_PATH, `addon_base/${CONFIG.Type}`);
+        let data = await Deno.readTextFile(`${baseAddonDir}/${file}`);
         data = data
             .replace(/const\s+ADDON_ID\s*=\s*"";/, `const ADDON_ID = ${JSON.stringify(CONFIG.AddonId)};`)
             .replace(/const\s+CONFIG\s*=\s*\{\};/, `const CONFIG = ${JSON.stringify(CONFIG)};`)
