@@ -14,4 +14,8 @@ export const ADDON_CATEGORIES_FOLDER_PATH = `${Deno.cwd()}/Addon/Categories`;
 
 export const ADDON_ICON_FOLDER_PATH = `${Deno.cwd()}/Addon`;
 
-//export const DEFAULT_ICON_PATH = path.join(__dirname, 'plugin_base', 'ico.svg');
+export const LOCAL_ADDON_BASE_PATH = `${Deno.cwd()}/_base`;
+
+export const ADDON_DEFAULT_ICON_URL = `https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/addon_base/icon.svg`
+
+export const ADDON_BASE_URL = `https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/addon_base/`

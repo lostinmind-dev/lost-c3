@@ -15,12 +15,12 @@ import { serveAddon } from "./serve-addon.ts";
 
 interface BuildOptions {
     serve: boolean;
-    LIB_PATH: string;
+    localBase: boolean;
 }
 
 export async function buildAddon(options: BuildOptions) {
     const startTime = performance.now();
-    const {serve, LIB_PATH} = options;
+    const { serve, localBase } = options;
 
     LOGGER.Clear();
     LOGGER.Process('Fetching addon files');
@@ -31,12 +31,13 @@ export async function buildAddon(options: BuildOptions) {
     LOGGER.LogBetweenLines('📃', Colors.bold('Plugin properties count:'), Colors.bold(Colors.yellow(`${PLUGIN_PROPERTIES.length}`)))
     const SCRIPTS = await getAddonScripts(CONFIG);
     const FILES = await getAddonFiles(CONFIG);
-    const ICON = await getAddonIcon({ LIB_PATH });
+    const ICON = await getAddonIcon();
     const CATEGORIES = await getCategories();
     LOGGER.Line();
     LOGGER.Process('Building addon');
+    LOGGER.Info(`${Colors.gray('Addon base:')} ${(localBase) ? 'local' : 'online'}`);
 
-    await createAddonStructure({LIB_PATH, CONFIG, PLUGIN_PROPERTIES, SCRIPTS, FILES, CATEGORIES, ICON});
+    await createAddonStructure({CONFIG, PLUGIN_PROPERTIES, SCRIPTS, FILES, CATEGORIES, ICON}, localBase);
 
     await createAddonJSON({CONFIG, ICON, SCRIPTS, FILES});
 
@@ -53,5 +54,5 @@ export async function buildAddon(options: BuildOptions) {
 
     const endTime = performance.now();
     const elapsedTime = endTime - startTime;
-    LOGGER.Timer(` Addon build time: ${Colors.bold(Colors.yellow(String(elapsedTime.toFixed(2))))} ms`);
+    LOGGER.LogBetweenLines('⏱️', ` Addon build time: ${Colors.bold(Colors.yellow(String(elapsedTime.toFixed(2))))} ms!`);
 }

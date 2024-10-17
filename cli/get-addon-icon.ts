@@ -1,21 +1,16 @@
 
-import { path } from '../deps.ts';
 import type { IconType } from "../lib/common.ts";
 import { LOGGER, WarningMessage } from "./misc.ts";
-import { ADDON_ICON_FOLDER_PATH } from "./paths.ts";
+import { ADDON_DEFAULT_ICON_URL, ADDON_ICON_FOLDER_PATH } from "./paths.ts";
 
 export interface AddonIcon {
     filename: string;
     path: string;
     type: IconType;
+    isDefault?: true;
 }
 
-interface GetAddonIconOptions {
-    LIB_PATH: string;
-}
-
-export async function getAddonIcon(options: GetAddonIconOptions): Promise<AddonIcon> {
-    const { LIB_PATH } = options;
+export async function getAddonIcon(): Promise<AddonIcon> {
     LOGGER.Searching('Looking for addon icon in png/svg format')
     for await (const entry of Deno.readDir(ADDON_ICON_FOLDER_PATH)) {
         if (entry.isFile) {
@@ -34,7 +29,8 @@ export async function getAddonIcon(options: GetAddonIconOptions): Promise<AddonI
     LOGGER.Warning(WarningMessage.ICON_NOT_DETECTED_OR_WRONG_FORMAT);
     return {
         filename: 'icon.svg',
-        path: path.resolve(LIB_PATH, 'addon_base', 'icon.svg'),
-        type: 'image/svg+xml'
+        path: ADDON_DEFAULT_ICON_URL,
+        type: 'image/svg+xml',
+        isDefault: true
     };
 }

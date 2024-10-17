@@ -1,29 +1,17 @@
 #!/usr/bin/env deno run --allow-read --allow-write --unstable
-import { getLibraryDirectory, path } from "./deps.ts"
 import { parseArgs } from "jsr:@std/cli@1.0.6";
 import { Colors } from "./deps.ts";
 import { buildAddon } from "./cli/main.ts";
 import type { AddonType } from "./lib/common.ts";
 
-//const __dirname: string = getLibraryDirectory();
-
-let __dirname: string //= path.dirname(path.fromFileUrl(import.meta.url));
-
-if (import.meta.url.startsWith('file:')) {
-    __dirname = path.fromFileUrl(import.meta.url);
-  } else {
-    // Обработка https: URL
-    __dirname = new URL(import.meta.url).pathname;
-  }
-
-const VERSION = '1.1.11'
+const VERSION = '1.1.12'
 
 type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
-        boolean: ["plugin"],
-        alias: {p: "plugin"},
+        boolean: ["plugin", "local-base"],
+        alias: {p: "plugin", l: "local-base"},
         "--": true,
       });
 
@@ -48,10 +36,20 @@ async function main() {
             }
             break;
         case 'build':
-            await buildAddon({ serve: false, LIB_PATH: __dirname });
+            if (!flags['local-base']) {
+                await buildAddon({ serve: false, localBase: false});
+            } 
+            if (flags['local-base']) {
+                await buildAddon({ serve: false, localBase: true });
+            }
             break;
         case 'serve':
-            await buildAddon({ serve: true, LIB_PATH: __dirname });
+            if (!flags['local-base']) {
+                await buildAddon({ serve: true, localBase: false});
+            } 
+            if (flags['local-base']) {
+                await buildAddon({ serve: true, localBase: true });
+            }
             break;
         case 'none':
             console.error('❌', Colors.red(Colors.bold(`Unknown command:`)), Colors.italic(command));
@@ -97,5 +95,6 @@ function printHelp() {
     console.log('   ⚙️', Colors.gray('  --plugin, -p'), '   Creates a bare-bones for "plugin" addon type.');
 
     console.log(`  ${Colors.yellow('build')}`);
+    console.log('   ⚙️', Colors.gray('  --local-base, -c'), '   Builds addon with local addon base.');
     console.log(`  ${Colors.yellow('serve')}`);
 }

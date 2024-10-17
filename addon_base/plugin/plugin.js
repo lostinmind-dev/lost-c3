@@ -10,6 +10,9 @@ const SCRIPTS = [];
 
 const FILES = [];
 
+const ICON_NAME = "";
+const ICON_TYPE = "";
+
 const SDK = globalThis.SDK;
 
 const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPluginBase {

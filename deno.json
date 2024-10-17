@@ -1,6 +1,6 @@
 {
     "name": "@lost-c3/lib",
-    "version": "1.1.11",
+    "version": "1.1.12",
     "exports": {
         ".": "./mod.ts",
         "./cli": "./cli.ts"
@@ -32,6 +32,7 @@
             "cover.png"
         ],
         "exclude": [
+            "addon_base",
             ".github",
             "addon_base",
             "./cli/src/",
