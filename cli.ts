@@ -1,10 +1,15 @@
 #!/usr/bin/env deno run --allow-read --allow-write --unstable
+import { getLibraryDirectory } from "./deps.ts"
 import { parseArgs } from "jsr:@std/cli@1.0.6";
 import { Colors } from "./deps.ts";
 import { buildAddon } from "./cli/main.ts";
 import type { AddonType } from "./lib/common.ts";
 
-const LOST_VERSION = '1.0.82';
+const __dirname: string = getLibraryDirectory();
+
+const denoJSON = await import(`file://${__dirname}/deno.json`, {
+    with: { type: "json" },
+});
 
 type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 
@@ -22,7 +27,7 @@ async function main() {
             printHelp();
             break;
         case 'version':
-            console.log('✅', Colors.bold(`Lost ➜  ${Colors.yellow(LOST_VERSION)} by ${Colors.italic(Colors.magenta('lostinmind.'))}`))
+            console.log('✅', Colors.bold(`Lost ➜  ${Colors.yellow(denoJSON.default.version)} by ${Colors.italic(Colors.magenta('lostinmind.'))}`))
             break;
         case 'create':
             if (!flags.plugin) {
@@ -36,10 +41,10 @@ async function main() {
             }
             break;
         case 'build':
-            await buildAddon({ serve: false });
+            await buildAddon({ serve: false, LIB_PATH: __dirname });
             break;
         case 'serve':
-            await buildAddon({ serve: true });
+            await buildAddon({ serve: true, LIB_PATH: __dirname });
             break;
         case 'none':
             console.error('❌', Colors.red(Colors.bold(`Unknown command:`)), Colors.italic(command));

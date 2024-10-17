@@ -6,33 +6,35 @@ import type { AddonJSON } from "../lib/json.ts";
 
 import { BUILD_PATH } from "./paths.ts";
 
+interface CreateAddonJSONOptions {
+    CONFIG: LostConfig<'plugin' | 'behavior'>;
+    ICON: AddonIcon;
+    SCRIPTS: AddonScript[];
+    FILES: AddonFile[];
+}
 
-export async function createAddonJSON(
-    config: LostConfig<'plugin' | 'behavior'>,
-    icon: AddonIcon,
-    scripts: AddonScript[],
-    files: AddonFile[]
-) {
+export async function createAddonJSON(options: CreateAddonJSONOptions) {
+    const { CONFIG, ICON, SCRIPTS, FILES } = options;
     const AddonJSON: AddonJSON = {
-        "supports-worker-mode": (config.SupportsWorkerMode) ? config.SupportsWorkerMode : undefined,
-        "min-construct-version": (config.MinConstructVersion) ? config.MinConstructVersion : undefined,
+        "supports-worker-mode": (CONFIG.SupportsWorkerMode) ? CONFIG.SupportsWorkerMode : undefined,
+        "min-construct-version": (CONFIG.MinConstructVersion) ? CONFIG.MinConstructVersion : undefined,
         "is-c3-addon": true,
         "sdk-version": 2,
-        "type": config.Type,
-        "name": config.AddonName,
-        "id": config.AddonId,
-        "version": config.Version,
-        "author": config.Author,
-        "website": config.WebsiteURL,
-        "documentation": config.DocsURL,
-        "description": config.AddonDescription,
+        "type": CONFIG.Type,
+        "name": CONFIG.AddonName,
+        "id": CONFIG.AddonId,
+        "version": CONFIG.Version,
+        "author": CONFIG.Author,
+        "website": CONFIG.WebsiteURL,
+        "documentation": CONFIG.DocsURL,
+        "description": CONFIG.AddonDescription,
         "editor-scripts": [
-            `${(config.Type === 'plugin') ? 'plugin.js' : 'behavior.js'}`,
+            `${(CONFIG.Type === 'plugin') ? 'plugin.js' : 'behavior.js'}`,
             "type.js",
             "instance.js"
         ],
         "file-list": [
-            `${(config.Type === 'plugin') ? 'c3runtime/plugin.js' : 'c3runtime/behavior.js'}`,
+            `${(CONFIG.Type === 'plugin') ? 'c3runtime/plugin.js' : 'c3runtime/behavior.js'}`,
             "c3runtime/type.js",
             "c3runtime/instance.js",
             "c3runtime/conditions.js",
@@ -41,15 +43,15 @@ export async function createAddonJSON(
             "lang/en-US.json",
             "aces.json",
             "addon.json",
-            `${(config.Type === 'plugin') ? 'plugin.js' : 'behavior.js'}`,
+            `${(CONFIG.Type === 'plugin') ? 'plugin.js' : 'behavior.js'}`,
             "instance.js",
             "type.js",
-            `${icon.filename}`
+            `${ICON.filename}`
         ]
     };
 
-    scripts.forEach(script => AddonJSON['file-list'].push(`scripts/${script.filename}`));
-    files.forEach(file => AddonJSON['file-list'].push(`files/${file.filename}`));
+    SCRIPTS.forEach(script => AddonJSON['file-list'].push(`scripts/${script.filename}`));
+    FILES.forEach(file => AddonJSON['file-list'].push(`files/${file.filename}`));
 
     await Deno.writeTextFile(`${BUILD_PATH}/addon.json`, JSON.stringify(AddonJSON, null, 4));
 }

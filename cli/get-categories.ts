@@ -1,23 +1,23 @@
 // deno-lint-ignore-file no-case-declarations
 import { Colors } from "../deps.ts";
-import type { LostCategoryBase, LostAction, LostCondition, LostExpression } from "../lib/entities.ts";
+import type { LostCategoryDefault, LostAction, LostCondition, LostExpression } from "../lib/entities.ts";
 import { ErrorMessage, getModule, LOGGER, WarningMessage } from "./misc.ts";
 import { findDuplicatesInArray } from "./misc/find-duplicates.ts";
 import { ADDON_CATEGORIES_FOLDER_PATH } from "./paths.ts";
 
 interface CategoryModule {
-    LostCategory: LostCategoryBase;
+    default: typeof LostCategoryDefault;
 }
 
 async function getCategory(path: string) {
     const module = await getModule<CategoryModule>(path);
-    return (module.LostCategory) ? module.LostCategory : null;    
+    return (new module.default()) ? new module.default() : null;    
 }
 
 export async function getCategories() {
     LOGGER.Searching('Searching for categories');
 
-    const categories: LostCategoryBase[] = [];
+    const categories: LostCategoryDefault[] = [];
     
     const readCategoriesDirectory = async (path: string) => {
         for await (const entry of Deno.readDir(path)) {
@@ -100,7 +100,7 @@ export async function getCategories() {
     return categories;
 }
 
-function validateCategoryEntities(category: LostCategoryBase) {
+function validateCategoryEntities(category: LostCategoryDefault) {
     const actions = category.Actions.map(e => e.Id);
     const conditions = category.Conditions.map(e => e.Id);
     const expressions = category.Expressions.map(e => e.Id);
@@ -123,7 +123,7 @@ function validateCategoryEntities(category: LostCategoryBase) {
     return true;
 }
 
-function validateEntity(category: LostCategoryBase, entity: LostAction | LostCondition | LostExpression) {
+function validateEntity(category: LostCategoryDefault, entity: LostAction | LostCondition | LostExpression) {
     switch (entity.Type) {
         case 'Action':
             if (entity.Id === '') {

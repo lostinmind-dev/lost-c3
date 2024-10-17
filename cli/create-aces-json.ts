@@ -3,10 +3,15 @@ import type { AcesJSON, AceAction, AceCondition, AceExpression, AceParam } from 
 
 import { BUILD_PATH } from "./paths.ts";
 
-export async function createAcesJSON(categories: LostCategoryBase[]) {
+interface CreateAcesJSONOptions {
+    CATEGORIES: LostCategoryBase[];
+}
+
+export async function createAcesJSON(options: CreateAcesJSONOptions) {
+    const { CATEGORIES } = options
     const AcesJSON = {} as AcesJSON;
 
-    categories.forEach(category => {
+    CATEGORIES.forEach(category => {
         AcesJSON[category.Id] = {
             'actions': [],
             'conditions': [],

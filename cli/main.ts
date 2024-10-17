@@ -15,9 +15,13 @@ import { serveAddon } from "./serve-addon.ts";
 
 interface BuildOptions {
     serve: boolean;
+    LIB_PATH: string;
 }
 
 export async function buildAddon(options: BuildOptions) {
+    const startTime = performance.now();
+    const {serve, LIB_PATH} = options;
+
     LOGGER.Clear();
     LOGGER.Process('Fetching addon files');
 
@@ -27,23 +31,27 @@ export async function buildAddon(options: BuildOptions) {
     LOGGER.LogBetweenLines('📃', Colors.bold('Plugin properties count:'), Colors.bold(Colors.yellow(`${PLUGIN_PROPERTIES.length}`)))
     const SCRIPTS = await getAddonScripts(CONFIG);
     const FILES = await getAddonFiles(CONFIG);
-    const ICON = await getAddonIcon();
+    const ICON = await getAddonIcon({ LIB_PATH });
     const CATEGORIES = await getCategories();
     LOGGER.Line();
     LOGGER.Process('Building addon');
 
-    await createAddonStructure(CONFIG, PLUGIN_PROPERTIES, SCRIPTS, FILES, CATEGORIES, ICON);
+    await createAddonStructure({LIB_PATH, CONFIG, PLUGIN_PROPERTIES, SCRIPTS, FILES, CATEGORIES, ICON});
 
-    await createAddonJSON(CONFIG, ICON, SCRIPTS, FILES);
+    await createAddonJSON({CONFIG, ICON, SCRIPTS, FILES});
 
-    await createAcesJSON(CATEGORIES);
+    await createAcesJSON({CATEGORIES});
 
-    await createLanguageJSON(CONFIG, PLUGIN_PROPERTIES, CATEGORIES);
+    await createLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES});
     
     LOGGER.Success(Colors.bold(`Addon [${Colors.yellow(CONFIG.AddonId)}] has been ${Colors.green('successfully')} built`));
-    if (options.serve) {
+    if (serve) {
         await serveAddon(65432);
     } else {
         await zipAddon(CONFIG);
     }
+
+    const endTime = performance.now();
+    const elapsedTime = endTime - startTime;
+    LOGGER.Timer(` Addon build time: ${Colors.bold(Colors.yellow(String(elapsedTime.toFixed(2))))} ms`);
 }

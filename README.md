@@ -49,7 +49,7 @@ Here I've compiled some of the benefits from standard addon creation for
 
 - **Install [Deno (JavaScript runtime)](https://docs.deno.com/runtime/)**
 - **Install [Lost CLI](https://jsr.io/@lost-c3/lib) by using
-  `deno install --name lost jsr:@lost-c3/lib@latest/cli --global -f -A`**
+  `deno install --name lost jsr:@lost-c3/lib/cli --global -f -A`**
 - **Create empty folder which will be used as main folder for your addon.**
 - **Create a bare-bones for _**"plugin"**_ addon type by using
   `lost create --plugin` OR `lost create -p`**
@@ -59,6 +59,9 @@ deno install --name lost jsr:@lost-c3/lib/cli --global -f -A
 lost create --plugin
 lost build
 ```
+
+>[!IMPORTANT] Check and install the latest version of Lost CLI!
+> deno install --name lost jsr:@lost-c3/lib@LAST_VERSION/cli --global -f -A
 
 # 📝 Documentation
 
@@ -73,7 +76,7 @@ lost build
 │       ├── ts-defs/            # Construct 3 declaration files
 │       └── global.d.ts         # Declaration file for your purposes
 │   ├── Instance.ts             # Addon Instance class
-│   ├── ico.svg                 # Your .svg OR .png addon icon
+│   ├── icon.svg                 # Your .svg OR .png addon icon
 │   └── PluginProperties.ts     # Plugin properties file
 ├── Builds/                     # Builds folder
 │   ├── Source/                 # Final Construct 3 addon folder
@@ -88,9 +91,9 @@ lost build
 Let's setup _`lost.config.ts`_ config file at first.
 
 ```typescript
-import type { LostConfig } from "jsr:@lost-c3/lib@0.1.6";
+import type { LostConfig } from "jsr:@lost-c3/lib";
 
-export const Config: LostConfig<'plugin'> = {
+const Config: LostConfig<'plugin'> = {
     /**
      * Set addon type
      */
@@ -143,6 +146,8 @@ export const Config: LostConfig<'plugin'> = {
      */
     Files?: []
 }
+
+export default Config;
 ```
 
 ## 📚 Using custom Libraries OR Scripts OR Files
@@ -170,9 +175,7 @@ Example
 ```typescript
 import type { LostConfig } from 'jsr:@lost-c3/lib';
 
-export const Config: LostConfig<
-    'plugin'
-> = {
+const Config: LostConfig<'plugin'> = {
     Scripts: [
         {
             FileName: 'library.js',
@@ -180,6 +183,8 @@ export const Config: LostConfig<
         },
     ],
 };
+
+export default Config;
 ```
 
 In that case we added new object in _`Scripts`_ property. That object has some
@@ -290,14 +295,8 @@ const PluginProperties: PluginProperty[] = [
             Id: 'comboProperty',
             Name: 'Combo',
             Items: [
-                [
-                    'item1',
-                    'Item 1',
-                ],
-                [
-                    'item2',
-                    'Item 2',
-                ],
+                ['item1','Item 1'],
+                ['item2', 'Item 2'],
             ],
         },
     ),
@@ -332,7 +331,7 @@ const PluginProperties: PluginProperty[] = [
     ),
 ];
 
-export { PluginProperties };
+export default PluginProperties;
 ```
 
 ## 📁 Creating category
@@ -343,11 +342,11 @@ project **`!cc`** to create default Category structure or copy-paste below
 script.
 
 ```typescript
-import { Category, Action, Condition, Expression, Param } from "jsr:@lost-c3/lib@0.1.6";
+import { Category, Action, Condition, Expression, Param } from "jsr:@lost-c3/lib";
 import type { Instance } from "../Instance.ts";
 
 @Category({Id: 'myCategory', Name: 'Category Name', Deprecated?: false, InDevelopment?: false})
-class MyCategory {
+export default class MyCategory {
     /**
      * Actions
      */
@@ -360,11 +359,11 @@ class MyCategory {
      * Expressions
      */
 }
-export const LostCategory = new MyCategory();
 ```
 
-> [!CAUTION]
-> DO NOT CHANGE **`LostCategory`** VARIABLE NAME!'
+>[!INFO] *Deprecated* property in @Category decorator deprecates all category Actions, Conditions, Expressions.
+
+>[!WARNING] *InDevelopment* property in @Category decorator removes all category Actions, Conditions, Expressions from addon.
 
 ### ⚡️ Create action
 
@@ -380,8 +379,8 @@ import type { Instance } from '../Instance.ts';
 /**
  * Setup your category settings here
  */
-@Category({Id: 'categoryId', Name: 'Category Name', Deprecated: false, InDevelopment: false})
-class MyCategory {
+@Category({Id: 'categoryId', Name: 'Category Name'})
+export default class MyCategory {
     @Action({
         /**
          * A string specifying a unique ID for the ACE.
@@ -422,7 +421,6 @@ class MyCategory {
         console.log('Do something');
     };    
 }
-export const LostCategory = new MyCategory();
 ```
 
 > [!WARNING]
@@ -445,8 +443,8 @@ Example
 import { Category, Action, Condition, Expression } from 'jsr:@lost-c3/lib';
 import type { Instance } from '../Instance.ts';
 
-@Category({Id: 'categoryId', Name: 'Category Name', Deprecated: false, InDevelopment: false})
-class MyCategory {
+@Category({Id: 'categoryId', Name: 'Category Name'})
+export default class MyCategory {
     @Condition({
         Id: `onEvent`,
         Name: `On event`,
@@ -482,7 +480,6 @@ class MyCategory {
     })
     onEvent(this: Instance) { return true };
 }
-export const LostCategory = new MyCategory();
 ```
 
 > [!WARNING]
@@ -505,8 +502,8 @@ Example
 import { Category, Action, Condition, Expression } from 'jsr:@lost-c3/lib';
 import type { Instance } from '../Instance.ts';
 
-@Category({Id: 'categoryId', Name: 'Category Name', Deprecated: false, InDevelopment: false})
-class MyCategory {
+@Category({Id: 'categoryId', Name: 'Category Name'})
+export default class MyCategory {
     @Expression({
         Id: `getValue`,
         Name: `getValue`,
@@ -525,7 +522,6 @@ class MyCategory {
     })
     getValue(this: Instance) { return 'value' };
 }
-export const LostCategory = new MyCategory();
 ```
 
 > [!TIP]
@@ -565,8 +561,8 @@ Example
 import { Category, Action, Condition, Expression, Param, Bold } from 'jsr:@lost-c3/lib';
 import type { Instance } from '../Instance.ts';
 
-@Category({Id: 'categoryId', Name: 'Category Name', Deprecated: false, InDevelopment: false})
-class MyCategory {
+@Category({Id: 'categoryId', Name: 'Category Name'})
+export default class MyCategory {
     @Action({
         Id: `doActionWithParams`,
         Name: `Do action`,
@@ -593,7 +589,6 @@ class MyCategory {
         console.log('Do action with value', value);
     };
 }
-export const LostCategory = new MyCategory();
 ```
 
 ### 💢 Deprecating _Actions_, _Conditions_, _Expressions_
@@ -612,39 +607,22 @@ it to _`true`_ to deprecate.
 Example
 
 ```typescript
-import {
-    Action,
-    Bold,
-    Category,
-    Condition,
-    Expression,
-    Param,
-} from 'jsr:@lost-c3/lib';
+import { Action, Bold, Category, Condition, Expression, Param } from 'jsr:@lost-c3/lib';
 import type { Instance } from '../Instance.ts';
 
-@Category(
-    {
-        Id: 'categoryId',
-        Name: 'Category Name',
-        Deprecated: false,
-        InDevelopment: false,
-    },
-)
-class MyCategory {
-    @Action(
-        {
-            Id: `doAction`,
-            Name: `Do action`,
-            DisplayText: `Do action`,
-            /**
-             * Default is False. Set to true to deprecate the ACE.
-             */
-            Deprecated: true,
-        },
-    )
-    doActionWithParams() {}
+@Category({Id: 'categoryId', Name: 'Category Name'})
+export default class MyCategory {
+    @Action({
+        Id: `doAction`,
+        Name: `Do action`,
+        DisplayText: `Do action`,
+        /**
+         * Default is False. Set to true to deprecate the ACE.
+         */
+        Deprecated: true,
+    })
+    doActionWithParams() { /* do something */ }
 }
-export const LostCategory = new MyCategory();
 ```
 
 ## 🌳 Using Instance
@@ -658,30 +636,22 @@ Example of using Instance properties and functions inside any category entity
 _Instance.ts_
 
 ```typescript
-import { Config } from '@config';
+import Config from '@config';
 
-const C3 = globalThis
-    .C3;
+const C3 = globalThis.C3;
 
-class LostInstance extends globalThis
-    .ISDKInstanceBase {
+class LostInstance extends globalThis.ISDKInstanceBase {
     readonly value: string = 'My property value';
     /**
      * Use this property to call any condition in your addon
      */
-    readonly PluginConditions = C3.Plugins[
-        Config
-            .AddonId
-    ].Cnds;
+    readonly PluginConditions = C3.Plugins[Config.AddonId].Cnds;
 
     constructor() {
         super();
-        const properties = this
-            ._getInitProperties();
+        const properties = this._getInitProperties();
 
-        if (
-            properties
-        ) {
+        if (properties) {
             /**
              * Here you can find your plugin properties
              */
@@ -697,60 +667,38 @@ class LostInstance extends globalThis
      * Here is our instance method
      */
     _getPropertyValue() {
-        return this
-            .value;
+        return this.value;
     }
 }
 
-C3.Plugins[
-    Config
-        .AddonId
-].Instance = LostInstance;
+C3.Plugins[Config.AddonId].Instance = LostInstance;
 export type { LostInstance as Instance };
 ```
 
 _MyCategory.ts_
 
 ```typescript
-import {
-    Action,
-    Category,
-    Condition,
-    Expression,
-    Param,
-} from 'jsr:@lost-c3/lib';
+import { Action, Category, Condition, Expression, Param } from 'jsr:@lost-c3/lib';
 /**
  * Import your instance type
  */
 import type { Instance } from '../Instance.ts';
 
-@Category(
-    {
-        Id: 'categoryId',
-        Name: 'Category Name',
-        Deprecated: false,
-        InDevelopment: false,
-    },
+@Category({Id: 'categoryId', Name: 'Category Name'},
 )
-class MyCategory {
-    @Expression(
-        {
-            Id: `GetValue`,
-            Name: `GetValue`,
-            ReturnType: 'string',
-        },
-    )
+export default class MyCategory {
+    @Expression({
+        Id: `GetValue`,
+        Name: `GetValue`,
+        ReturnType: 'string'
+    })
     /**
      * Set the first argument of your method to: this: Instance
      */
-    GetValue(
-        this: Instance,
-    ) {
-        return this
-            ._getPropertyValue();
+    GetValue(this: Instance) {
+        return this._getPropertyValue();
     }
 }
-export const LostCategory = new MyCategory();
 ```
 
 ## 🏗️ Building addon
@@ -759,7 +707,6 @@ To build addon into **`.c3addon`** file you can use one of the following
 commands:
 
 - `lost build`
-- `deno task build`
 
 **`addon.c3addon`** file will be available at path: `./Builds/addon.c3addon`
 
@@ -768,7 +715,6 @@ commands:
 To test your addon you can use one of the following commands:
 
 - `lost serve`
-- `deno task serve`
 
 > [!IMPORTANT]
 > Read more info about Developer Mode in Construct 3:
@@ -783,42 +729,32 @@ customize displaying text in your addon.**
 List of available **Lost BBCode** functions:
 
 ```typescript
-Bold(
-    'Any text',
-);
+Bold('Any text');
 ```
 
 Returns: **Any text**
 
 ```typescript
-Italic(
-    'Any text',
-);
+Italic('Any text');
 ```
 
 Returns: _**Any text**_
 
 ```typescript
-Strikethrough(
-    'Any text',
-);
+Strikethrough('Any text');
 ```
 
 Returns: ~~Any text~~
 
 ```typescript
-Underline(
-    'Any text',
-);
+Underline('Any text');
 ```
 
 Returns:
 <u>Any text</u>
 
 ```typescript
-Code(
-    'Any text',
-);
+Code('Any text');
 ```
 
 Returns:
@@ -827,59 +763,20 @@ Returns:
 Example
 
 ```typescript
-import {
-    Action,
-    Bold,
-    Category,
-    Code,
-    Italic,
-    Strikethrough,
-    Underline,
-} from 'jsr:@lost-c3/lib';
+import { Action, Bold, Category, Code, Italic, Strikethrough, Underline } from 'jsr:@lost-c3/lib';
 import type { Instance } from '../Instance.ts';
 
-@Category(
-    {
-        Id: 'categoryId',
-        Name: 'Category Name',
-        Deprecated: false,
-        InDevelopment: false,
-    },
-)
-class MyCategory {
-    @Action(
-        {
-            Id: `doAction`,
-            Name: `${
-                Bold(
-                    'Action name',
-                )
-            }`,
-            DisplayText: `${
-                Italic(
-                    'Do something',
-                )
-            } and ${
-                Strikethrough(
-                    'NOT',
-                )
-            }`,
-            Description: `${
-                Underline(
-                    'Underlined description...',
-                )
-            } with ${
-                Code(
-                    'SOMETHING',
-                )
-            }`,
-        },
+@Category({Id: 'categoryId', Name: 'Category Name'})
+export default class MyCategory {
+    @Action({
+        Id: `doAction`,
+        Name: `${Bold('Action name')}`,
+        DisplayText: `${Italic('Do something')} and ${Strikethrough('NOT')}`,
+        Description: `${Underline('Underlined description...')} with ${Code('SOMETHING')}`,
+        }
     )
-    doAction(
-        this: Instance,
-    ) {}
+    doAction(this: Instance,) { /* do something */}
 }
-export const LostCategory = new MyCategory();
 ```
 
 # 🪪 License

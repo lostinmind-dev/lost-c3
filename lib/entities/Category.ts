@@ -32,8 +32,7 @@ export interface CategoryTarget {
     }
 }
 
-
-export abstract class LostCategoryBase {
+class LostCategoryBase {
     readonly Id: string;
     readonly Name: string;
 
@@ -51,6 +50,12 @@ export abstract class LostCategoryBase {
 
         this.Deprecated = Deprecated || false;
         this.InDevelopment = InDevelopment || false;
+    }
+}
+
+export class LostCategoryDefault extends LostCategoryBase {
+    constructor() {
+        super({Id: '', Name: ''});
     }
 }
 

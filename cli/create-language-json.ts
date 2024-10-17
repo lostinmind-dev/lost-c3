@@ -1,23 +1,26 @@
-import type { LostCategoryBase } from "../lib/entities.ts";
+import type { LostCategoryDefault } from "../lib/entities.ts";
 import type { LanguageJSON, LanguageAction, LanguageCondition, LanguageExpression, LanguagePluginProperty, LanguageParam } from "../lib/json.ts";
 import type { LostConfig } from "../lib/common.ts";
 import type { PluginProperty } from "../lib/plugin-props.ts";
 import { BUILD_PATH } from "./paths.ts";
 
-export async function createLanguageJSON(
-    config: LostConfig<'plugin' | 'behavior'>,
-    pluginProperties: PluginProperty[],
-    categories: LostCategoryBase[]
-) {
+interface CreateLanguageJSONOptions {
+    CONFIG: LostConfig<'plugin' | 'behavior'>;
+    PLUGIN_PROPERTIES: PluginProperty[];
+    CATEGORIES: LostCategoryDefault[];
+}
+
+export async function createLanguageJSON(options: CreateLanguageJSONOptions) {
+    const { CONFIG, PLUGIN_PROPERTIES, CATEGORIES } = options
     const LanguageJSON = {
         "languageTag": "en-US",
-        "fileDescription": `Strings for ${config.AddonName} addon.`,
+        "fileDescription": `Strings for ${CONFIG.AddonName} addon.`,
         "text": {
-            [config.Type + 's']: {
-                [config.AddonId.toLowerCase()]: {
-                    "name": config.ObjectName,
-                    "description": config.AddonDescription,
-                    "help-url": config.DocsURL,
+            [CONFIG.Type + 's']: {
+                [CONFIG.AddonId.toLowerCase()]: {
+                    "name": CONFIG.ObjectName,
+                    "description": CONFIG.AddonDescription,
+                    "help-url": CONFIG.DocsURL,
                     "properties": {},
                     "aceCategories": {},
                     "conditions": {},
@@ -28,9 +31,9 @@ export async function createLanguageJSON(
         }
     } as LanguageJSON;
 
-    const DeepJSON = LanguageJSON['text'][config.Type + 's'][config.AddonId.toLowerCase()];
+    const DeepJSON = LanguageJSON['text'][CONFIG.Type + 's'][CONFIG.AddonId.toLowerCase()];
 
-    pluginProperties.forEach(pp => {
+    PLUGIN_PROPERTIES.forEach(pp => {
         const {Type, Id, Name, Description} = pp.Options;
         const LangPP = {} as LanguagePluginProperty;
         LangPP['name'] = Name;
@@ -44,7 +47,7 @@ export async function createLanguageJSON(
         DeepJSON['properties'][Id] = LangPP;
     })
 
-    categories.forEach(category => {
+    CATEGORIES.forEach(category => {
         DeepJSON['aceCategories'][category.Id] = category.Name;
 
         

@@ -22,6 +22,13 @@ class Logger {
         console.clear();
     };
 
+    /**
+     * ⏱️
+     */
+    Timer(...data: any[]) {
+        console.log('⏱️', ...data);
+    }
+
     Log(...data: any[]) {
         console.log(...data);
     };
