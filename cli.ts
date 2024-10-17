@@ -4,7 +4,7 @@ import { Colors } from "./deps.ts";
 import { buildAddon } from "./cli/main.ts";
 import type { AddonType } from "./lib/common.ts";
 
-const VERSION = '1.1.12'
+const VERSION = '1.1.13'
 
 type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 
@@ -80,7 +80,7 @@ async function cloneRepo(url: string, addonType: AddonType) {
     if (code === 0) {
         console.log('✅', Colors.bold(`${Colors.green('Successfully')} created bare-bones for ${Colors.magenta(`"${addonType}"`)} addon type!`));
     } else {
-        console.error('❌', Colors.red(Colors.bold(`Error occured while creating bare-bones.`)));
+        console.error('❌', Colors.red(Colors.bold(`Error occured while creating bare-bones.`)), `Error code: ${code}`);
     }
 }
 

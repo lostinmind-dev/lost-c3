@@ -3,7 +3,7 @@ import type { PluginProperty } from "../lib/plugin-props.ts";
 import type { LostCategoryDefault } from "../lib/entities.ts";
 import type { AddonScript } from "./get-addon-scripts.ts";
 import type { AddonFile } from "./get-addon-files.ts";
-import { ADDON_BASE_URL, BUILD_PATH, LOCAL_ADDON_BASE_PATH } from "./paths.ts";
+import { ADDON_BASE_URL, ADDON_ICON_FOLDER_PATH, BUILD_PATH, LOCAL_ADDON_BASE_PATH } from "./paths.ts";
 import type { AddonIcon } from "./get-addon-icon.ts";
 import { Project } from "./cli-deps.ts";
 import { path } from '../deps.ts';
@@ -106,6 +106,8 @@ export async function createAddonStructure(options: CreateAddonStructureOptions,
                     .replace(/const\s+REMOTE_SCRIPTS\s*=\s*\[\];/, `const REMOTE_SCRIPTS = ${JSON.stringify(CONFIG.RemoteScripts || [])};`)
                     .replace(/const\s+SCRIPTS\s*=\s*\[\];/, `const SCRIPTS = ${JSON.stringify(SCRIPTS)};`)
                     .replace(/const\s+FILES\s*=\s*\[\];/, `const FILES = ${JSON.stringify(FILES)};`)
+                    .replace(/const\s+ICON_NAME\s*=\s*"";/, `const ICON_NAME = ${JSON.stringify(ICON.filename)};`)
+                    .replace(/const\s+ICON_TYPE\s*=\s*"";/, `const ICON_TYPE = ${JSON.stringify(ICON.type)};`)
     
                 await Deno.writeTextFile(path.resolve(BUILD_PATH, fileOrPath), fileContent);
     
@@ -116,10 +118,9 @@ export async function createAddonStructure(options: CreateAddonStructureOptions,
         }
     } else {
         if (!ICON.isDefault) {
-            await Deno.copyFile(`${LOCAL_ADDON_BASE_PATH}/${ICON.filename}`, `${BUILD_PATH}/${ICON.filename}`);
+            await Deno.copyFile(`${ADDON_ICON_FOLDER_PATH}/${ICON.filename}`, `${BUILD_PATH}/${ICON.filename}`);
         } else {
-            const iconContent = await Deno.readTextFile(`${LOCAL_ADDON_BASE_PATH}/${ICON.filename}`);
-            await Deno.writeTextFile(`${BUILD_PATH}/${ICON.filename}`, iconContent);
+            await Deno.copyFile(`${LOCAL_ADDON_BASE_PATH}/${ICON.filename}`, `${BUILD_PATH}/${ICON.filename}`);
         }
 
         for await (const fileOrPath of ADDON_FILES[CONFIG.Type]) {
