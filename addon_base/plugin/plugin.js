@@ -34,10 +34,18 @@ const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPlugi
             this._info.AddRemoteScriptDependency(url);
         })
         SCRIPTS.forEach(script => {
-            this._info.AddFileDependency({ filename: `scripts/${script.filename}`, type: script.dependencyType });
+            if (script.scriptType) {
+                this._info.AddFileDependency({ filename: `scripts/${script.filename}`, type: script.dependencyType, scriptType: script.scriptType });
+            } else {
+                this._info.AddFileDependency({ filename: `scripts/${script.filename}`, type: script.dependencyType });
+            }
         });
         FILES.forEach(file => {
-            this._info.AddFileDependency({ filename: `files/${file.filename}`, type: file.dependencyType });
+            if (file.fileType) {
+                this._info.AddFileDependency({ filename: `files/${file.filename}`, type: file.dependencyType, fileType: file.fileType });
+            } else {
+                this._info.AddFileDependency({ filename: `files/${file.filename}`, type: file.dependencyType });
+            }
         });
         const pps = [];
         PLUGIN_PROPERTIES.forEach(pp => {
