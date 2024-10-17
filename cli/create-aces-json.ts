@@ -1,10 +1,10 @@
-import type { LostCategoryBase } from "../lib/entities.ts";
+import type { LostCategoryDefault } from "../lib/entities.ts";
 import type { AcesJSON, AceAction, AceCondition, AceExpression, AceParam } from "../lib/json.ts";
 
 import { BUILD_PATH } from "./paths.ts";
 
 interface CreateAcesJSONOptions {
-    CATEGORIES: LostCategoryBase[];
+    CATEGORIES: LostCategoryDefault[];
 }
 
 export async function createAcesJSON(options: CreateAcesJSONOptions) {
