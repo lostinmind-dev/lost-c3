@@ -1,9 +1,10 @@
 import type { LostConfig, FileDependencyType } from "../lib/common.ts";
-import { LOGGER } from "./misc.ts";
+import { getMIMEFileType, LOGGER } from "./misc.ts";
 import { ADDON_FILES_FOLDER_PATH } from "./paths.ts";
 
 export interface AddonFile {
     filename: string;
+    fileType?: string;
     path: string;
     dependencyType: FileDependencyType;
 }
@@ -25,10 +26,12 @@ export async function getAddonFiles(config: LostConfig<'plugin' | 'behavior'>) {
                 } else {
                     LOGGER.Info(`Founded file: ${entry.name}`, `Loading with default type: ${(entry.name.endsWith('.css')) ? 'external-css' : 'copy-to-output'}`);
                 }
+                const dependencyType = (fileInConfig) ? fileInConfig.Type : (entry.name.endsWith('.css')) ? 'external-css' : 'copy-to-output';
                 files.push({
                     filename: entry.name,
+                    fileType: (dependencyType === 'copy-to-output') ? getMIMEFileType(entry.name) : undefined,
                     path: `${path}/${entry.name}`,
-                    dependencyType: (fileInConfig) ? fileInConfig.Type : (entry.name.endsWith('.css')) ? 'external-css' : 'copy-to-output'
+                    dependencyType: dependencyType
                 })
             }
         }

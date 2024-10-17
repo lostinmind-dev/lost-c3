@@ -4,6 +4,7 @@ import { ADDON_SCRIPTS_FOLDER_PATH } from "./paths.ts";
 
 export interface AddonScript {
     filename: string;
+    scriptType?: 'module';
     path: string;
     dependencyType: ScriptDependencyType;
 }
@@ -27,6 +28,7 @@ export async function getAddonScripts(config: LostConfig<'plugin' | 'behavior'>)
                 }
                 scripts.push({
                     filename: entry.name,
+                    scriptType: (scriptInConfig && scriptInConfig.Type === 'external-dom-script' && scriptInConfig.ScriptType) ? scriptInConfig.ScriptType : undefined,
                     path: `${path}/${entry.name}`,
                     dependencyType: (scriptInConfig) ? scriptInConfig.Type : 'external-dom-script'
                 })
