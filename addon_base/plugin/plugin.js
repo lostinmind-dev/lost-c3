@@ -33,26 +33,11 @@ const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPlugi
         REMOTE_SCRIPTS.forEach(url => {
             this._info.AddRemoteScriptDependency(url);
         })
-        SCRIPTS.forEach(scriptName => {
-            if (CONFIG.Scripts) {
-                const ScriptSettings = CONFIG.Scripts.find(script => script.FileName === scriptName);
-                if (ScriptSettings)
-                    this._info.AddFileDependency({ filename: `scripts/${scriptName}`, type: ScriptSettings.Type });
-            }
-            else {
-                this._info.AddFileDependency({ filename: `scripts/${scriptName}`, type: 'external-dom-script' });
-            }
+        SCRIPTS.forEach(script => {
+            this._info.AddFileDependency({ filename: `scripts/${script.filename}`, type: script.dependencyType });
         });
-        FILES.forEach(fileName => {
-            if (CONFIG.Files) {
-                const FileSettings = CONFIG.Files.find(file => file.FileName === fileName);
-                if (FileSettings)
-                    this._info.AddFileDependency({ filename: `files/${fileName}`, type: FileSettings.Type });
-            }
-            else {
-                const FileType = (fileName.endsWith('.css')) ? 'external-css' : 'copy-to-output';
-                this._info.AddFileDependency({ filename: `files/${fileName}`, type: FileType });
-            }
+        FILES.forEach(file => {
+            this._info.AddFileDependency({ filename: `files/${file.filename}`, type: file.dependencyType });
         });
         const pps = [];
         PLUGIN_PROPERTIES.forEach(pp => {
