@@ -7,9 +7,7 @@ import type { AddonType } from "./lib/common.ts";
 
 const __dirname: string = getLibraryDirectory();
 
-const denoJSON = await import(`file://${__dirname}/deno.json`, {
-    with: { type: "json" },
-});
+const VERSION = '1.1.1'
 
 type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 
@@ -27,7 +25,7 @@ async function main() {
             printHelp();
             break;
         case 'version':
-            console.log('✅', Colors.bold(`Lost ➜  ${Colors.yellow(denoJSON.default.version)} by ${Colors.italic(Colors.magenta('lostinmind.'))}`))
+            console.log('✅', Colors.bold(`Lost ➜  ${Colors.yellow(VERSION)} by ${Colors.italic(Colors.magenta('lostinmind.'))}`))
             break;
         case 'create':
             if (!flags.plugin) {
