@@ -10,8 +10,8 @@ type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
-        boolean: ["plugin", "local-base"],
-        alias: {p: "plugin", l: "local-base"},
+        boolean: ["plugin", "behavior", "local-base"],
+        alias: {p: "plugin", b: "plugin", l: "local-base"},
         "--": true,
       });
 
@@ -28,10 +28,15 @@ async function main() {
             if (!flags.plugin) {
                 console.log('🎓', Colors.blue(Colors.italic('Specify one of the available types of addon:')))
                 console.log(Colors.gray('  --plugin, -p'), '   Creates a bare-bones for "plugin" addon type.');
+                console.log(Colors.gray('  --behavior, -b'), '   Creates a bare-bones for "behavior" addon type.');
                 break;
             }
             if (flags.plugin) {
                 await createBareBones('plugin');
+                break;
+            }
+            if (flags.behavior) {
+                await createBareBones('behavior');
                 break;
             }
             break;

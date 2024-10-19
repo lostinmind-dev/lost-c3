@@ -18,6 +18,7 @@
         "test:cli": "deno run -A ./cli.ts"
     },
     "compilerOptions": {
+        "noImplicitOverride": false,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true
     },
@@ -32,6 +33,7 @@
             "cover.png"
         ],
         "exclude": [
+            "mocks",
             "addon_base",
             ".github",
             "addon_base",

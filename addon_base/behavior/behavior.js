@@ -15,7 +15,7 @@ const ICON_TYPE = "";
 
 const SDK = globalThis.SDK;
 
-const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPluginBase {
+const BEHAVIOR_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IBehaviorBase {
     constructor() {
         super(ADDON_ID);
         SDK.Lang.PushContext("plugins." + ADDON_ID.toLowerCase());
@@ -27,7 +27,7 @@ const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPlugi
         this._info.SetIcon(ICON_NAME, ICON_TYPE);
         this._info.SetIsDeprecated(CONFIG.Deprecated || false);
         this._info.SetCanBeBundled(CONFIG.CanBeBundled || true);
-        this._info.SetIsSingleGlobal(CONFIG.IsSingleGlobal || false);
+        this._info.SetIsOnlyOneAllowed(CONFIG.IsOnlyOneAllowed || false);
         SDK.Lang.PushContext(".properties");
 
         REMOTE_SCRIPTS.forEach(url => {
@@ -116,13 +116,9 @@ const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPlugi
             }
         });
         this._info.SetProperties(pps);
-
-        if (CONFIG.UseDOMSideScripts) {
-            this._info.SetDOMSideScripts(["c3runtime/domSide.js"]);
-        }
         SDK.Lang.PopContext();
         SDK.Lang.PopContext();
     }
 };
-PLUGIN_CLASS.Register(CONFIG.AddonId, PLUGIN_CLASS);
+BEHAVIOR_CLASS.Register(CONFIG.AddonId, BEHAVIOR_CLASS);
 export {};

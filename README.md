@@ -25,8 +25,8 @@ lostinmind.
 
 Here I've compiled some of the benefits from standard addon creation for
 **Construct 3**.
-
 > - ⚡️ **Using the powerful _**JavaScript Runtime**_ [Deno](https://deno.com).**
+> - ❌ **Error detecting before installization of your Addon!**
 > - 📝 **Only _**Typescript**_ and no _**Javascript**_ for your addon (not
 >   including scripts).**
 > - 🚀 **Fast compilation in milliseconds to .c3addon format!**
@@ -149,62 +149,6 @@ const Config: LostConfig<'plugin'> = {
 
 export default Config;
 ```
-
-## 📚 Using custom Libraries OR Scripts OR Files
-
-It's available to use custom scripts and files in your addon.
-
-- To use any script you should copy your _**script.js**_ file to path:
-  `./Addon/Scripts`. Your script will automatically loaded with type:
-  **external-dom-script**.
-- To use any file you should copy your _**file.css**_ OR _**data.txt**_ file to
-  path: `./Addon/Files`. If you added any **.css** file it will automatically
-  loaded with type: _**external-css**_. If you added file with any other
-  extension it will automatically loaded with type: _**copy-to-output**_.
-
-> [!NOTE]
-> If you want to load your script with type **external-runtime-script**, you
-> should add some settings in your _**`lost.config.ts`**_ file.
-
-> [!NOTE]
-> If you want to load your file with custom type, you should add some settings
-> in your _**`lost.config.ts`**_ file.
-
-Example
-
-```typescript
-import type { LostConfig } from 'jsr:@lost-c3/lib';
-
-const Config: LostConfig<'plugin'> = {
-    Scripts: [
-        {
-            FileName: 'library.js',
-            Type: 'external-runtime-script',
-        },
-    ],
-};
-
-export default Config;
-```
-
-In that case we added new object in _`Scripts`_ property. That object has some
-own properties:
-
-```typescript
-- FileName: string // Use only path to script without folder ./Scripts/library.js. Example: "library.js"
-- Type: "external-runtime-script" | "external-dom-script"
-```
-
-> [!WARNING]
-> Use only .js libraries with .d.ts declaration files only.
-
-> [!NOTE]
-> Useful information for choosing _`Type`_ property value:
-> https://www.construct.net/en/make-games/manuals/addon-sdk/reference/specifying-dependencies#internalH1Link0
-
-> [!TIP]
-> It's recommended to use _`.d.ts`_ files to easy code writing. You can also
-> move them into _`src/libs/`_ folder.
 
 ## ⚙️ Specifying plugin properties
 
@@ -700,6 +644,62 @@ export default class MyCategory {
     }
 }
 ```
+
+## 📚 Using custom Libraries OR Scripts OR Files
+
+It's available to use custom scripts and files in your addon.
+
+- To use any script you should copy your _**script.js**_ file to path:
+  `./Addon/Scripts`. Your script will automatically loaded with type:
+  **external-dom-script**.
+- To use any file you should copy your _**file.css**_ OR _**data.txt**_ file to
+  path: `./Addon/Files`. If you added any **.css** file it will automatically
+  loaded with type: _**external-css**_. If you added file with any other
+  extension it will automatically loaded with type: _**copy-to-output**_.
+
+> [!NOTE]
+> If you want to load your script with type **external-runtime-script**, you
+> should add some settings in your _**`lost.config.ts`**_ file.
+
+> [!NOTE]
+> If you want to load your file with custom type, you should add some settings
+> in your _**`lost.config.ts`**_ file.
+
+Example
+
+```typescript
+import type { LostConfig } from 'jsr:@lost-c3/lib';
+
+const Config: LostConfig<'plugin'> = {
+    Scripts: [
+        {
+            FileName: 'library.js',
+            Type: 'external-runtime-script',
+        },
+    ],
+};
+
+export default Config;
+```
+
+In that case we added new object in _`Scripts`_ property. That object has some
+own properties:
+
+```typescript
+- FileName: string // Use only path to script without folder ./Scripts/library.js. Example: "library.js"
+- Type: "external-runtime-script" | "external-dom-script"
+```
+
+> [!WARNING]
+> Use only .js libraries with .d.ts declaration files only.
+
+> [!NOTE]
+> Useful information for choosing _`Type`_ property value:
+> https://www.construct.net/en/make-games/manuals/addon-sdk/reference/specifying-dependencies#internalH1Link0
+
+> [!TIP]
+> It's recommended to use _`.d.ts`_ files to easy code writing. You can also
+> move them into _`src/libs/`_ folder.
 
 ## 🏗️ Building addon
 

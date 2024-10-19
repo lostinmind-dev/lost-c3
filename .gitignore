@@ -1,3 +1,4 @@
+mocks/
 src/
 deno.lock
 tsconfig.json

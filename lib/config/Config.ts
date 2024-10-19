@@ -1,4 +1,4 @@
-export type AddonType = 'plugin' | 'behavior';
+export type AddonType = 'plugin' | 'behavior' | 'drawing-plugin';
 
 export type ScriptDependencyType = 'external-dom-script' | 'external-runtime-script';
 
@@ -158,11 +158,21 @@ interface ConfigBase {
      * @example [{FileName: "styles.css", Type: "external-css"}]
      */
     Files?: (ExternalCSSFile | CopyToOutputFile)[];
+    /**
+     * Optional. Specify an array of TypeScript definition files (.d.ts) from ./Addon/Types folder.
+     * @description This should be used to provide full TypeScript definitions of any script interfaces your addon provides, which is necessary for projects using TypeScript with your addon.
+     */
+    TypeScriptDefinitionFiles?: string[];
 }
 
 type PluginCategory = "data-and-storage" | "form-controls" | "general" | "input" | "media" | "monetisation" | "platform-specific" | "web" | "other";
 
 interface PluginConfig extends ConfigBase {
+    /**
+     * Optional. If you are using DomSide.ts set it to True.
+     * @description Make sure that if you'll set that property to True, Lost will be looking for DomSide.ts file in your ./Addon folder.
+     */
+    UseDOMSideScripts?: boolean;
     Type: 'plugin',
     /**
      * The category for the plugin when displaying it in the Create New Object Type dialog.
@@ -175,6 +185,76 @@ interface PluginConfig extends ConfigBase {
      * This is the mode that plugins like Touch and Audio use.
      */
     IsSingleGlobal?: boolean;
+}
+
+interface DrawingPluginConfig {
+    Type: 'drawing-plugin',
+    /**
+     * The category for the plugin when displaying it in the Create New Object Type dialog.
+     * @example "general"
+     */
+    Category: PluginCategory;
+    /**
+     * Optional. Default is **True**. Pass true to enable resizing instances in the Layout View.
+     */
+    IsResizable?: boolean;
+    /**
+     * Optional. Default is **True**. Pass true to enable the Angle property and rotating instances in the Layout View.
+     */
+    IsRotatable?: boolean;
+    /**
+     * Optional. Default is **False**.  Pass true to specify that this plugin renders in 3D.
+     * @description This will cause the presence of the plugin in a project to enable 3D rendering when the project Rendering mode property is set to Auto (which is the default setting).
+     */
+    Is3D?: boolean;
+    /**
+     * Optional. Default is **True**. Pass true to add a single editable image, such as used by the Tiled Background plugin.
+     */
+    HasImage?: boolean;
+    /**
+     * Optional.
+     * @description For plugins that use a single editable image only.
+     * Set the URL to an image file in your addon to use as the default image when the object is added to a project, e.g. "default.png".
+     * @warning Remember to add the image file to ./Addon/Files folder when you are using this property.
+     */
+    DefaultImageURL?: string;
+    /**
+     * Optional. Default is **False** Pass true to indicate that the image is intended to be tiled.
+     * @description This adjusts the texture wrapping mode when Construct creates a texture for its image.
+     */
+    IsTiled?: boolean;
+    /**
+     * Optional. Default is **False**. Pass true to allow using Z elevation with this plugin.
+     * @description By default the renderer applies the Z elevation before calling the Draw() method on an instance, which in many cases is sufficient to handle rendering Z elevation correctly, but be sure to take in to account Z elevation in the drawing method if it does more complex rendering.
+     */
+    SupportsZElevation?: boolean;
+    /**
+     * Optional. Default is **True**. Pass true to allow using the built-in color property to tint the object appearance.
+     * @description By default the renderer sets the color before calling the Draw() method on an instance, which in many cases is sufficient to handle rendering with the applied color, but be sure to take in to account the instance color in the drawing method if it does more complex rendering.
+     */
+    SupportsColor?: boolean;
+    /**
+     * Optional. Default is **False**. Pass true to allow using effects, including the Blend mode property, with this plugin.
+     * @description If the plugin does not simply draw a texture the size of the object (as Sprite does), you should also set MustPreDraw: true.
+     */
+    SupportsEffects?: boolean;
+    /**
+     * Optional. Default is **False**. Pass true to disable an optimisation in the effects engine for objects that simply draw a texture the size of the object (e.g. Sprite).
+     * @description This is necessary for effects to render correctly if the plugin draws anything other than the equivalent the Sprite plugin would.
+     */
+    MustPreDraw?: boolean;
+    /**
+     * Optional. Default is all **False**. An boolean array of common built-in sets of actions, conditions and expressions to the plugin.
+     * @description Add common built-in sets of actions, conditions and expressions (ACEs) to the plugin relating to various built-in features.
+     */
+    AddCommonACEs?: {
+        Position?: boolean;
+        SceneGraph?: boolean;
+        Size?: boolean;
+        Angle?: boolean;
+        Appearance?: boolean;
+        ZOrder?: boolean;
+    }
 }
 
 type BehaviorCategory = "attributes" | "general" | "movements" | "other";
@@ -193,4 +273,4 @@ interface BehaviorConfig extends ConfigBase {
     IsOnlyOneAllowed?: boolean;
 }
 
-export type LostConfig<T extends AddonType> = T extends 'plugin' ? PluginConfig : T extends 'behavior' ? BehaviorConfig : never;
+export type LostConfig<T extends AddonType> = T extends 'plugin' ? PluginConfig : T extends 'behavior' ? BehaviorConfig : T extends DrawingPluginConfig ? 'drawing-plugin' : never;
