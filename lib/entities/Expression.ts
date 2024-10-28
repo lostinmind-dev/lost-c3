@@ -1,10 +1,9 @@
-import type { CategoryTarget } from "./Category.ts";
-import type { EntityOptionsWithSpecificParams, LostEntityWithSpecificParams, LostEntityOptions, PropertyKeyObject } from "./Entity.ts";
+import type { EntityOptionsWithSpecificParams, LostEntityWithSpecificParams, LostEntityOptions } from "./Entity.ts";
 
 type AllowedParamsType = 'number' | 'string' | 'any';
 
 export interface LostExpression extends LostEntityWithSpecificParams<AllowedParamsType> {
-    Type: 'Expression',
+    Type: 'Expression';
     Options: LostEntityOptions & {
         ReturnType: AllowedParamsType;
         IsVariadicParameters: boolean;
@@ -26,50 +25,37 @@ interface ExpressionEntityOptions extends EntityOptionsWithSpecificParams<Allowe
     IsVariadicParameters?: boolean;
 }
 
-export function Expression(Options: ExpressionEntityOptions): MethodDecorator {
+export function Expression<T>(Options: ExpressionEntityOptions) {
     return function (
-        target: Object,
-        propertyKey: string | symbol | PropertyKeyObject,
-        descriptor?: TypedPropertyDescriptor<any>
+        value: (this: any) => void,
+        context: ClassMethodDecoratorContext<T, (this: any) => void>
     ) {
+        context.addInitializer(function (this: any) {
 
-        let methodName: string = '';
-        let method: any;
-        
-        if (typeof propertyKey === 'object' && 'name' in propertyKey) {
-            methodName = String(propertyKey.name);
-            method = propertyKey.access.get();
-        } else if (descriptor) {
-            methodName = String(propertyKey);
-            method = descriptor.value;
-        }
+            if (!this.constructor.prototype['Expressions']) {
+                this.constructor.prototype['Expressions'] = [];
+            }
 
-        if (typeof method === 'undefined') {
-            throw new Error('Decorator lost method.')
-        }
+            const Expression: LostExpression = {
+                Type: 'Expression',
+                Id: Options.Id,
+                Name: Options.Name,
+                Description: Options.Description || 'There is no any description yet...',
+                Options: {
+                    ReturnType: Options.ReturnType,
+                    IsVariadicParameters: Options.IsVariadicParameters || false,
+    
+    
+                    ScriptName: String(context.name),
+                    Script: value,
+                    Highlight: Options.Highlight || false,
+                    Deprecated: Options.Deprecated || false
+                },
+                Params: Options.Params || []
+            };
 
-        if (!target.constructor.prototype['Expressions']) {
-            target.constructor.prototype['Expressions'] = [];
-        }
+            this.constructor.prototype['Expressions'].push(Expression)
 
-        const Expression: LostExpression = {
-            Type: 'Expression',
-            Id: Options.Id,
-            Name: Options.Name,
-            Description: Options.Description || 'There is no any description yet...',
-            Options: {
-                ReturnType: Options.ReturnType,
-                IsVariadicParameters: Options.IsVariadicParameters || false,
-
-
-                ScriptName: methodName,
-                Script: method,
-                Highlight: Options.Highlight || false,
-                Deprecated: Options.Deprecated || false
-            },
-            Params: Options.Params || []
-        };
-
-        target.constructor.prototype['Expressions'].push(Expression);
+        })
     }    
 }

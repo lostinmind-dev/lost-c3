@@ -190,7 +190,7 @@ type PluginPropertyOptions =
     FontPropertyOptions | ComboPropertyOptions | ColorPropertyOptions |
     ObjectPropertyOptions | GroupPropertyOptions | InfoPropertyOptions;
 
-export class PluginProperty {
+export class Property {
     readonly Options: PluginPropertyOptions;
     constructor(Options: PluginPropertyOptions) {
 

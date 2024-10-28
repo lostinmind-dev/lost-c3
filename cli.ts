@@ -4,9 +4,9 @@ import { Colors } from "./deps.ts";
 import { buildAddon } from "./cli/main.ts";
 import type { AddonType } from "./lib/common.ts";
 
-const VERSION = '1.1.14'
+const VERSION = '1.1.3'
 
-type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
+type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve' | 'convert-sdk2';
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {

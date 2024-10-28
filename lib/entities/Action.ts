@@ -1,4 +1,4 @@
-import type { EntityOptionsBase, LostEntity, LostEntityOptions, PropertyKeyObject } from "./Entity.ts";
+import type { EntityOptionsBase, LostEntity, LostEntityOptions } from "./Entity.ts";
 
 export interface LostAction extends LostEntity {
     Type: 'Action';
@@ -24,49 +24,35 @@ interface ActionEntityOptions extends EntityOptionsBase {
     IsAsync?: boolean;
 }
 
-export function Action(Options: ActionEntityOptions): MethodDecorator {
+export function Action<T>(Options: ActionEntityOptions) {
     return function (
-        target: Object,
-        propertyKey: string | symbol | PropertyKeyObject,
-        descriptor?: TypedPropertyDescriptor<any>
-    ): TypedPropertyDescriptor<any> | void {
+        value: (this: any) => void,
+        context: ClassMethodDecoratorContext<T, (this: any) => void>
+    ) {
+        context.addInitializer(function (this: any) {
 
-        let methodName: string = '';
-        let method: any;
-        
-        if (typeof propertyKey === 'object' && 'name' in propertyKey) {
-            methodName = String(propertyKey.name);
-            method = propertyKey.access.get();
-        } else if (descriptor) {
-            methodName = String(propertyKey);
-            method = descriptor.value;
-        }
+            if (!this.constructor.prototype['Actions']) {
+                this.constructor.prototype['Actions'] = [];
+            }
 
-        if (typeof method === 'undefined') {
-            throw new Error('Decorator lost method.')
-        }
+            const Action: LostAction = {
+                Type: 'Action',
+                Id: Options.Id,
+                Name: Options.Name,
+                DisplayText: Options.DisplayText,
+                Description: Options.Description || 'There is no any description yet...',
+                Options: {
+                    IsAsync: Options.IsAsync || false,
+                    ScriptName: String(context.name),
+                    Script: value,
+                    Highlight: Options.Highlight || false,
+                    Deprecated: Options.Deprecated || false
+                },
+                Params: Options.Params || []
+            };
 
-        if (!target.constructor.prototype['Actions']) {
-            target.constructor.prototype['Actions'] = [];
-        }
+            this.constructor.prototype['Actions'].push(Action)
 
-        const Action: LostAction = {
-            Type: 'Action',
-            Id: Options.Id,
-            Name: Options.Name,
-            DisplayText: Options.DisplayText,
-            Description: Options.Description || 'There is no any description yet...',
-            Options: {
-                IsAsync: Options.IsAsync || false,
-                ScriptName: methodName,
-                Script: method,
-                Highlight: Options.Highlight || false,
-                Deprecated: Options.Deprecated || false
-            },
-            Params: Options.Params || []
-        };
-
-        target.constructor.prototype['Actions'].push(Action);
-        return;
+        })
     }
 }

@@ -27,5 +27,5 @@ export async function zipAddon(config: LostConfig<'plugin' | 'behavior'>) {
     /**
      * Remove all files after build
      */
-    await Deno.remove(BUILD_PATH, { recursive: true });
+    //await Deno.remove(BUILD_PATH, { recursive: true });
 }

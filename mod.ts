@@ -1,7 +1,7 @@
 /**
  * Entities
  */
-export { Action, Category, Condition, Expression } from './lib/entities.ts';
+export { Category, Action, Condition, Expression } from './lib/entities.ts';
 
 /**
  * Params
@@ -11,7 +11,7 @@ export { Param } from './lib/params.ts';
 /**
  * Plugin Properties
  */
-export { PluginProperty } from './lib/plugin-props.ts';
+export { Property } from './lib/plugin-props.ts';
 
 /**
  * Common

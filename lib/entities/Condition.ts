@@ -1,4 +1,4 @@
-import type { EntityOptionsBase, LostEntity, LostEntityOptions, PropertyKeyObject } from "./Entity.ts";
+import type { EntityOptionsBase, LostEntity, LostEntityOptions } from "./Entity.ts";
 
 export interface LostCondition extends LostEntity {
     Type: 'Condition';
@@ -63,56 +63,42 @@ interface ConditionEntityOptions extends EntityOptionsBase {
     IsCompatibleWithTriggers?: boolean;
 }
 
-export function Condition(Options: ConditionEntityOptions): MethodDecorator {
+export function Condition<T>(Options: ConditionEntityOptions) {
     return function (
-        target: Object,
-        propertyKey: string | symbol | PropertyKeyObject,
-        descriptor?: TypedPropertyDescriptor<any>
+        value: (this: any) => void,
+        context: ClassMethodDecoratorContext<T, (this: any) => void>
     ) {
+        context.addInitializer(function (this: any) {
+           
+            if (!this.constructor.prototype['Conditions']) {
+                this.constructor.prototype['Conditions'] = [];
+            }
 
-        let methodName: string = '';
-        let method: any;
-        
-        if (typeof propertyKey === 'object' && 'name' in propertyKey) {
-            methodName = String(propertyKey.name);
-            method = propertyKey.access.get();
-        } else if (descriptor) {
-            methodName = String(propertyKey);
-            method = descriptor.value;
-        }
+            const Condition: LostCondition = {
+                Type: 'Condition',
+                Id: Options.Id,
+                Name: Options.Name,
+                DisplayText: Options.DisplayText,
+                Description: Options.Description || 'There is no any description yet...',
+                Options: {
+                    IsTrigger: Options.IsTrigger,
+                    IsFakeTrigger: Options.IsFakeTrigger || false,
+                    IsStatic: Options.IsStatic || false,
+                    IsLooping: Options.IsLooping || false,
+                    IsInvertible: Options.IsInvertible || true,
+                    IsCompatibleWithTriggers: Options.IsCompatibleWithTriggers || true,
+    
+    
+                    ScriptName: String(context.name),
+                    Script: value,
+                    Highlight: Options.Highlight || false,
+                    Deprecated: Options.Deprecated || false
+                },
+                Params: Options.Params || []
+            };
+            
+            this.constructor.prototype['Conditions'].push(Condition)
 
-        if (typeof method === 'undefined') {
-            throw new Error('Decorator lost method.')
-        }
-
-        if (!target.constructor.prototype['Conditions']) {
-            target.constructor.prototype['Conditions'] = [];
-        }
-
-        const Condition: LostCondition = {
-            Type: 'Condition',
-            Id: Options.Id,
-            Name: Options.Name,
-            DisplayText: Options.DisplayText,
-            Description: Options.Description || 'There is no any description yet...',
-            Options: {
-                IsTrigger: Options.IsTrigger,
-                IsFakeTrigger: Options.IsFakeTrigger || false,
-                IsStatic: Options.IsStatic || false,
-                IsLooping: Options.IsLooping || false,
-                IsInvertible: Options.IsInvertible || true,
-                IsCompatibleWithTriggers: Options.IsCompatibleWithTriggers || true,
-
-
-                ScriptName: methodName,
-                Script: method,
-                Highlight: Options.Highlight || false,
-                Deprecated: Options.Deprecated || false
-            },
-            Params: Options.Params || []
-        };
-
-        target.constructor.prototype['Conditions'].push(Condition);
-        return;
+        })
     }
 }

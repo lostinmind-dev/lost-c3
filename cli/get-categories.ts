@@ -1,25 +1,25 @@
-// deno-lint-ignore-file no-case-declarations
 import { Colors } from "../deps.ts";
-import type { LostCategoryDefault, LostAction, LostCondition, LostExpression } from "../lib/entities.ts";
+import type { CategoryClassType, LostAction, LostCondition, LostExpression } from "../lib/entities.ts";
 import { ErrorMessage, getModule, LOGGER, WarningMessage } from "./misc.ts";
 import { findDuplicatesInArray } from "./misc/find-duplicates.ts";
 import { ADDON_CATEGORIES_FOLDER_PATH } from "./paths.ts";
 
 interface CategoryModule {
-    default: typeof LostCategoryDefault;
+    default: new () => CategoryClassType;
 }
 
 async function getCategory(path: string) {
     const module = await getModule<CategoryModule>(path);
-    return (new module.default()) ? new module.default() : null;    
+    const _class = new module.default();
+    const _prototype = _class.constructor.prototype as CategoryClassType;
+    return (_prototype) ? _prototype : null;    
 }
 
 export async function getCategories() {
     LOGGER.Searching('Searching for categories');
 
-    const categories: LostCategoryDefault[] = [];
-    
-    const readCategoriesDirectory = async (path: string) => {
+    const categories: CategoryClassType[] = [];
+    async function readCategoriesDirectory(path: string) {
         for await (const entry of Deno.readDir(path)) {
             if (entry.isDirectory) {
                 await readCategoriesDirectory(`${path}/${entry.name}`);
@@ -27,6 +27,8 @@ export async function getCategories() {
             if (entry.isFile && entry.name.endsWith('.ts')) {
                 try {
                     const Category = await getCategory(`file://${path}/${entry.name}`);
+                    // console.log(Category)
+
                     if (Category !== null) {
 
                         const {Id, Name, Deprecated, InDevelopment} = Category;
@@ -48,7 +50,7 @@ export async function getCategories() {
                             if (Deprecated) {
                                 LOGGER.Warning(`"${Name}" --> ${WarningMessage.CATEGORY_DEPRECATED}`);
                             }
-
+                            // if (!Deprecated) console.log(Category?.Actions.length);
                             Category.Actions.forEach(entity => {
                                 const isEntityValid = validateEntity(Category, entity);
                                 if (!isEntityValid) {
@@ -100,7 +102,7 @@ export async function getCategories() {
     return categories;
 }
 
-function validateCategoryEntities(category: LostCategoryDefault) {
+function validateCategoryEntities(category: CategoryClassType) {
     const actions = category.Actions.map(e => e.Id);
     const conditions = category.Conditions.map(e => e.Id);
     const expressions = category.Expressions.map(e => e.Id);
@@ -123,7 +125,7 @@ function validateCategoryEntities(category: LostCategoryDefault) {
     return true;
 }
 
-function validateEntity(category: LostCategoryDefault, entity: LostAction | LostCondition | LostExpression) {
+function validateEntity(category: CategoryClassType, entity: LostAction | LostCondition | LostExpression) {
     switch (entity.Type) {
         case 'Action':
             if (entity.Id === '') {

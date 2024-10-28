@@ -1,17 +1,16 @@
 import type { Param, ParamOptions } from "../params/Params.ts";
 
-type EntityType = 'Action' | 'Condition' | 'Expression';
+export type LostEntityType = 'Action' | 'Condition' | 'Expression';
 
 export interface LostEntityOptions {
     ScriptName: string;
-    // deno-lint-ignore no-explicit-any
     Script: any;
     Highlight: boolean;
     Deprecated: boolean;
 }
 
 export interface LostEntity {
-    Type: EntityType;
+    Type: LostEntityType;
     Id: string;
     Name: string;
     Description: string;
@@ -63,17 +62,4 @@ export interface EntityOptionsBase {
 
 export interface EntityOptionsWithSpecificParams<T extends ParamOptions['Type']> extends EntityOptionsBase {
     Params?: Param<Extract<ParamOptions, { Type: T }>>[];
-}
-
-// Deno sucks at decorators
-export interface PropertyKeyObject {
-    kind: string;
-    name: string | symbol;
-    static: boolean;
-    private: boolean;
-    metadata: any,
-    addInitializer: () => void;
-    access: {
-        get: () => any;
-    }
 }

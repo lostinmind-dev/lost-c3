@@ -3,6 +3,7 @@
 <div align="center">
   <h3>
     Lost for easy making Construct 3 Addons. <br />
+    v1.1.3
   </h3>
 </div>
 
@@ -75,15 +76,15 @@ lost build
 │   ├── Types/                  # Addon scripts folder
 │       ├── ts-defs/            # Construct 3 declaration files
 │       └── global.d.ts         # Declaration file for your purposes
-│   ├── Instance.ts             # Addon Instance class
-│   ├── icon.svg                 # Your .svg OR .png addon icon
-│   └── PluginProperties.ts     # Plugin properties file
+│   ├── icon.svg                # Your .svg OR .png addon icon
+│   └── Instance.ts             # Addon Instance class
 ├── Builds/                     # Builds folder
 │   ├── Source/                 # Final Construct 3 addon folder
 │       └── ...
 │   └── AddonId_Version.c3addon # Final .c3addon file
 ├── deno.json                   # deno.json file for Deno enviroment
 ├── lost.config.ts              # Addon config file
+├── properties.ts               # Plugin properties file
 ```
 
 ## ⚙️ Addon config setup
@@ -152,8 +153,8 @@ export default Config;
 
 ## ⚙️ Specifying plugin properties
 
-Use _`PluginProperties.ts`_ file to specify any plugin properties for your
-addon. That file located in following path: `./Addon/PluginProperties.ts`.
+Use _`properties.ts`_ file to specify any plugin properties for your
+addon. That file located in following path: `./properties.ts`.
 
 List of available plugin property types:
 
@@ -175,10 +176,10 @@ List of available plugin property types:
 Example
 
 ```typescript
-import { PluginProperty } from 'jsr:@lost-c3/lib';
+import { Property } from 'jsr:@lost-c3/lib';
 
-const PluginProperties: PluginProperty[] = [
-    new PluginProperty(
+const Properties: Property[] = [
+    new Property(
         {
             Type: 'integer',
             Id: 'integerProperty',
@@ -186,7 +187,7 @@ const PluginProperties: PluginProperty[] = [
             InitialValue: 0,
         },
     ),
-    new PluginProperty(
+    new Property(
         {
             Type: 'float',
             Id: 'floatProperty',
@@ -194,7 +195,7 @@ const PluginProperties: PluginProperty[] = [
             InitialValue: 0,
         },
     ),
-    new PluginProperty(
+    new Property(
         {
             Type: 'percent',
             Id: 'percentProperty',
@@ -202,7 +203,7 @@ const PluginProperties: PluginProperty[] = [
             InitialValue: 1,
         },
     ),
-    new PluginProperty(
+    new Property(
         {
             Type: 'text',
             Id: 'textProperty',
@@ -210,7 +211,7 @@ const PluginProperties: PluginProperty[] = [
             InitialValue: '...',
         },
     ),
-    new PluginProperty(
+    new Property(
         {
             Type: 'longtext',
             Id: 'longtextProperty',
@@ -218,7 +219,7 @@ const PluginProperties: PluginProperty[] = [
             InitialValue: '',
         },
     ),
-    new PluginProperty(
+    new Property(
         {
             Type: 'check',
             Id: 'checkProperty',
@@ -226,14 +227,14 @@ const PluginProperties: PluginProperty[] = [
             InitialValue: true,
         },
     ),
-    new PluginProperty(
+    new Property(
         {
             Type: 'font',
             Id: 'fontProperty',
             Name: 'Font',
         },
     ),
-    new PluginProperty(
+    new Property(
         {
             Type: 'combo',
             Id: 'comboProperty',
@@ -244,28 +245,28 @@ const PluginProperties: PluginProperty[] = [
             ],
         },
     ),
-    new PluginProperty(
+    new Property(
         {
             Type: 'color',
             Id: 'colorProperty',
             Name: 'Color',
         },
     ),
-    new PluginProperty(
+    new Property(
         {
             Type: 'object',
             Id: 'objectProperty',
             Name: 'Object',
         },
     ),
-    new PluginProperty(
+    new Property(
         {
             Type: 'group',
             Id: 'groupProperty',
             Name: 'Awesome Group',
         },
     ),
-    new PluginProperty(
+    new Property(
         {
             Type: 'info',
             Id: 'infoProperty',
@@ -275,7 +276,7 @@ const PluginProperties: PluginProperty[] = [
     ),
 ];
 
-export default PluginProperties;
+export default Properties;
 ```
 
 ## 📁 Creating category
@@ -311,7 +312,7 @@ export default class MyCategory {
 
 ### ⚡️ Create action
 
-To create actions for your addon you should use _`@Action()`_ method decorator
+To create actions for your addon you should use _`@Action`_ method decorator
 in your category class.
 
 Example

@@ -33,18 +33,25 @@ const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPlugi
         REMOTE_SCRIPTS.forEach(url => {
             this._info.AddRemoteScriptDependency(url);
         })
-        SCRIPTS.forEach(script => {
-            if (script.scriptType) {
-                this._info.AddFileDependency({ filename: `scripts/${script.filename}`, type: script.dependencyType, scriptType: script.scriptType });
-            } else {
-                this._info.AddFileDependency({ filename: `scripts/${script.filename}`, type: script.dependencyType });
+        SCRIPTS.forEach(scriptName => {
+            if (CONFIG.Scripts) {
+                const ScriptSettings = CONFIG.Scripts.find(script => script.FileName === scriptName);
+                if (ScriptSettings)
+                    this._info.AddFileDependency({ filename: `scripts/${scriptName}`, type: ScriptSettings.Type });
+            }
+            else {
+                this._info.AddFileDependency({ filename: `scripts/${scriptName}`, type: 'external-dom-script' });
             }
         });
-        FILES.forEach(file => {
-            if (file.fileType) {
-                this._info.AddFileDependency({ filename: `files/${file.filename}`, type: file.dependencyType, fileType: file.fileType });
-            } else {
-                this._info.AddFileDependency({ filename: `files/${file.filename}`, type: file.dependencyType });
+        FILES.forEach(fileName => {
+            if (CONFIG.Files) {
+                const FileSettings = CONFIG.Files.find(file => file.FileName === fileName);
+                if (FileSettings)
+                    this._info.AddFileDependency({ filename: `files/${fileName}`, type: FileSettings.Type });
+            }
+            else {
+                const FileType = (fileName.endsWith('.css')) ? 'external-css' : 'copy-to-output';
+                this._info.AddFileDependency({ filename: `files/${fileName}`, type: FileType });
             }
         });
         const pps = [];
@@ -116,10 +123,6 @@ const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPlugi
             }
         });
         this._info.SetProperties(pps);
-
-        if (CONFIG.UseDOMSideScripts) {
-            this._info.SetDOMSideScripts(["c3runtime/domSide.js"]);
-        }
         SDK.Lang.PopContext();
         SDK.Lang.PopContext();
     }

@@ -20,7 +20,7 @@ interface BuildOptions {
 
 export async function buildAddon(options: BuildOptions) {
     const startTime = performance.now();
-    const { serve, localBase } = options;
+    const { serve } = options;
 
     LOGGER.Clear();
     LOGGER.Process('Fetching addon files');
@@ -35,9 +35,8 @@ export async function buildAddon(options: BuildOptions) {
     const CATEGORIES = await getCategories();
     LOGGER.Line();
     LOGGER.Process('Building addon');
-    LOGGER.Info(`${Colors.gray('Addon base:')} ${(localBase) ? 'local' : 'online'}`);
 
-    await createAddonStructure({CONFIG, PLUGIN_PROPERTIES, SCRIPTS, FILES, CATEGORIES, ICON}, localBase);
+    await createAddonStructure({CONFIG, PLUGIN_PROPERTIES, SCRIPTS, FILES, CATEGORIES, ICON}, false);
 
     await createAddonJSON({CONFIG, ICON, SCRIPTS, FILES});
 

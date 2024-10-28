@@ -1,16 +1,15 @@
-import type { LostCategoryDefault } from "../lib/entities.ts";
+import type { CategoryClassType } from "../lib/entities.ts";
 import type { AcesJSON, AceAction, AceCondition, AceExpression, AceParam } from "../lib/json.ts";
 
 import { BUILD_PATH } from "./paths.ts";
 
 interface CreateAcesJSONOptions {
-    CATEGORIES: LostCategoryDefault[];
+    CATEGORIES: CategoryClassType[];
 }
 
-export async function createAcesJSON(options: CreateAcesJSONOptions) {
-    const { CATEGORIES } = options
+export async function createAcesJSON({ CATEGORIES }: CreateAcesJSONOptions) {
     const AcesJSON = {} as AcesJSON;
-
+    
     CATEGORIES.forEach(category => {
         AcesJSON[category.Id] = {
             'actions': [],
@@ -28,6 +27,7 @@ export async function createAcesJSON(options: CreateAcesJSONOptions) {
             AceAction['isDeprecated'] = Deprecated;
             AceAction['isAsync'] = IsAsync;
             AceAction['params'] = [];
+
             Params.forEach(param => {
                 const {Type, Id, InitialValue} = param.Options;
                 const AceParam = {} as AceParam;
@@ -64,6 +64,7 @@ export async function createAcesJSON(options: CreateAcesJSONOptions) {
             AceCondition['isLooping'] = IsLooping;
             AceCondition['isInvertible'] = IsInvertible;
             AceCondition['isCompatibleWithTriggers'] = IsCompatibleWithTriggers;
+            AceCondition['params'] = [];
 
             Params.forEach(param => {
                 const {Type, Id, InitialValue} = param.Options;
@@ -93,6 +94,7 @@ export async function createAcesJSON(options: CreateAcesJSONOptions) {
             AceExpression['isDeprecated'] = Deprecated;
             AceExpression['returnType'] = ReturnType;
             AceExpression['isVariadicParameters'] = IsVariadicParameters;
+            AceExpression['params'] = [];
 
             Params.forEach(param => {
                 const {Type, Id, InitialValue} = param.Options;

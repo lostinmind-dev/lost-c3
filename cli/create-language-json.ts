@@ -1,13 +1,13 @@
-import type { LostCategoryDefault } from "../lib/entities.ts";
 import type { LanguageJSON, LanguageAction, LanguageCondition, LanguageExpression, LanguagePluginProperty, LanguageParam } from "../lib/json.ts";
 import type { LostConfig } from "../lib/common.ts";
-import type { PluginProperty } from "../lib/plugin-props.ts";
+import type { Property } from "../lib/plugin-props.ts";
 import { BUILD_PATH } from "./paths.ts";
+import type { CategoryClassType } from '../lib/entities.ts';
 
 interface CreateLanguageJSONOptions {
     CONFIG: LostConfig<'plugin' | 'behavior'>;
-    PLUGIN_PROPERTIES: PluginProperty[];
-    CATEGORIES: LostCategoryDefault[];
+    PLUGIN_PROPERTIES: Property[];
+    CATEGORIES: CategoryClassType[];
 }
 
 export async function createLanguageJSON(options: CreateLanguageJSONOptions) {

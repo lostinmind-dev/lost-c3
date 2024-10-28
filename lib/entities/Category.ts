@@ -2,7 +2,7 @@ import type { LostAction } from "./Action.ts";
 import type { LostCondition } from "./Condition.ts";
 import type { LostExpression } from "./Expression.ts";
 
-interface LostCategoryOptions {
+interface CategoryOptions {
     /**
      * Category id to indetify, must me unique for all addon.
      * @description By convention this is lowercase with dashes for separators
@@ -26,55 +26,26 @@ interface LostCategoryOptions {
     InDevelopment?: boolean;
 }
 
-export interface CategoryTarget {
-    constructor: {
-        prototype: LostCategoryBase
-    }
+export type CategoryClassType = {
+    Id: string;
+    Name: string;
+    Deprecated: boolean;
+    InDevelopment: boolean;
+
+    Actions: LostAction[];
+    Conditions: LostCondition[];
+    Expressions: LostExpression[];
 }
 
-class LostCategoryBase {
-    readonly Id: string;
-    readonly Name: string;
+export function Category(Options: CategoryOptions) {
+    return function (target: Function, context: ClassDecoratorContext) {
+        target.prototype['Id'] = Options.Id;
+        target.prototype['Name'] = Options.Name;
+        target.prototype['Deprecated'] = Options.Deprecated || false;
+        target.prototype['InDevelopment'] = Options.InDevelopment || false;
 
-    readonly Deprecated: boolean;
-    readonly InDevelopment: boolean;
-
-    Actions: LostAction[] = [];
-    Conditions: LostCondition[] = [];
-    Expressions: LostExpression[] = [];
-
-    constructor(Options: LostCategoryOptions) {
-        const {Id, Name, Deprecated, InDevelopment } = Options;
-        this.Id = Id;
-        this.Name = Name;
-
-        this.Deprecated = Deprecated || false;
-        this.InDevelopment = InDevelopment || false;
-    }
-}
-
-export class LostCategoryDefault extends LostCategoryBase {
-    constructor() {
-        super({Id: '', Name: ''});
-    }
-}
-
-export function Category(Options: LostCategoryOptions): ClassDecorator {
-    return function (BaseClass: any): any {
-        return class extends LostCategoryBase {
-            constructor() {
-                super(Options)
-                let prototype;
-                if (BaseClass.prototype.Actions) {
-                    prototype = BaseClass.prototype;
-                } else {
-                    prototype = Object.getPrototypeOf(BaseClass)
-                }
-                this.Actions = [...(prototype.Actions || [])];
-                this.Conditions = [...(prototype.Conditions || [])];
-                this.Expressions = [...(prototype.Expressions || [])];
-
-            }
-        }
+        if (!target.prototype['Actions']) target.prototype['Actions'] = [];
+        if (!target.prototype['Conditions']) target.prototype['Conditions'] = [];
+        if (!target.prototype['Expressions']) target.prototype['Expressions'] = [];
     }
 }

@@ -1,6 +1,6 @@
 import type { AddonType, LostConfig } from "../lib/common.ts";
-import type { PluginProperty } from "../lib/plugin-props.ts";
-import type { LostCategoryDefault } from "../lib/entities.ts";
+import type { Property } from "../lib/plugin-props.ts";
+import type { CategoryClassType } from "../lib/entities.ts";
 import type { AddonScript } from "./get-addon-scripts.ts";
 import type { AddonFile } from "./get-addon-files.ts";
 import { ADDON_BASE_URL, ADDON_ICON_FOLDER_PATH, BUILD_PATH, LOCAL_ADDON_BASE_PATH } from "./paths.ts";
@@ -38,10 +38,10 @@ const ADDON_FILES: AddonFiles = {
 
 interface CreateAddonStructureOptions {
     CONFIG: LostConfig<'plugin' | 'behavior'>;
-    PLUGIN_PROPERTIES: PluginProperty[];
+    PLUGIN_PROPERTIES: Property[];
     SCRIPTS: AddonScript[];
     FILES: AddonFile[];
-    CATEGORIES: LostCategoryDefault[];
+    CATEGORIES: CategoryClassType[];
     ICON: AddonIcon;
 }
 
@@ -152,7 +152,7 @@ export async function createAddonStructure(options: CreateAddonStructureOptions,
 
 }
 
-function serializeEntities(categories: LostCategoryDefault[]) {
+function serializeEntities(categories: CategoryClassType[]) {
     let actions: any = {};
     let conditions: any = {};
     let expressions: any = {};

@@ -4,7 +4,7 @@ export const ADDONS_COLLECTION_PATH = `${Deno.cwd()}/Builds`;
 
 export const CONFIG_FILE_PATH = `file://${Deno.cwd()}/lost.config.ts`;
 
-export const PLUGIN_PROPERTIES_FILE_PATH = `file://${Deno.cwd()}/Addon/PluginProperties.ts`;
+export const PLUGIN_PROPERTIES_FILE_PATH = `file://${Deno.cwd()}/properties.ts`;
 
 export const ADDON_SCRIPTS_FOLDER_PATH = `${Deno.cwd()}/Addon/Scripts`;
 
