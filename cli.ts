@@ -4,7 +4,7 @@ import { Colors } from "./deps.ts";
 import { buildAddon } from "./cli/main.ts";
 import type { AddonType } from "./lib/common.ts";
 
-const VERSION = '1.1.4'
+const VERSION = '1.2.0'
 
 type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve' | 'convert-sdk2';
 
