@@ -65,8 +65,8 @@ interface ConditionEntityOptions extends EntityOptionsBase {
 
 export function Condition<T>(Options: ConditionEntityOptions) {
     return function (
-        value: (this: any) => void,
-        context: ClassMethodDecoratorContext<T, (this: any) => void>
+        value: (this: any, ...args: any[]) => void,
+        context: ClassMethodDecoratorContext<T, (this: any, ...args: any[]) => void>
     ) {
         context.addInitializer(function (this: any) {
            

@@ -20,7 +20,7 @@ export default class Test {
         Description: ``,
         IsTrigger: true
     })
-    onCondition(this: Instance) {
+    onCondition(this: Instance, test: string) {
         
     };
 }

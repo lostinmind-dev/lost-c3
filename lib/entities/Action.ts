@@ -26,10 +26,10 @@ interface ActionEntityOptions extends EntityOptionsBase {
 
 export function Action<T>(Options: ActionEntityOptions) {
     return function (
-        value: (this: any) => void,
-        context: ClassMethodDecoratorContext<T, (this: any) => void>
+        value: (this: any, ...args: any[]) => void,
+        context: ClassMethodDecoratorContext<T, (this: any, ...args: any[]) => void>
     ) {
-        context.addInitializer(function (this: any) {
+        context.addInitializer(function (this: any, ...args: any[]) {
 
             if (!this.constructor.prototype['Actions']) {
                 this.constructor.prototype['Actions'] = [];
