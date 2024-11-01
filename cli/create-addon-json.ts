@@ -1,5 +1,5 @@
 import type { AddonIcon } from "./get-addon-icon.ts";
-import type { LostConfig } from "../lib/common.ts";
+import type { AddonType, LostConfig } from "../lib/common.ts";
 import type { AddonScript } from "./get-addon-scripts.ts";
 import type { AddonFile } from "./get-addon-files.ts";
 import type { AddonJSON } from "../lib/json.ts";
@@ -8,7 +8,7 @@ import type { AddonModule } from './get-addon-modules.ts';
 import { BUILD_PATH } from "./paths.ts";
 
 interface CreateAddonJSONOptions {
-    CONFIG: LostConfig<'plugin' | 'behavior'>;
+    CONFIG: LostConfig<AddonType>;
     ICON: AddonIcon;
     SCRIPTS: AddonScript[];
     FILES: AddonFile[];
