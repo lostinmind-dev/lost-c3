@@ -1,3 +1,4 @@
+ts-defs/
 mocks/
 src/
 deno.lock

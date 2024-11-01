@@ -55,7 +55,7 @@ export async function createAddonJSON(options: CreateAddonJSONOptions) {
 
     SCRIPTS.forEach(script => AddonJSON['file-list'].push(`scripts/${script.filename}`));
     FILES.forEach(file => AddonJSON['file-list'].push(`files/${file.filename}`));
-    MODULES.forEach(module => AddonJSON['file-list'].push(`modules/${module.filename}`));
+    MODULES.forEach(module => AddonJSON['file-list'].push(`c3runtime/Modules/${module.filename}`));
 
     await Deno.writeTextFile(`${BUILD_PATH}/addon.json`, JSON.stringify(AddonJSON, null, 4));
 }

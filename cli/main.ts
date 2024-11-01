@@ -39,6 +39,7 @@ export async function buildAddon() {
 
     await createLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES});
 
+    LOGGER.Process('Creating .c3addon file');
     await zipAddon(CONFIG);
     LOGGER.Success(Colors.bold(`Addon [${Colors.yellow(CONFIG.AddonId)}] has been ${Colors.green('successfully')} built`));
 

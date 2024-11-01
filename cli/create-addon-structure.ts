@@ -13,8 +13,6 @@ import { LOGGER } from './misc.ts';
 
 type AddonFiles = {
     readonly [K in AddonType]: [
-        `c3runtime/${K}.js`,
-        'c3runtime/type.js',
         'instance.js',
         'plugin.js',
         'type.js'
@@ -23,23 +21,14 @@ type AddonFiles = {
 
 const ADDON_FILES: AddonFiles = {
     plugin: [
-        'c3runtime/plugin.js',
-        'c3runtime/type.js',
         'instance.js',
         'plugin.js',
         'type.js'
-    ],
-    behavior: [
-        'c3runtime/behavior.js',
-        'c3runtime/type.js',
-        'instance.js',
-        'plugin.js',
-        'type.js'    
     ]
 }
 
 interface CreateAddonStructureOptions {
-    CONFIG: LostConfig<'plugin' | 'behavior'>;
+    CONFIG: LostConfig<AddonType>;
     PLUGIN_PROPERTIES: Property[];
     SCRIPTS: AddonScript[];
     FILES: AddonFile[];
@@ -80,8 +69,15 @@ export async function createAddonStructure(options: CreateAddonStructureOptions)
 
     let instanceFileData = await transpileTsToJs(`${Deno.cwd()}/Addon/Instance.ts`) as string;
     instanceFileData = `const Config = {AddonId: ${JSON.stringify(CONFIG.AddonId)}};\n${instanceFileData}`
-    // instanceFileData = instanceFileData.replace(/import\s+Config\s+from\s+["'](?:@config|\.\.\/lost\.config\.ts)["'];/, `const Config = ${JSON.stringify(CONFIG)};`);
     await Deno.writeTextFile(`${BUILD_PATH}/c3runtime/instance.js`, instanceFileData);
+
+    let pluginFileData = await transpileTsToJs(`${Deno.cwd()}/Addon/Plugin.ts`) as string;
+    pluginFileData = `const Config = {AddonId: ${JSON.stringify(CONFIG.AddonId)}};\n${pluginFileData}`
+    await Deno.writeTextFile(`${BUILD_PATH}/c3runtime/plugin.js`, pluginFileData);
+
+    let typeFileData = await transpileTsToJs(`${Deno.cwd()}/Addon/Type.ts`) as string;
+    typeFileData = `const Config = {AddonId: ${JSON.stringify(CONFIG.AddonId)}};\n${typeFileData}`
+    await Deno.writeTextFile(`${BUILD_PATH}/c3runtime/type.js`, typeFileData);
 
     if (!localBase) {
         if (!ICON.isDefault) {

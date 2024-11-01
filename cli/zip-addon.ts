@@ -1,31 +1,25 @@
-import type { LostConfig } from "../lib/common.ts";
-import { walk, zip } from "./cli-deps.ts";
+import type { AddonType, LostConfig } from "../lib/common.ts";
+import { walk, BlobWriter, ZipWriter, TextReader } from "./cli-deps.ts";
 import { ADDONS_COLLECTION_PATH, BUILD_PATH } from "./paths.ts";
 
-export async function zipAddon(config: LostConfig<'plugin' | 'behavior'>) {
-    const files: {
-        name: string;
-        data: Uint8Array;
-    }[] = [];
+export async function zipAddon(config: LostConfig<AddonType>) {
+    const zipWriter = new ZipWriter(new BlobWriter("application/zip"));
+    const addonFilePath = `${ADDONS_COLLECTION_PATH}/${config.AddonId}_${config.Version}`;
 
-    // Add top files
     for await (const entry of walk(BUILD_PATH)) {
         const {isFile, path} = entry;
         if (isFile) {
-            const data = await Deno.readFile(path);
-            const relativePath = entry.path.substring(BUILD_PATH.length + 1);
-            
-            files.push({name: relativePath, data});
+            const data = await Deno.readTextFile(path);
+            const relativePath = path.substring(BUILD_PATH.length + 1).replace(/\\/g, "/");;
+            // console.log(relativePath);
+            zipWriter.add(relativePath, new TextReader(data))
         }
     }
+    const blob = await zipWriter.close();
 
-    //console.log(files);
-    const buffer = await zip.create(files);
-    const addonFile = `${config.AddonId}_${config.Version}.c3addon`;
-    await Deno.writeFile(`${ADDONS_COLLECTION_PATH}/${addonFile}`, buffer);
+    // const url = URL.createObjectURL(blob);
+    // console.log("Ссылка для скачивания архива:", url);
 
-    /**
-     * Remove all files after build
-     */
-    //await Deno.remove(BUILD_PATH, { recursive: true });
+    await Deno.writeFile(`${addonFilePath}.zip`, new Uint8Array(await blob.arrayBuffer()))
+    await Deno.rename(`${addonFilePath}.zip`, `${addonFilePath}.c3addon`);
 }

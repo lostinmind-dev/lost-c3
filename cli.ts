@@ -11,8 +11,8 @@ type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve' | 
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
-        boolean: ["plugin", "behavior", "local-base"],
-        alias: {p: "plugin", b: "plugin", l: "local-base"},
+        boolean: ["plugin"],
+        alias: {p: "plugin"},
         "--": true,
       });
 
@@ -34,10 +34,6 @@ async function main() {
             }
             if (flags.plugin) {
                 await createBareBones('plugin');
-                break;
-            }
-            if (flags.behavior) {
-                await createBareBones('behavior');
                 break;
             }
             break;

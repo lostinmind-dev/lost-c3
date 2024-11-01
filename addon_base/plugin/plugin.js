@@ -41,7 +41,7 @@ const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPlugi
             this._info.AddFileDependency({ filename: `scripts/${script.filename}`, type: script.dependencyType });
         });
         FILES.forEach(file => {
-            this._info.AddFileDependency({ filename: `files/${file.filename}`, type: file.dependencyType });
+            this._info.AddFileDependency({ filename: `files/${file.filename}`, type: file.dependencyType, fileType: file.fileType });
         });
         MODULES.forEach(module => {
             this._info.AddC3RuntimeScript(`c3runtime/Modules/${module.filename}`);

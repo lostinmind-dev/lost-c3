@@ -1,4 +1,4 @@
-import type { LostConfig, ScriptDependencyType } from "../lib/common.ts";
+import type { AddonType, LostConfig, ScriptDependencyType } from "../lib/common.ts";
 import { LOGGER } from "./misc.ts";
 import { ADDON_SCRIPTS_FOLDER_PATH } from "./paths.ts";
 
@@ -9,7 +9,7 @@ export interface AddonScript {
     dependencyType: ScriptDependencyType;
 }
 
-export async function getAddonScripts(config: LostConfig<'plugin' | 'behavior'>) {
+export async function getAddonScripts(config: LostConfig<AddonType>) {
     LOGGER.Searching('Searching for scripts');
 
     const scripts: AddonScript[] = [];

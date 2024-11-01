@@ -1,4 +1,4 @@
-export type AddonType = 'plugin' | 'behavior';
+export type AddonType = 'plugin';
 
 export type ScriptDependencyType = 'external-dom-script' | 'external-runtime-script';
 
@@ -187,20 +187,21 @@ interface PluginConfig extends ConfigBase {
     IsSingleGlobal?: boolean;
 }
 
-type BehaviorCategory = "attributes" | "general" | "movements" | "other";
+//type BehaviorCategory = "attributes" | "general" | "movements" | "other";
 
-interface BehaviorConfig extends ConfigBase {
-    Type: 'behavior',
-    /**
-     * The category for the behavior when displaying it in the Add behavior dialog.
-     * @example "general"
-     */
-    Category: BehaviorCategory;
-    /** Optional. Set a boolean of whether the behavior is allowed to be added more than once to the same object.
-     * @description The default is false, which means the behavior can be added multiple times to the same object.
-     * Set to true to only allow it to be added once to each object.
-     */
-    IsOnlyOneAllowed?: boolean;
-}
+// interface BehaviorConfig extends ConfigBase {
+//     Type: 'behavior',
+//     /**
+//      * The category for the behavior when displaying it in the Add behavior dialog.
+//      * @example "general"
+//      */
+//     Category: BehaviorCategory;
+//     /** Optional. Set a boolean of whether the behavior is allowed to be added more than once to the same object.
+//      * @description The default is false, which means the behavior can be added multiple times to the same object.
+//      * Set to true to only allow it to be added once to each object.
+//      */
+//     IsOnlyOneAllowed?: boolean;
+// }
 
-export type LostConfig<T extends AddonType> = T extends 'plugin' ? PluginConfig : T extends 'behavior' ? BehaviorConfig : never;
+// export type LostConfig<T extends AddonType> = T extends 'plugin' ? PluginConfig : T extends 'behavior' ? BehaviorConfig : never;
+export type LostConfig<T extends AddonType> = T extends 'plugin' ? PluginConfig : never;

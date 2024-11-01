@@ -1,4 +1,4 @@
-import type { LostConfig, FileDependencyType } from "../lib/common.ts";
+import type { LostConfig, FileDependencyType, AddonType } from "../lib/common.ts";
 import { getMIMEFileType, LOGGER } from "./misc.ts";
 import { ADDON_FILES_FOLDER_PATH } from "./paths.ts";
 
@@ -9,7 +9,7 @@ export interface AddonFile {
     dependencyType: FileDependencyType;
 }
 
-export async function getAddonFiles(config: LostConfig<'plugin' | 'behavior'>) {
+export async function getAddonFiles(config: LostConfig<AddonType>) {
     LOGGER.Searching('Searching for files');
     
     const files: AddonFile[] = [];
