@@ -3,6 +3,7 @@ import type { LostConfig } from "../lib/common.ts";
 import type { AddonScript } from "./get-addon-scripts.ts";
 import type { AddonFile } from "./get-addon-files.ts";
 import type { AddonJSON } from "../lib/json.ts";
+import type { AddonModule } from './get-addon-modules.ts';
 
 import { BUILD_PATH } from "./paths.ts";
 
@@ -11,10 +12,11 @@ interface CreateAddonJSONOptions {
     ICON: AddonIcon;
     SCRIPTS: AddonScript[];
     FILES: AddonFile[];
+    MODULES: AddonModule[];
 }
 
 export async function createAddonJSON(options: CreateAddonJSONOptions) {
-    const { CONFIG, ICON, SCRIPTS, FILES } = options;
+    const { CONFIG, ICON, SCRIPTS, FILES, MODULES } = options;
     const AddonJSON: AddonJSON = {
         "supports-worker-mode": (CONFIG.SupportsWorkerMode) ? CONFIG.SupportsWorkerMode : undefined,
         "min-construct-version": (CONFIG.MinConstructVersion) ? CONFIG.MinConstructVersion : undefined,
@@ -40,6 +42,7 @@ export async function createAddonJSON(options: CreateAddonJSONOptions) {
             "c3runtime/conditions.js",
             "c3runtime/actions.js",
             "c3runtime/expressions.js",
+            "c3runtime/main.js",
             "lang/en-US.json",
             "aces.json",
             "addon.json",
@@ -52,6 +55,7 @@ export async function createAddonJSON(options: CreateAddonJSONOptions) {
 
     SCRIPTS.forEach(script => AddonJSON['file-list'].push(`scripts/${script.filename}`));
     FILES.forEach(file => AddonJSON['file-list'].push(`files/${file.filename}`));
+    MODULES.forEach(module => AddonJSON['file-list'].push(`modules/${module.filename}`));
 
     await Deno.writeTextFile(`${BUILD_PATH}/addon.json`, JSON.stringify(AddonJSON, null, 4));
 }

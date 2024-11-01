@@ -3,8 +3,9 @@ import { parseArgs } from "jsr:@std/cli@1.0.6";
 import { Colors } from "./deps.ts";
 import { buildAddon } from "./cli/main.ts";
 import type { AddonType } from "./lib/common.ts";
+import { serveAddon } from './cli/serve-addon.ts';
 
-const VERSION = '1.2.2'
+const VERSION = '1.2.3'
 
 type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve' | 'convert-sdk2';
 
@@ -41,20 +42,10 @@ async function main() {
             }
             break;
         case 'build':
-            if (!flags['local-base']) {
-                await buildAddon({ serve: false, localBase: false});
-            } 
-            if (flags['local-base']) {
-                await buildAddon({ serve: false, localBase: true });
-            }
+            await buildAddon();
             break;
         case 'serve':
-            if (!flags['local-base']) {
-                await buildAddon({ serve: true, localBase: false});
-            } 
-            if (flags['local-base']) {
-                await buildAddon({ serve: true, localBase: true });
-            }
+            await serveAddon(65432);
             break;
         case 'none':
             console.error('❌', Colors.red(Colors.bold(`Unknown command:`)), Colors.italic(command));

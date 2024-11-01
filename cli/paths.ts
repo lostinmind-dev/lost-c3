@@ -10,6 +10,8 @@ export const ADDON_SCRIPTS_FOLDER_PATH = `${Deno.cwd()}/Addon/Scripts`;
 
 export const ADDON_FILES_FOLDER_PATH = `${Deno.cwd()}/Addon/Files`;
 
+export const ADDON_MODULES_FOLDER_PATH = `${Deno.cwd()}/Addon/Modules`;
+
 export const ADDON_CATEGORIES_FOLDER_PATH = `${Deno.cwd()}/Addon/Categories`;
 
 export const ADDON_ICON_FOLDER_PATH = `${Deno.cwd()}/Addon`;
