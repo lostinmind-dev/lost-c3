@@ -30,7 +30,7 @@ Here I've compiled some of the benefits from standard addon creation for
 > - ❌ **Error detecting before installization of your Addon!**
 > - 📝 **Only _**Typescript**_ and no _**Javascript**_ for your addon (not
 >   including scripts).**
-> - 🚀 **Fast compilation in milliseconds to .c3addon format!**
+> - 🚀 **Fast compilation to .c3addon format!**
 > - 🧪 **Built-in addon testing using
 >   [Developer Mode in Construct 3](https://www.construct.net/en/make-games/manuals/addon-sdk/guide/using-developer-mode)**.
 > - 📂 **No need to configure separately _**aces.json**_ and _**en-US.json**_
@@ -73,11 +73,16 @@ lost build
 │   ├── Categories/             # Categories folder
 │   ├── Files/                  # Addon files folder
 │   ├── Scripts/                # Addon scripts folder
+│   ├── Modules/                # Addon modules folder
 │   ├── Types/                  # Addon scripts folder
 │       ├── ts-defs/            # Construct 3 declaration files
+│           ├── ...
+│           └── lost.d.ts/      # Lost types declaration file
 │       └── global.d.ts         # Declaration file for your purposes
 │   ├── icon.svg                # Your .svg OR .png addon icon
-│   └── Instance.ts             # Addon Instance class
+│   ├── Instance.ts             # Addon Instance class
+│   ├── Plugin.ts               # Addon Plugin class
+│   └── Type.ts                 # Addon Type class
 ├── Builds/                     # Builds folder
 │   ├── Source/                 # Final Construct 3 addon folder
 │       └── ...
@@ -581,8 +586,6 @@ Example of using Instance properties and functions inside any category entity
 _Instance.ts_
 
 ```typescript
-import Config from '@config';
-
 const C3 = globalThis.C3;
 
 class LostInstance extends globalThis.ISDKInstanceBase {
