@@ -6,7 +6,7 @@ PLUGIN_CLASS.Instance = class LostInstance extends SDK.IInstanceBase {
         super(sdkType, inst);
     }
     Release() { }
-    OnCreate() { console.log(`%c Lost addon loaded! `, `background: #222; color: #bada55`); }
+    OnCreate() { console.log(`%c Lost addon instance loaded! `, `background: #222; color: #bada55`); }
     OnPropertyChanged(id, value) { }
 };
 export {};

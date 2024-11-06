@@ -16,7 +16,7 @@ export { Property } from './lib/plugin-props.ts';
 /**
  * Common
  */
-export type { LostConfig, AddonType } from './lib/common.ts';
+export { type LostConfig, type AddonType, STABLE, BETA, LTS } from './lib/common.ts';
 
 /**
  * Misc

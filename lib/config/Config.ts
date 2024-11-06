@@ -66,6 +66,24 @@ interface CopyToOutputFile {
     Type: "copy-to-output"
 }
 
+export enum LTS {
+    R397_4 = 'r397-4'
+}
+
+export enum BETA {
+    R408 = 'r408',
+    R409 = 'r409',
+    R410 = 'r410',
+    R411 = 'r411',
+    R412 = 'r412',
+    R413 = 'r413',
+    R414 = 'r414'
+}
+
+export enum STABLE {
+    R407_2 = 'r407-2'
+}
+
 interface ConfigBase {
     /**
      * Optional. Default is **True**.
@@ -84,7 +102,7 @@ interface ConfigBase {
      * If the user installs the addon with a newer version of Construct and then rolls back to an older version of Construct lower than the minimum, then Construct will refuse to load the addon (a message will be logged to the console) and the editor will act as if the addon is not installed.
      * @example "r399"
      */
-    MinConstructVersion?: string;
+    MinConstructVersion?: STABLE | BETA | LTS;
     /**
      * The unique ID of the addon.
      * @description This is not displayed and is only used internally.

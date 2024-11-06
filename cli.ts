@@ -5,9 +5,9 @@ import { buildAddon } from "./cli/main.ts";
 import type { AddonType } from "./lib/common.ts";
 import { serveAddon } from './cli/serve-addon.ts';
 
-const VERSION = '1.2.4'
+const VERSION = '1.2.5'
 
-type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve' | 'convert-sdk2';
+type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {

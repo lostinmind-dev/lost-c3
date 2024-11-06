@@ -198,7 +198,11 @@ export class Param<T extends ParamOptions> {
                 break;
             case 'string':
                 if (!Options.AutocompleteId) Options.AutocompleteId = false;
-                if (!Options.InitialValue) Options.InitialValue = '""';
+                if (!Options.InitialValue) {
+                    Options.InitialValue = '""';
+                } else {
+                    Options.InitialValue = `"${Options.InitialValue}"`;
+                }
                 break;
             case 'boolean':
                 if (!Options.InitialValue) Options.InitialValue = 'false';
@@ -219,7 +223,11 @@ export class Param<T extends ParamOptions> {
                 if (!Options.AllowedPluginIds) Options.AllowedPluginIds = ["<world>"];
                 break;
             default:
-                if (!Options.InitialValue) Options.InitialValue = '""';
+                if (!Options.InitialValue) {
+                    Options.InitialValue = '""';
+                } else {
+                    Options.InitialValue = `"${Options.InitialValue}"`;
+                }
                 break;
         }
 
