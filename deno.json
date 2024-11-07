@@ -33,8 +33,7 @@
         "exclude": [
             ".github",
             "tests",
-            "addon_base",
-            "examples"
+            "addon_base"
         ]
     }
 }

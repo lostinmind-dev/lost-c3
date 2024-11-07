@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-namespace
 export interface LanguageParam {
     "name": string;
     "desc": string
@@ -81,30 +82,67 @@ export interface LanguagePluginProperty {
     };
 }
 
+export interface LanguageEffectParameter {
+    "name": string;
+    "desc": string;
+}
 
-export interface LanguageJSON {
-    "languageTag": "en-US",
-    "fileDescription": string;
-    "text": {
-        [addonTypeInPluralForm: string]: {
-            [pluginId: string]: {
-                "name": string;
-                "description": string;
-                "help-url": string;
-                "properties": {
-                    [propertyId: string]: LanguagePluginProperty;
-                },
-                "aceCategories": {
-                    [categoryId: string]: string;
-                },
-                "conditions": {
-                    [conditionId: string]: LanguageCondition;
-                },
-                "actions": {
-                    [actionId: string]: LanguageAction;
-                },
-                "expressions": {
-                    [expressionId: string]: LanguageExpression;
+
+export namespace LanguageJSON {
+    export interface Plugin {
+        "languageTag": "en-US",
+        "fileDescription": string;
+        "text": {
+            [addonTypeInPluralForm: string]: {
+                [addonPluginId: string]: {
+                    "name": string;
+                    "description": string;
+                    "help-url": string;
+                    "properties": {
+                        [propertyId: string]: LanguagePluginProperty;
+                    },
+                    "aceCategories": {
+                        [categoryId: string]: string;
+                    },
+                    "conditions": {
+                        [conditionId: string]: LanguageCondition;
+                    },
+                    "actions": {
+                        [actionId: string]: LanguageAction;
+                    },
+                    "expressions": {
+                        [expressionId: string]: LanguageExpression;
+                    }
+                }
+            }
+        }
+    }
+
+    export interface Theme {
+        "languageTag": "en-US",
+        "fileDescription": string;
+        "text": {
+            [addonTypeInPluralForm: string]: {
+                [addonThemeId: string]: {
+                    "name": string;
+                    "description": string;
+                    "help-url": string;
+                }
+            }
+        }
+    }
+
+    export interface Effect {
+        "languageTag": "en-US",
+        "fileDescription": string;
+        "text": {
+            [addonTypeInPluralForm: string]: {
+                [addonEffectId: string]: {
+                    "name": string;
+                    "description": string;
+                    "parameters": {
+                        [parameterId: string]: LanguageEffectParameter
+                    };
                 }
             }
         }

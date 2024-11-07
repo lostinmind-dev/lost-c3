@@ -30,7 +30,7 @@ const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPlugi
         this._info.SetIsDeprecated(CONFIG.Deprecated || false);
         this._info.SetCanBeBundled(CONFIG.CanBeBundled || true);
         this._info.SetIsSingleGlobal(CONFIG.IsSingleGlobal || false);
-        this._info.SetRuntimeModuleMainScript("c3runtime/main.js")
+        this._info.SetRuntimeModuleMainScript("c3runtime/main.js");
         
         SDK.Lang.PushContext(".properties");
 
@@ -38,7 +38,11 @@ const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPlugi
             this._info.AddRemoteScriptDependency(url);
         });
         SCRIPTS.forEach(script => {
-            this._info.AddFileDependency({ filename: `scripts/${script.filename}`, type: script.dependencyType });
+            if (script.scriptType) {
+                this._info.AddFileDependency({ filename: `scripts/${script.filename}`, type: script.dependencyType, scriptType: script.scriptType });
+            } else {
+                this._info.AddFileDependency({ filename: `scripts/${script.filename}`, type: script.dependencyType });
+            }
         });
         FILES.forEach(file => {
             this._info.AddFileDependency({ filename: `files/${file.filename}`, type: file.dependencyType, fileType: file.fileType });

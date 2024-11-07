@@ -1,17 +1,16 @@
-import type { LanguageJSON, LanguageAction, LanguageCondition, LanguageExpression, LanguagePluginProperty, LanguageParam } from "../lib/json.ts";
-import type { AddonType, LostConfig } from "../lib/common.ts";
-import type { Property } from "../lib/plugin-props.ts";
-import { BUILD_PATH } from "./paths.ts";
-import type { CategoryClassType } from '../lib/entities.ts';
+import type { LanguageJSON, LanguageAction, LanguageCondition, LanguageExpression, LanguagePluginProperty, LanguageParam } from "../../lib/json.ts";
+import type { LostConfig } from "../../lib/common.ts";
+import type { Property } from "../../lib/plugin-props.ts";
+import { BUILD_PATH } from "../paths.ts";
+import type { CategoryClassType } from '../../lib/entities.ts';
 
 interface CreateLanguageJSONOptions {
-    CONFIG: LostConfig<AddonType>;
+    CONFIG: LostConfig<'plugin'>;
     PLUGIN_PROPERTIES: Property[];
     CATEGORIES: CategoryClassType[];
 }
 
-export async function createLanguageJSON(options: CreateLanguageJSONOptions) {
-    const { CONFIG, PLUGIN_PROPERTIES, CATEGORIES } = options
+export async function createAddonPluginLanguageJSON({ CONFIG, PLUGIN_PROPERTIES, CATEGORIES }: CreateLanguageJSONOptions) {
     const LanguageJSON = {
         "languageTag": "en-US",
         "fileDescription": `Strings for ${CONFIG.AddonName} addon.`,
@@ -29,7 +28,7 @@ export async function createLanguageJSON(options: CreateLanguageJSONOptions) {
                 }
             }
         }
-    } as LanguageJSON;
+    } as LanguageJSON.Plugin;
 
     const DeepJSON = LanguageJSON['text'][CONFIG.Type + 's'][CONFIG.AddonId.toLowerCase()];
 

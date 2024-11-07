@@ -16,8 +16,18 @@ export const ADDON_CATEGORIES_FOLDER_PATH = `${Deno.cwd()}/Addon/Categories`;
 
 export const ADDON_ICON_FOLDER_PATH = `${Deno.cwd()}/Addon`;
 
-export const LOCAL_ADDON_BASE_PATH = `${Deno.cwd()}/_base`;
-
 export const ADDON_DEFAULT_ICON_URL = `https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/addon_base/icon.svg`
 
 export const ADDON_BASE_URL = `https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/addon_base/`
+
+/**
+ * Theme addon
+ */
+export const THEME_ADDON_STYLES_FOLDER_PATH = `${Deno.cwd()}/Addon/Styles`;
+
+/**
+ * Effect addon
+ */
+export const EFFECT_ADDON_FILES_FOLDER_PATH = `${Deno.cwd()}/Addon/Effects`;
+
+export const EFFECT_PARAMETERS_FILE_PATH = `file://${Deno.cwd()}/parameters.ts`;

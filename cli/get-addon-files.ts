@@ -9,7 +9,7 @@ export interface AddonFile {
     dependencyType: FileDependencyType;
 }
 
-export async function getAddonFiles(config: LostConfig<AddonType>) {
+export async function getAddonFiles(config: LostConfig<'plugin'>) {
     LOGGER.Searching('Searching for files');
     
     const files: AddonFile[] = [];

@@ -14,6 +14,11 @@ export { Param } from './lib/params.ts';
 export { Property } from './lib/plugin-props.ts';
 
 /**
+ * Effect Parameters
+ */
+export { EffectParameter } from './lib/params.ts';
+
+/**
  * Common
  */
 export { type LostConfig, type AddonType, STABLE, BETA, LTS } from './lib/common.ts';

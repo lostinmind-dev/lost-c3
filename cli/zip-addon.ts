@@ -1,4 +1,5 @@
 import type { AddonType, LostConfig } from "../lib/common.ts";
+
 import { walk, BlobWriter, ZipWriter, TextReader } from "./cli-deps.ts";
 import { ADDONS_COLLECTION_PATH, BUILD_PATH } from "./paths.ts";
 

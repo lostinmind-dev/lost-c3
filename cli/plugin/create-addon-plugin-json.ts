@@ -1,23 +1,22 @@
-import type { AddonIcon } from "./get-addon-icon.ts";
-import type { AddonType, LostConfig } from "../lib/common.ts";
-import type { AddonScript } from "./get-addon-scripts.ts";
-import type { AddonFile } from "./get-addon-files.ts";
-import type { AddonJSON } from "../lib/json.ts";
-import type { AddonModule } from './get-addon-modules.ts';
+import type { AddonIcon } from "../get-addon-icon.ts";
+import type { LostConfig } from "../../lib/common.ts";
+import type { AddonScript } from "../get-addon-scripts.ts";
+import type { AddonFile } from "../get-addon-files.ts";
+import type { AddonJSON } from "../../lib/json.ts";
+import type { AddonModule } from '../get-addon-modules.ts';
 
-import { BUILD_PATH } from "./paths.ts";
+import { BUILD_PATH } from "../paths.ts";
 
 interface CreateAddonJSONOptions {
-    CONFIG: LostConfig<AddonType>;
+    CONFIG: LostConfig<'plugin'>;
     ICON: AddonIcon;
     SCRIPTS: AddonScript[];
     FILES: AddonFile[];
     MODULES: AddonModule[];
 }
 
-export async function createAddonJSON(options: CreateAddonJSONOptions) {
-    const { CONFIG, ICON, SCRIPTS, FILES, MODULES } = options;
-    const AddonJSON: AddonJSON = {
+export async function createAddonPluginJSON({ CONFIG, ICON, SCRIPTS, FILES, MODULES }: CreateAddonJSONOptions) {
+    const AddonJSON: AddonJSON.Plugin = {
         "supports-worker-mode": (CONFIG.SupportsWorkerMode) ? CONFIG.SupportsWorkerMode : undefined,
         "min-construct-version": (CONFIG.MinConstructVersion) ? CONFIG.MinConstructVersion : undefined,
         "is-c3-addon": true,

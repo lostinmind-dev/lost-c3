@@ -1,8 +1,9 @@
 #!/usr/bin/env deno run --allow-read --allow-write --unstable
+import type { AddonType } from "./lib/common.ts";
+
 import { parseArgs } from "jsr:@std/cli@1.0.6";
 import { Colors } from "./deps.ts";
-import { buildAddon } from "./cli/main.ts";
-import type { AddonType } from "./lib/common.ts";
+import { build } from "./cli/main.ts";
 import { serveAddon } from './cli/serve-addon.ts';
 
 const VERSION = '1.2.5'
@@ -11,8 +12,8 @@ type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
-        boolean: ["plugin"],
-        alias: {p: "plugin"},
+        boolean: ["plugin", "theme", "effect"],
+        alias: {p: "plugin", t: "theme", e: "effect"},
         "--": true,
       });
 
@@ -38,7 +39,7 @@ async function main() {
             }
             break;
         case 'build':
-            await buildAddon();
+            await build();
             break;
         case 'serve':
             await serveAddon(65432);
@@ -85,8 +86,9 @@ function printHelp() {
     
     console.log(`  ${Colors.yellow('create')}`);
     console.log('   ⚙️', Colors.gray('  --plugin, -p'), '   Creates a bare-bones for "plugin" addon type.');
+    console.log('   ⚙️', Colors.gray('  --theme, -t'), '   Creates a bare-bones for "theme" addon type.');
+    console.log('   ⚙️', Colors.gray('  --effect, -e'), '   Creates a bare-bones for "effect" addon type.');
 
     console.log(`  ${Colors.yellow('build')}`);
-    console.log('   ⚙️', Colors.gray('  --local-base, -c'), '   Builds addon with local addon base.');
     console.log(`  ${Colors.yellow('serve')}`);
 }
