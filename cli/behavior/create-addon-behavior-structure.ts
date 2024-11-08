@@ -13,15 +13,15 @@ import { path } from '../../deps.ts';
 import { LOGGER } from '../misc.ts';
 
 const ADDON_FILES = {
-    plugin: [
+    behavior: [
         'instance.js',
-        'plugin.js',
+        'behavior.js',
         'type.js'
     ]
 }
 
 interface CreateAddonStructureOptions {
-    CONFIG: LostConfig<'plugin'>;
+    CONFIG: LostConfig<'behavior'>;
     PLUGIN_PROPERTIES: Property[];
     SCRIPTS: AddonScript[];
     FILES: AddonFile[];
@@ -30,7 +30,7 @@ interface CreateAddonStructureOptions {
     ICON: AddonIcon;
 }
 
-export async function createAddonPluginStructure(
+export async function createAddonBehaviorStructure(
     {CONFIG, PLUGIN_PROPERTIES, SCRIPTS, FILES, MODULES, ICON, CATEGORIES}: CreateAddonStructureOptions
 ) {
     const localBase = false;
@@ -92,9 +92,9 @@ export async function createAddonPluginStructure(
     instanceFileData = `const Config = {AddonId: ${JSON.stringify(CONFIG.AddonId)}};\n${instanceFileData}`
     await Deno.writeTextFile(`${BUILD_PATH}/c3runtime/instance.js`, instanceFileData);
 
-    let pluginFileData = await transpileTsToJs(`${Deno.cwd()}/Addon/Plugin.ts`) as string;
-    pluginFileData = `const Config = {AddonId: ${JSON.stringify(CONFIG.AddonId)}};\n${pluginFileData}`
-    await Deno.writeTextFile(`${BUILD_PATH}/c3runtime/plugin.js`, pluginFileData);
+    let behaviorFileData = await transpileTsToJs(`${Deno.cwd()}/Addon/Behavior.ts`) as string;
+    behaviorFileData = `const Config = {AddonId: ${JSON.stringify(CONFIG.AddonId)}};\n${behaviorFileData}`
+    await Deno.writeTextFile(`${BUILD_PATH}/c3runtime/behavior.js`, behaviorFileData);
 
     let typeFileData = await transpileTsToJs(`${Deno.cwd()}/Addon/Type.ts`) as string;
     typeFileData = `const Config = {AddonId: ${JSON.stringify(CONFIG.AddonId)}};\n${typeFileData}`
@@ -149,14 +149,14 @@ export async function createAddonPluginStructure(
 
     const setializedEntities = serializeEntities(CATEGORIES);
 
-    let entities = `const ADDON_ID = ${JSON.stringify(CONFIG.AddonId)};\nconst C3 = globalThis.C3;\nC3.Plugins[ADDON_ID].Acts = ${setializedEntities.Actions};`;
+    let entities = `const ADDON_ID = ${JSON.stringify(CONFIG.AddonId)};\nconst C3 = globalThis.C3;\nC3.Behaviors[ADDON_ID].Acts = ${setializedEntities.Actions};`;
     await Deno.writeTextFile(path.resolve(BUILD_PATH, 'c3runtime', 'actions.js'), entities);
-    entities = `const ADDON_ID = ${JSON.stringify(CONFIG.AddonId)};\nconst C3 = globalThis.C3;\nC3.Plugins[ADDON_ID].Cnds = ${setializedEntities.Conditions};`;
+    entities = `const ADDON_ID = ${JSON.stringify(CONFIG.AddonId)};\nconst C3 = globalThis.C3;\nC3.Behaviors[ADDON_ID].Cnds = ${setializedEntities.Conditions};`;
     await Deno.writeTextFile(path.resolve(BUILD_PATH, 'c3runtime', 'conditions.js'), entities);
-    entities = `const ADDON_ID = ${JSON.stringify(CONFIG.AddonId)};\nconst C3 = globalThis.C3;\nC3.Plugins[ADDON_ID].Exps = ${setializedEntities.Expressions};`;
+    entities = `const ADDON_ID = ${JSON.stringify(CONFIG.AddonId)};\nconst C3 = globalThis.C3;\nC3.Behaviors[ADDON_ID].Exps = ${setializedEntities.Expressions};`;
     await Deno.writeTextFile(path.resolve(BUILD_PATH, 'c3runtime', 'expressions.js'), entities);
     
-    const main = `import "./plugin.js";\nimport "./type.js";\nimport "./instance.js";\nimport "./conditions.js";\nimport "./actions.js";\nimport "./expressions.js";`
+    const main = `import "./behavior.js";\nimport "./type.js";\nimport "./instance.js";\nimport "./conditions.js";\nimport "./actions.js";\nimport "./expressions.js";`
     await Deno.writeTextFile(path.resolve(BUILD_PATH, 'c3runtime', 'main.js'), main);
 
 }

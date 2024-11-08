@@ -1,5 +1,5 @@
 ts-defs/
-mocks/
 src/
 deno.lock
 tsconfig.json
+package.json

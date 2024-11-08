@@ -23,6 +23,11 @@ import { createAddonPluginLanguageJSON } from "./plugin/create-addon-plugin-lang
 import { createAddonPluginJSON } from "./plugin/create-addon-plugin-json.ts";
 
 /**
+ * Behavior Addon Functions
+ */
+import { createAddonBehaviorStructure } from './behavior/create-addon-behavior-structure.ts';
+
+/**
  * Theme Addon Functions
  */
 import { getAddonThemeStyleFiles } from './theme/get-addon-theme-style-files.ts';
@@ -58,6 +63,9 @@ export async function build() {
         case 'effect':
             await buildEffect(CONFIG);
             break;
+        case 'behavior':
+            await buildBehavior(CONFIG);
+            break;
     }
 
     LOGGER.Process('Creating .c3addon file');
@@ -81,6 +89,26 @@ async function buildPlugin(CONFIG: LostConfig<'plugin'>) {
     LOGGER.Process('Building addon');
 
     await createAddonPluginStructure({CONFIG, PLUGIN_PROPERTIES, SCRIPTS, FILES, MODULES, CATEGORIES, ICON});
+
+    await createAddonPluginJSON({CONFIG, ICON, SCRIPTS, FILES, MODULES});
+
+    await createAcesJSON({CATEGORIES});
+
+    await createAddonPluginLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES});
+}
+
+async function buildBehavior(CONFIG: LostConfig<'behavior'>) {
+    const PLUGIN_PROPERTIES = await getPluginProperties();
+    LOGGER.LogBetweenLines('📃', Colors.bold('Plugin properties count:'), Colors.bold(Colors.yellow(`${PLUGIN_PROPERTIES.length}`)));
+    const SCRIPTS = await getAddonScripts(CONFIG);
+    const FILES = await getAddonFiles(CONFIG);
+    const MODULES = await getAddonModules();
+    const ICON = await getAddonIcon();
+    const CATEGORIES = await getCategories();
+    LOGGER.Line();
+    LOGGER.Process('Building addon');
+
+    await createAddonBehaviorStructure({CONFIG, PLUGIN_PROPERTIES, SCRIPTS, FILES, MODULES, CATEGORIES, ICON});
 
     await createAddonPluginJSON({CONFIG, ICON, SCRIPTS, FILES, MODULES});
 

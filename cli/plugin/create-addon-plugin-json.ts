@@ -8,7 +8,7 @@ import type { AddonModule } from '../get-addon-modules.ts';
 import { BUILD_PATH } from "../paths.ts";
 
 interface CreateAddonJSONOptions {
-    CONFIG: LostConfig<'plugin'>;
+    CONFIG: LostConfig<'plugin' | 'behavior'>;
     ICON: AddonIcon;
     SCRIPTS: AddonScript[];
     FILES: AddonFile[];
@@ -16,7 +16,7 @@ interface CreateAddonJSONOptions {
 }
 
 export async function createAddonPluginJSON({ CONFIG, ICON, SCRIPTS, FILES, MODULES }: CreateAddonJSONOptions) {
-    const AddonJSON: AddonJSON.Plugin = {
+    const AddonJSON: AddonJSON.PluginOrBehavior = {
         "supports-worker-mode": (CONFIG.SupportsWorkerMode) ? CONFIG.SupportsWorkerMode : undefined,
         "min-construct-version": (CONFIG.MinConstructVersion) ? CONFIG.MinConstructVersion : undefined,
         "is-c3-addon": true,
@@ -52,7 +52,7 @@ export async function createAddonPluginJSON({ CONFIG, ICON, SCRIPTS, FILES, MODU
         ]
     };
 
-    SCRIPTS.forEach(script => AddonJSON['file-list'].push(`scripts/${script.filename}`));
+    SCRIPTS.forEach(script => AddonJSON['file-list'].push(`scripts/${script.relativePath}`));
     FILES.forEach(file => AddonJSON['file-list'].push(`files/${file.filename}`));
     MODULES.forEach(module => AddonJSON['file-list'].push(`c3runtime/Modules/${module.filename}`));
 

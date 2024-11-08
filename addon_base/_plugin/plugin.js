@@ -1,13 +1,22 @@
 const ADDON_ID = "";
+
 const CONFIG = {};
+
 const PLUGIN_PROPERTIES = [];
+
 const REMOTE_SCRIPTS = [];
+
 const SCRIPTS = [];
+
 const FILES = [];
+
 const MODULES = [];
+
 const ICON_NAME = "";
-const ICON_TYPE = 'image/svg+xml';
+const ICON_TYPE = "";
+
 const SDK = globalThis.SDK;
+
 const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPluginBase {
     constructor() {
         super(ADDON_ID);
@@ -22,17 +31,17 @@ const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPlugi
         this._info.SetCanBeBundled(CONFIG.CanBeBundled || true);
         this._info.SetIsSingleGlobal(CONFIG.IsSingleGlobal || false);
         this._info.SetRuntimeModuleMainScript("c3runtime/main.js");
+        
         SDK.Lang.PushContext(".properties");
+
         REMOTE_SCRIPTS.forEach(url => {
             this._info.AddRemoteScriptDependency(url);
         });
         SCRIPTS.forEach(script => {
-            const scriptPath = (script.language === 'ts') ? script.relativePath.replace('.ts', '.js') : script.relativePath;
             if (script.scriptType) {
-                this._info.AddFileDependency({ filename: `scripts/${scriptPath}`, type: script.dependencyType, scriptType: script.scriptType });
-            }
-            else {
-                this._info.AddFileDependency({ filename: `scripts/${scriptPath}`, type: script.dependencyType });
+                this._info.AddFileDependency({ filename: `scripts/${script.filename}`, type: script.dependencyType, scriptType: script.scriptType });
+            } else {
+                this._info.AddFileDependency({ filename: `scripts/${script.filename}`, type: script.dependencyType });
             }
         });
         FILES.forEach(file => {
@@ -88,6 +97,7 @@ const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPlugi
                 case 'font':
                     pps.push(new SDK.PluginProperty(Type, Id, { initialValue: pp.Options.InitialValue }));
                     break;
+                // deno-lint-ignore no-case-declarations
                 case 'combo':
                     const items = pp.Options.Items.map(item => item[0]);
                     pps.push(new SDK.PluginProperty(Type, Id, { items: items, initialValue: pp.Options.InitialValue }));
@@ -101,6 +111,7 @@ const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostPlugin extends SDK.IPlugi
                 case 'group':
                     pps.push(new SDK.PluginProperty(Type, Id));
                     break;
+                // deno-lint-ignore no-case-declarations
                 case 'info':
                     const returnValue = pp.Options.Value;
                     pps.push(new SDK.PluginProperty(Type, Id, { infoCallback: (inst) => { return returnValue; } }));

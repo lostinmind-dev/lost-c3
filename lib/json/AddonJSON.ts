@@ -13,12 +13,12 @@ interface EffectParameter {
 }
 
 export namespace AddonJSON {
-    export interface Plugin {
+    export interface PluginOrBehavior {
         "supports-worker-mode"?: boolean;
         "min-construct-version"?: string;
         "is-c3-addon": true;
         "sdk-version": 2;
-        "type": 'plugin';
+        "type": 'plugin' | 'behavior';
         "name": string;
         "id": string;
         "version": string;

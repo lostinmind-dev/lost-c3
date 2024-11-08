@@ -1,4 +1,4 @@
-export type AddonType = 'plugin' | 'theme' | 'effect';
+export type AddonType = 'plugin' | 'behavior' | 'theme' | 'effect';
 
 export type ScriptDependencyType = 'external-dom-script' | 'external-runtime-script';
 
@@ -187,11 +187,6 @@ interface ConfigBase {
 type PluginCategory = 'data-and-storage' | 'form-controls' | 'general' | 'input' | 'media' | 'monetisation' | 'platform-specific' | 'web' | 'other';
 
 interface PluginConfig extends ConfigBase {
-    /**
-     * Optional. If you are using DomSide.ts set it to True.
-     * @description Make sure that if you'll set that property to True, Lost will be looking for DomSide.ts file in your ./Addon folder.
-     */
-    // UseDOMSideScripts?: boolean;
     Type: 'plugin',
     /**
      * The category for the plugin when displaying it in the Create New Object Type dialog.
@@ -206,21 +201,21 @@ interface PluginConfig extends ConfigBase {
     IsSingleGlobal?: boolean;
 }
 
-//type BehaviorCategory = "attributes" | "general" | "movements" | "other";
+type BehaviorCategory = 'attributes' | 'general' | 'movements' | 'other';
 
-// interface BehaviorConfig extends ConfigBase {
-//     Type: 'behavior',
-//     /**
-//      * The category for the behavior when displaying it in the Add behavior dialog.
-//      * @example "general"
-//      */
-//     Category: BehaviorCategory;
-//     /** Optional. Set a boolean of whether the behavior is allowed to be added more than once to the same object.
-//      * @description The default is false, which means the behavior can be added multiple times to the same object.
-//      * Set to true to only allow it to be added once to each object.
-//      */
-//     IsOnlyOneAllowed?: boolean;
-// }
+interface BehaviorConfig extends ConfigBase {
+    Type: 'behavior',
+    /**
+     * The category for the behavior when displaying it in the Add behavior dialog.
+     * @example "general"
+     */
+    Category: BehaviorCategory;
+    /** Optional. Set a boolean of whether the behavior is allowed to be added more than once to the same object.
+     * @description The default is false, which means the behavior can be added multiple times to the same object.
+     * Set to true to only allow it to be added once to each object.
+     */
+    IsOnlyOneAllowed?: boolean;
+}
 
 interface ThemeConfig {
     Type: 'theme',
@@ -381,4 +376,13 @@ interface EffectConfig {
 }
 
 // export type LostConfig<T extends AddonType> = T extends 'plugin' ? PluginConfig : T extends 'behavior' ? BehaviorConfig : never;
-export type LostConfig<T extends AddonType> = T extends 'plugin' ? PluginConfig : T extends 'theme' ? ThemeConfig : T extends 'effect' ? EffectConfig : never; 
+export type LostConfig<T extends AddonType> = 
+    T extends 'plugin'
+    ? PluginConfig
+    : T extends 'behavior'
+    ? BehaviorConfig
+    : T extends 'theme'
+    ? ThemeConfig
+    : T extends 'effect'
+    ? EffectConfig
+    : never; 

@@ -43,7 +43,7 @@ interface FloatEffectParameterOptions extends EffectParameterOptionsBase {
 
 interface PercentEffectParameterOptions extends EffectParameterOptionsBase {
     /**
-     * A float parameter
+     * A percent parameter
      */
     Type: 'percent';
     /**
@@ -55,7 +55,7 @@ interface PercentEffectParameterOptions extends EffectParameterOptionsBase {
 
 interface ColorEffectParameterOptions extends EffectParameterOptionsBase {
     /**
-     * A float parameter
+     * A color parameter
      */
     Type: 'color';
     /**

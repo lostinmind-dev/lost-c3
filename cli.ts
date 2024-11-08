@@ -6,14 +6,14 @@ import { Colors } from "./deps.ts";
 import { build } from "./cli/main.ts";
 import { serveAddon } from './cli/serve-addon.ts';
 
-const VERSION = '1.2.5'
+const VERSION = '2.0.0'
 
 type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
-        boolean: ["plugin", "theme", "effect"],
-        alias: {p: "plugin", t: "theme", e: "effect"},
+        boolean: ["plugin", "behavior", "theme", "effect"],
+        alias: {p: "plugin", b: "behavior", t: "theme", e: "effect"},
         "--": true,
       });
 
@@ -29,8 +29,10 @@ async function main() {
         case 'create':
             if (!flags.plugin) {
                 console.log('🎓', Colors.blue(Colors.italic('Specify one of the available types of addon:')))
-                console.log(Colors.gray('  --plugin, -p'), '   Creates a bare-bones for "plugin" addon type.');
-                console.log(Colors.gray('  --behavior, -b'), '   Creates a bare-bones for "behavior" addon type.');
+                console.log('   ⚙️', Colors.gray('  --plugin, -p'), '   Creates a bare-bones for "plugin" addon type.');
+                console.log('   ⚙️', Colors.gray('  --behavior, -b'), '   Creates a bare-bones for "behavior" addon type.');
+                console.log('   ⚙️', Colors.gray('  --theme, -t'), '   Creates a bare-bones for "theme" addon type.');
+                console.log('   ⚙️', Colors.gray('  --effect, -e'), '   Creates a bare-bones for "effect" addon type.');
                 break;
             }
             if (flags.plugin) {
@@ -86,6 +88,7 @@ function printHelp() {
     
     console.log(`  ${Colors.yellow('create')}`);
     console.log('   ⚙️', Colors.gray('  --plugin, -p'), '   Creates a bare-bones for "plugin" addon type.');
+    console.log('   ⚙️', Colors.gray('  --behavior, -b'), '   Creates a bare-bones for "behavior" addon type.');
     console.log('   ⚙️', Colors.gray('  --theme, -t'), '   Creates a bare-bones for "theme" addon type.');
     console.log('   ⚙️', Colors.gray('  --effect, -e'), '   Creates a bare-bones for "effect" addon type.');
 

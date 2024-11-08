@@ -3,7 +3,7 @@
 <div align="center">
   <h3>
     Lost for easy making Construct 3 Addons. <br />
-    v1.2.4
+    v2.0.0
   </h3>
 </div>
 
@@ -15,12 +15,14 @@ lostinmind.
 
 <!-- - __[Examples](https://github.com/lostinmindd/lost-c3-examples)__ -->
 
-- **[Advantages](#-advantages)**
-- **[Quickstart](#-quickstart)**
-- **[Specifying plugin properties](#️-specifying-plugin-properties)**
-- **[Creating category](#-creating-category)**
-- **[Building addon](#️-building-addon)**
-- **[Testing addon](#-testing-addons-in-developer-mode)**
+- **[💪 Advantages](#-advantages)**
+- **[🚀 Quickstart](#-quickstart)**
+- **[🔌 Creating ***`Plugin`*** addon](#-creating-plugin-addon)**
+- **[🎛️ Creating ***`Behavior`*** addon](#️-creating-behavior-addon)**
+- **[🎨 Creating ***`Theme`*** addon](#-creating-theme-addon)**
+- **[✨ Creating ***`Effect`*** addon](#-creating-effect-addon)**
+- **[🏗️ Building addon](#️-building-addon)**
+- **[🧪 Testing addon](#-testing-addons-in-developer-mode)**
 
 # 💪 Advantages
 
@@ -28,8 +30,8 @@ Here I've compiled some of the benefits from standard addon creation for
 **Construct 3**.
 > - ⚡️ **Using the powerful _**JavaScript Runtime**_ [Deno](https://deno.com).**
 > - ❌ **Error detecting before installization of your Addon!**
-> - 📝 **Only _**Typescript**_ and no _**Javascript**_ for your addon (not
->   including scripts).**
+> - 📝 **Only _**Typescript**_ and no _**Javascript**_ for your addon**
+> - E **___Typescript___ support for addon scripts!**
 > - 🚀 **Fast compilation to .c3addon format!**
 > - 🧪 **Built-in addon testing using
 >   [Developer Mode in Construct 3](https://www.construct.net/en/make-games/manuals/addon-sdk/guide/using-developer-mode)**.
@@ -49,25 +51,39 @@ Here I've compiled some of the benefits from standard addon creation for
 # 🚀 Quickstart
 
 - **Install [Deno (JavaScript runtime)](https://docs.deno.com/runtime/)**
-- **Install [Lost CLI](https://jsr.io/@lost-c3/lib) by using
-  `deno install --name lost jsr:@lost-c3/lib/cli --global -f -A`**
+- **Install [Lost CLI](https://jsr.io/@lost-c3/lib) by using**
+  `deno install --name lost jsr:@lost-c3/lib/cli --global -f -A`
 - **Create empty folder which will be used as main folder for your addon.**
-- **Create a bare-bones for _**"plugin"**_ addon type by using
-  `lost create --plugin` OR `lost create -p`**
 
 ```bash
 deno install --name lost jsr:@lost-c3/lib/cli --global -f -A
-lost create --plugin
-lost build
+lost create
 ```
+- **Create a bare-bones project for addon by using one of the following commands:**
+```bash
+lost create --plugin    # Creates a bare-bones project for 'plugin' addon
+```
+
+```bash
+lost create --theme    # Creates a bare-bones project for 'theme' addon
+```
+
+```bash
+lost create --effect    # Creates a bare-bones project for 'effect' addon
+```
+
 
 >[!IMPORTANT] Check and install the latest version of Lost CLI!
 > deno install --name lost jsr:@lost-c3/lib@LAST_VERSION/cli --global -f -A
 
 # 📝 Documentation
 
-## 🧱 Addon file structure
+## 🔌 Creating `Plugin` addon
+```bash
+lost create --plugin    # Creates a bare-bones project for 'plugin' addon
+```
 
+### 🧱 File structure
 ```bash
 ├── Addon/                      # Addon folder
 │   ├── Categories/             # Categories folder
@@ -92,12 +108,11 @@ lost build
 ├── properties.ts               # Plugin properties file
 ```
 
-## ⚙️ Addon config setup
-
+### ⚙️ Config setup
 Let's setup _`lost.config.ts`_ config file at first.
 
 ```typescript
-import type { LostConfig } from "jsr:@lost-c3/lib";
+import { type LostConfig, STABLE, BETA, LTS } from "jsr:@lost-c3/lib";
 
 const Config: LostConfig<'plugin'> = {
     /**
@@ -116,7 +131,7 @@ const Config: LostConfig<'plugin'> = {
     /**
      * The minimum Construct version required to load your addon, e.g. "r399".
      */
-    MinConstructVersion?: "r397-4", 
+    MinConstructVersion?: STABLE.R407_2, 
     /**
      * Pass false to prevent the addon from being bundled via the Bundle addons project property.
      */
@@ -156,136 +171,110 @@ const Config: LostConfig<'plugin'> = {
 export default Config;
 ```
 
-## ⚙️ Specifying plugin properties
-
+### 📜 Specifying plugin properties
 Use _`properties.ts`_ file to specify any plugin properties for your
 addon. That file located in following path: `./properties.ts`.
 
-List of available plugin property types:
+**List of available plugin property types:**
 
-```typescript
-"integer" — An integer number property, always rounded to a whole number.
-"float" — A floating-point number property.
-"percent" — A floating-point number in the range [0-1] represented as a percentage.
-"text" — A field the user can enter a string in to.
-"longtext" — The same as "text", but a button with an ellipsis ("...") appears on the right side of the field.
-"check" — A checkbox property, returning a boolean.
-"font" — A field which displays the name of a font and provides a button to open a font picker dialog.
-"combo" — A dropdown list property.
-"color" — A color picker property.
-"object" — An object picker property allowing the user to pick an object class.
-"group" — Creates a new group in the Properties Bar.
-"info" — Creates a read-only string that cannot be edited.
-```
+| Type | Description |
+| ----------- | ----------- |
+| ```"integer"``` | **An integer number property, always rounded to a whole number.** |
+| ```"float"``` | **A floating-point number property.** |
+| ```"percent"``` | **A floating-point number in the range [0-1] represented as a percentage.** |
+| ```"text"``` | **A field the user can enter a string in to.** |
+| ```"longtext"``` | **The same as "text", but a button with an ellipsis ("...") appears on the right side of the field.** |
+| ```"check"``` | **A checkbox property, returning a boolean.** |
+| ```"font"``` | **A field which displays the name of a font and provides a button to open a font picker dialog.** |
+| ```"combo"``` | **A dropdown list property.** |
+| ```"color"``` | **A color picker property.** |
+| ```"object"``` | **An object picker property allowing the user to pick an object class.** |
+| ```"group"``` | **Creates a new group in the Properties Bar.** |
+| ```"info"``` | **Creates a read-only string that cannot be edited.** |
 
-Example
+*Example*
 
 ```typescript
 import { Property } from 'jsr:@lost-c3/lib';
 
 const Properties: Property[] = [
-    new Property(
-        {
-            Type: 'integer',
-            Id: 'integerProperty',
-            Name: 'Integer',
-            InitialValue: 0,
-        },
-    ),
-    new Property(
-        {
-            Type: 'float',
-            Id: 'floatProperty',
-            Name: 'Float',
-            InitialValue: 0,
-        },
-    ),
-    new Property(
-        {
-            Type: 'percent',
-            Id: 'percentProperty',
-            Name: 'Percent',
-            InitialValue: 1,
-        },
-    ),
-    new Property(
-        {
-            Type: 'text',
-            Id: 'textProperty',
-            Name: 'Text',
-            InitialValue: '...',
-        },
-    ),
-    new Property(
-        {
-            Type: 'longtext',
-            Id: 'longtextProperty',
-            Name: 'Long Text',
-            InitialValue: '',
-        },
-    ),
-    new Property(
-        {
-            Type: 'check',
-            Id: 'checkProperty',
-            Name: 'Check',
-            InitialValue: true,
-        },
-    ),
-    new Property(
-        {
-            Type: 'font',
-            Id: 'fontProperty',
-            Name: 'Font',
-        },
-    ),
-    new Property(
-        {
-            Type: 'combo',
-            Id: 'comboProperty',
-            Name: 'Combo',
-            Items: [
-                ['item1','Item 1'],
-                ['item2', 'Item 2'],
-            ],
-        },
-    ),
-    new Property(
-        {
-            Type: 'color',
-            Id: 'colorProperty',
-            Name: 'Color',
-        },
-    ),
-    new Property(
-        {
-            Type: 'object',
-            Id: 'objectProperty',
-            Name: 'Object',
-        },
-    ),
-    new Property(
-        {
-            Type: 'group',
-            Id: 'groupProperty',
-            Name: 'Awesome Group',
-        },
-    ),
-    new Property(
-        {
-            Type: 'info',
-            Id: 'infoProperty',
-            Name: 'Info',
-            Value: 'lostinmind.',
-        },
-    ),
+    new Property({
+        Type: 'integer',
+        Id: 'integerProperty',
+        Name: 'Integer',
+        InitialValue: 0,
+    }),
+    new Property({
+        Type: 'float',
+        Id: 'floatProperty',
+        Name: 'Float',
+        InitialValue: 0,
+    }),
+    new Property({
+        Type: 'percent',
+        Id: 'percentProperty',
+        Name: 'Percent',
+        InitialValue: 1,
+    }),
+    new Property({
+        Type: 'text',
+        Id: 'textProperty',
+        Name: 'Text',
+        InitialValue: '...',
+    }),
+    new Property({
+        Type: 'longtext',
+        Id: 'longtextProperty',
+        Name: 'Long Text',
+        InitialValue: '',
+    }),
+    new Property({
+        Type: 'check',
+        Id: 'checkProperty',
+        Name: 'Check',
+        InitialValue: true,
+    }),
+    new Property({
+        Type: 'font',
+        Id: 'fontProperty',
+        Name: 'Font',
+    }),
+    new Property({
+        Type: 'combo',
+        Id: 'comboProperty',
+        Name: 'Combo',
+        Items: [
+            ['item1','Item 1'],
+            ['item2', 'Item 2'],
+        ],
+    }),
+    new Property({
+        Type: 'color',
+        Id: 'colorProperty',
+        Name: 'Color',
+    }),
+    new Property({
+        Type: 'object',
+        Id: 'objectProperty',
+        Name: 'Object',
+    }),
+    new Property({
+        Type: 'group',
+        Id: 'groupProperty',
+        Name: 'Awesome Group',
+    }),
+    new Property({
+        Type: 'info',
+        Id: 'infoProperty',
+        Name: 'Info',
+        Value: 'lostinmind.',
+    }),
 ];
 
 export default Properties;
 ```
 
-## 📁 Creating category
-
+### 📁 Creating category
 To create category you should create new **`CategoryName.ts`** file in path:
 `./Addon/Categories` folder. Then you can use code snippet from bare-bones
 project **`!cc`** to create default Category structure or copy-paste below
@@ -315,7 +304,7 @@ export default class MyCategory {
 
 >[!WARNING] *InDevelopment* property in @Category decorator removes all category Actions, Conditions, Expressions from addon.
 
-### ⚡️ Create action
+#### ⚡️ Create action
 
 To create actions for your addon you should use _`@Action`_ method decorator
 in your category class.
@@ -379,10 +368,10 @@ export default class MyCategory {
 > parameter as _Instance_ Type)
 
 > [!TIP]
-> You can use build-in [Lost BBCode](#-lost-bbcode) functions for fast and
+> You can use build-in [BBCode](#-fast-bbcode-features) functions for fast and
 > beautiful development.
 
-### ❓ Create condition
+#### ❓ Create condition
 
 To create conditions for your addon you should use _`@Condition`_ method
 decorator in your category class.
@@ -438,10 +427,10 @@ export default class MyCategory {
 > parameter as _Instance_ Type)
 
 > [!TIP]
-> You can use build-in [Lost BBCode](#-lost-bbcode) functions for fast and
+> You can use build-in [BBCode](#-fast-bbcode-features) functions for fast and
 > beautiful development.
 
-### 🧮 Create expression
+#### 🧮 Create expression
 
 To create expressions for your addon you should use _`@Expression`_ decorator in
 your category class.
@@ -475,37 +464,37 @@ export default class MyCategory {
 ```
 
 > [!TIP]
-> You can use build-in [Lost BBCode](#-lost-bbcode) functions for fast and
+> You can use build-in [BBCode](#-fast-bbcode-features) functions for fast and
 > beautiful development.
 
-### 🔧 Setting up Action/Condition/Expression parameters
+#### 🔧 Setting up Action/Condition/Expression parameters
 
 To setup parameters in your Action/Condition/Expression you should use 'Params'
 field when you creating on of the entity.
 
-List of available parameter types:
+**List of available parameter types:**
 
-```typescript
-"number" — A number parameter
-"string" — A string parameter
-"any" — Either a number or a string
-"boolean" — A boolean parameter, displayed as a checkbox
-"combo" — A dropdown list.
-"cmp" — A dropdown list with comparison options like "equal to", "less than" etc.
-"object" — An object picker.
-"objectname" — A string parameter which is interpreted as an object name
-"layer" — A string parameter which is interpreted as a layer name
-"layout" — A dropdown list with every layout in the project
-"keyb" — A keyboard key picker
-"instancevar" — A dropdown list with the non-boolean instance variables the object has
-"instancevarbool" — A dropdown list with the boolean instance variables the object has
-"eventvar" — A dropdown list with non-boolean event variables in scope
-"eventvarbool" — A dropdown list with boolean event variables in scope
-"animation" — A string parameter which is interpreted as an animation name in the object
-"objinstancevar" — A dropdown list with non-boolean instance variables available in a prior "object" parameter.
-```
+| Type | Description |
+| ----------- | ----------- |
+| ```"number"``` | **A number parameter.** |
+| ```"string"``` | **A string parameter.** |
+| ```"any"``` | **Either a number or a string.** |
+| ```"boolean"``` | **A boolean parameter, displayed as a checkbox.** |
+| ```"combo"``` | **A dropdown list.** |
+| ```"cmp"``` | **A dropdown list with comparison options like "equal to", "less than" etc.** |
+| ```"object"``` | **An object picker.** |
+| ```"objectname"``` | **A string parameter which is interpreted as an object name.** |
+| ```"layer"``` | **A string parameter which is interpreted as a layer name.** |
+| ```"layout"``` | **A dropdown list with every layout in the project.** |
+| ```"keyb"``` | **A keyboard key picker.** |
+| ```"instancevar"``` | **A dropdown list with the non-boolean instance variables the object has.** |
+| ```"instancevarbool"``` | **A dropdown list with the boolean instance variables the object has.** |
+| ```"eventvar"``` | **A dropdown list with non-boolean event variables in scope.** |
+| ```"eventvarbool"``` | **A dropdown list with boolean event variables in scope.** |
+| ```"animation"``` | **A string parameter which is interpreted as an animation name in the object.** |
+| ```"objinstancevar"``` | **A dropdown list with non-boolean instance variables available in a prior "object" parameter.** |
 
-Example
+*Example*
 
 ```typescript
 import { Category, Action, Condition, Expression, Param, Bold } from 'jsr:@lost-c3/lib';
@@ -521,7 +510,9 @@ export default class MyCategory {
          */
         DisplayText: `Do action with value: ${Bold('{0}')}`,
         Params: [
-            new Param({Type: 'string', Id: 'value',
+            new Param({
+                Type: 'string',
+                Id: 'value',
                 Name: 'Value',
                 Description?: '',
                 /**
@@ -541,7 +532,7 @@ export default class MyCategory {
 }
 ```
 
-### 💢 Deprecating _Actions_, _Conditions_, _Expressions_
+#### 💢 Deprecating _Actions_, _Conditions_, _Expressions_
 
 > [!CAUTION]
 > Do not delete any actions, conditions, expressions from your category file.
@@ -575,8 +566,7 @@ export default class MyCategory {
 }
 ```
 
-## 🌳 Using Instance
-
+### 🌳 Using Instance
 Use Instance class to implement your custom logic to addon. Main instance file
 is available at path: `./Addon/Instance.ts`.
 
@@ -649,122 +639,129 @@ export default class MyCategory {
 }
 ```
 
-## 📚 Using custom Libraries OR Scripts OR Files
+### 📚 Using Scripts (Javascript / Typescript)
+It's available to use custom **Javascript** OR **Typescript** in your addon.
 
-It's available to use custom scripts and files in your addon.
+To use any script you should copy OR create _**script.js**_ OR _**script.ts**_ file at path:
+`./Addon/Scripts`. Your script will automatically will be loaded with type:
+**external-dom-script**.
 
-- To use any script you should copy your _**script.js**_ file to path:
-  `./Addon/Scripts`. Your script will automatically loaded with type:
-  **external-dom-script**.
+
 - To use any file you should copy your _**file.css**_ OR _**data.txt**_ file to
   path: `./Addon/Files`. If you added any **.css** file it will automatically
   loaded with type: _**external-css**_. If you added file with any other
   extension it will automatically loaded with type: _**copy-to-output**_.
 
 > [!NOTE]
+> All **Typescript** files will be compiled into .js files after addon building.
+
+> [!NOTE]
 > If you want to load your script with type **external-runtime-script**, you
 > should add some settings in your _**`lost.config.ts`**_ file.
 
 > [!NOTE]
-> If you want to load your file with custom type, you should add some settings
-> in your _**`lost.config.ts`**_ file.
+> If you want to load your script with other dependency type, you should add your script with your dependency type in your _**`lost.config.ts`**_ file.
 
-Example
+*Example*
 
 ```typescript
 import type { LostConfig } from 'jsr:@lost-c3/lib';
 
 const Config: LostConfig<'plugin'> = {
     Scripts: [
-        {
-            FileName: 'library.js',
-            Type: 'external-runtime-script',
-        },
+        {FileName: 'library.js', Type: 'external-runtime-script'},
     ],
 };
 
 export default Config;
 ```
 
-In that case we added new object in _`Scripts`_ property. That object has some
-own properties:
-
-```typescript
-- FileName: string // Use only path to script without folder ./Scripts/library.js. Example: "library.js"
-- Type: "external-runtime-script" | "external-dom-script"
-```
-
-> [!WARNING]
-> Use only .js libraries with .d.ts declaration files only.
-
 > [!NOTE]
 > Useful information for choosing _`Type`_ property value:
 > https://www.construct.net/en/make-games/manuals/addon-sdk/reference/specifying-dependencies#internalH1Link0
 
-> [!TIP]
-> It's recommended to use _`.d.ts`_ files to easy code writing. You can also
-> move them into _`src/libs/`_ folder.
+### 📄 Using Files
+It's available to use files in your addon.
 
-## 🏗️ Building addon
+To use any file you should copy OR create _**file.***_ file at path:
+`./Addon/Files`. Your file will automatically will be loaded with auto-detected type.
 
-To build addon into **`.c3addon`** file you can use one of the following
-commands:
+> [!NOTE]
+> If you want to load your file with other type, you should add your file with your type in your _**`lost.config.ts`**_ file.
 
-- `lost build`
+*Example*
 
-**`addon.c3addon`** file will be available at path: `./Builds/addon.c3addon`
+```typescript
+import type { LostConfig } from 'jsr:@lost-c3/lib';
 
-## 🧪 Testing addons in Developer Mode
+const Config: LostConfig<'plugin'> = {
+    Files: [
+        {FileName: 'styles.css', Type: 'copy-to-output'},
+    ],
+};
 
-To test your addon you can use one of the following commands:
+export default Config;
+```
 
-- `lost serve`
+### 📦 Using Modules
+It's available to use modules in your addon.
 
-> [!IMPORTANT]
-> Read more info about Developer Mode in Construct 3:
+To use any module you should copy OR create _**mymodule.js**_ file at path:
+`./Addon/Modules`.
+
+*Example*
+
+```typescript
+import * as MyModule from './Modules/mymodule.js';
+
+const C3 = globalThis.C3;
+
+class LostInstance extends globalThis.ISDKInstanceBase {
+
+	readonly PluginConditions = C3.Plugins[Config.AddonId].Cnds;
+	constructor() {
+		super();
+		const properties = this._getInitProperties();
+
+		console.log(MyModule.VAR);
+
+        if (properties) {
+
+        }
+
+	}
+
+	_release() {
+		super._release();
+	}
+
+};
+
+C3.Plugins[Config.AddonId].Instance = LostInstance;
+export type { LostInstance as Instance };
+```
+
+>[!WARNING] Note this is only supported from r401+.
+
+>[!INFO] 📖 For more info checkout official docs:
 >
-> https://www.construct.net/en/make-games/manuals/addon-sdk/guide/using-developer-mode
+>https://www.construct.net/en/make-games/manuals/addon-sdk/guide/runtime-scripts/sdk-v2
 
-## 🔤 Lost BBCode
+### 🔤 Fast BBCode features
+For *fast* and *beautiful* development there is a few functions that can help you
+customize displaying text in your addon.
 
-**For fast and beautiful development there is a few functions that can help you
-customize displaying text in your addon.**
+**List of available BBCode functions:**
 
-List of available **Lost BBCode** functions:
+| Function | Result |
+| ----------- | ----------- |
+| ```Bold('Do action')``` | **Do action** |
+| ```Italic('Do action')``` | *Do action* |
+| ```Strikethrough('Do action')``` | ~~Do action~~ |
+| ```Underline('Do action')``` | <u>Do action</u> |
+| ```Code('Do action')``` | <code>Do action</code> |
 
-```typescript
-Bold('Any text');
-```
-
-Returns: **Any text**
-
-```typescript
-Italic('Any text');
-```
-
-Returns: _**Any text**_
-
-```typescript
-Strikethrough('Any text');
-```
-
-Returns: ~~Any text~~
-
-```typescript
-Underline('Any text');
-```
-
-Returns:
-<u>Any text</u>
-
-```typescript
-Code('Any text');
-```
-
-Returns:
-<code>Any text</code>
-
-Example
+*Example*
 
 ```typescript
 import { Action, Bold, Category, Code, Italic, Strikethrough, Underline } from 'jsr:@lost-c3/lib';
@@ -782,6 +779,217 @@ export default class MyCategory {
     doAction(this: Instance,) { /* do something */}
 }
 ```
+
+## 🎛️ Creating `Behavior` addon
+
+## 🎨 Creating `Theme` addon
+```bash
+lost create --theme    # Creates a bare-bones project for 'theme' addon
+```
+
+### 🧱 File structure
+```bash
+├── Addon/                      # Addon folder
+│   └── Styles/                 # Addon styles collections folder
+│       └── *.css               # Your .css file
+│   └── icon.svg                # Your .svg OR .png addon icon
+├── Builds/                     # Builds folder
+│   ├── Source/                 # Final Construct 3 addon folder
+│       └── ...
+│   └── AddonId_Version.c3addon # Final .c3addon file
+├── deno.json                   # deno.json file for Deno enviroment
+├── lost.config.ts              # Addon config file
+```
+
+
+### ⚙️ Config setup
+Let's setup _`lost.config.ts`_ config file at first.
+
+```typescript
+import type { LostConfig } from "jsr:@lost-c3/lib";
+
+const Config: LostConfig<'theme'> = {
+    /**
+     * Set addon type
+     */
+    Type: 'theme',
+
+    /**
+     * An object name that will applied after plugin was installed/added to project.
+     */
+    ObjectName: 'LostPluginName',
+    AddonId: 'Lost_MyAddon',
+    AddonName: 'Lost addon for Construct 3',
+    AddonDescription: 'Amazing addon made with Lost.',
+    Category: 'general',
+    Version: '1.0.0.0',
+    Author: 'lostinmind.',
+    WebsiteURL: `https://addon.com`,
+    DocsURL: `https://docs.addon.com`
+}
+
+export default Config;
+```
+
+### 🛠️ Theme development
+>[!TIP] For more info about developing themes you can read official docs
+>
+> https://www.construct.net/en/make-games/manuals/addon-sdk/guide/themes
+
+## ✨ Creating `Effect` addon
+```bash
+lost create --effect    # Creates a bare-bones project for 'effect' addon
+```
+
+### 🧱 File structure
+```bash
+├── Addon/                      # Addon folder
+│   └── Effects/                # .fx OR .wgsl files collections folder
+├── Builds/                     # Builds folder
+│   ├── Source/                 # Final Construct 3 addon folder
+│       └── ...
+│   └── AddonId_Version.c3addon # Final .c3addon file
+├── deno.json                   # deno.json file for Deno enviroment
+├── lost.config.ts              # Addon config file
+├── parameters.ts               # Effect parameters file
+```
+
+### ⚙️ Config setup
+Let's setup _`lost.config.ts`_ config file at first.
+
+```typescript
+import type { LostConfig } from "jsr:@lost-c3/lib";
+
+const Config: LostConfig<'effect'> = {
+    /**
+     * Set addon type
+     */
+    Type: 'effect',
+
+    AddonId: 'Lost_MyAddon',
+    AddonName: 'Lost addon for Construct 3',
+    AddonDescription: 'Amazing addon made with Lost.',
+    Category: 'general',
+    Version: '1.0.0.0',
+    Author: 'lostinmind.',
+    WebsiteURL: `https://addon.com`,
+    DocsURL: `https://docs.addon.com`,
+
+    /**
+     * An array of strings indicating the supported renderers for this effect.
+     */
+    SupportedRenderers: ['webgl', 'webgl2', 'webgpu'],
+
+    /**
+     * Boolean indicating whether the effect blends with the background.
+     */
+    BlendsBackground: false,
+
+    /**
+     * Boolean indicating whether the effect samples the depth buffer with the samplerDepth uniform.
+     */
+    UsesDepth: false,
+    /**
+     * Boolean indicating whether a background-blending effect has inconsistent sampling of the background and foreground.
+     */
+    CrossSampling: false,
+
+    /**
+     * Boolean indicating whether the effect preserves opaque pixels, i.e. every input pixel with an alpha of 1 is also output with an alpha of 1.
+     */
+    PreservesOpaqueness: true,
+
+    /**
+     * Boolean indicating whether the effect is animated, i.e. changes over time using the seconds uniform.
+     */
+    Animated: false,
+
+    /**
+     * Optional. Default is False. Boolean indicating whether to force the pre-draw step.
+     */
+    MustPredraw?: false,
+
+    /**
+     * Optional. Default is False. Boolean indicating whether 3D objects can render directly with this effect.
+     */
+    Supports3DDirectRendering?: false,
+
+    /**
+     * Amount to extend the rendered box horizontally and vertically as [0, 0].
+     */
+    ExtendBox: [0, 0]
+}
+
+export default Config;
+```
+
+### 📜 Specifying effect parameters
+Use _`parameters.ts`_ file to specify any effect parameters. That file located in following path: `./parameters.ts`.
+
+**List of available effect parameters types:**
+
+| Type | Description |
+| ----------- | ----------- |
+| ```"color"``` | **A color parameter.** |
+| ```"float"``` | **A float parameter.** |
+| ```"percent"``` | **A percent parameter.** |
+
+*Example*
+
+```typescript
+import { EffectParameter } from "jsr:@lost-c3/lib@1.2.5";
+
+const EffectParameters: EffectParameter<any>[] = [
+    new EffectParameter<any>({
+        Type: 'color',
+        Id: 'myColor',
+        InitialValue: [0, 0, 0]
+    }),
+    new EffectParameter<any>({
+        Type: 'float',
+        Id: 'myFloat',
+        InitialValue: 1
+    }),
+    new EffectParameter<any>({
+        Type: 'percent',
+        Id: 'myPercent',
+        InitialValue: 0.5
+    })
+]
+
+export default EffectParameters;
+```
+
+### 🔮 Effect development
+>[!TIP] For more info about developing WebGL shaders you can read official docs
+>
+> https://www.construct.net/en/make-games/manuals/addon-sdk/guide/configuring-effects/webgl-shaders
+
+>[!TIP] For more info about developing WebGPU shaders you can read official docs
+>
+> https://www.construct.net/en/make-games/manuals/addon-sdk/guide/configuring-effects/webgpu-shaders
+
+
+## 🏗️ Building addon
+
+To build addon into **`.c3addon`** file you can use one of the following
+commands:
+
+- `lost build`
+
+**`addon.c3addon`** file will be available at path: `./Builds/my_addon_1.0.0.0.c3addon`
+
+## 🧪 Testing addons in Developer Mode
+
+To test your addon you can use one of the following commands:
+
+- `lost serve`
+
+> [!IMPORTANT]
+> Read more info about Developer Mode in Construct 3:
+>
+> https://www.construct.net/en/make-games/manuals/addon-sdk/guide/using-developer-mode
+
 
 # 🪪 License
 

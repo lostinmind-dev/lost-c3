@@ -5,12 +5,12 @@ import { BUILD_PATH } from "../paths.ts";
 import type { CategoryClassType } from '../../lib/entities.ts';
 
 interface CreateLanguageJSONOptions {
-    CONFIG: LostConfig<'plugin'>;
+    CONFIG: LostConfig<'plugin' | 'behavior'>;
     PLUGIN_PROPERTIES: Property[];
     CATEGORIES: CategoryClassType[];
 }
 
-export async function createAddonPluginLanguageJSON({ CONFIG, PLUGIN_PROPERTIES, CATEGORIES }: CreateLanguageJSONOptions) {
+export async function createAddonPluginLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES}: CreateLanguageJSONOptions) {
     const LanguageJSON = {
         "languageTag": "en-US",
         "fileDescription": `Strings for ${CONFIG.AddonName} addon.`,
