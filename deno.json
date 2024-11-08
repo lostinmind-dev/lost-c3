@@ -1,6 +1,6 @@
 {
     "name": "@lost-c3/lib",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "exports": {
         ".": "./mod.ts",
         "./cli": "./cli.ts"

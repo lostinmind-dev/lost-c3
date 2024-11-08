@@ -6,7 +6,7 @@ import { Colors } from "./deps.ts";
 import { build } from "./cli/main.ts";
 import { serveAddon } from './cli/serve-addon.ts';
 
-const VERSION = '2.0.0'
+const VERSION = '2.0.1'
 
 type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 
@@ -37,6 +37,18 @@ async function main() {
             }
             if (flags.plugin) {
                 await createBareBones('plugin');
+                break;
+            }
+            if (flags.behavior) {
+                await createBareBones('behavior');
+                break;
+            }
+            if (flags.effect) {
+                await createBareBones('effect');
+                break;
+            }
+            if (flags.theme) {
+                await createBareBones('theme');
                 break;
             }
             break;
