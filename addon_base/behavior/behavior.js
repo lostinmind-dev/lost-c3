@@ -29,10 +29,10 @@ const BEHAVIOR_CLASS = SDK.Plugins[ADDON_ID] = class LostBehavior extends SDK.IB
         SCRIPTS.forEach(script => {
             const scriptPath = (script.language === 'ts') ? script.relativePath.replace('.ts', '.js') : script.relativePath;
             if (script.scriptType) {
-                this._info.AddFileDependency({ filename: `scripts/${scriptPath}`, type: script.dependencyType, scriptType: script.scriptType });
+                this._info.AddFileDependency({ filename: `scripts${scriptPath}`, type: script.dependencyType, scriptType: script.scriptType });
             }
             else {
-                this._info.AddFileDependency({ filename: `scripts/${scriptPath}`, type: script.dependencyType });
+                this._info.AddFileDependency({ filename: `scripts${scriptPath}`, type: script.dependencyType });
             }
         });
         FILES.forEach(file => {

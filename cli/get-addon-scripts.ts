@@ -34,11 +34,21 @@ export async function getAddonScripts(config: LostConfig<'plugin' | 'behavior'>)
                 const basePath = 'Addon/Scripts';
                 const relativePathIndex = path.indexOf(basePath);
 
+                const relativePath = path.substring(relativePathIndex + basePath.length + 1);
+
                 scripts.push({
                     filename: entry.name,
                     scriptType: (scriptInConfig && scriptInConfig.Type === 'external-dom-script' && scriptInConfig.ScriptType) ? scriptInConfig.ScriptType : undefined,
                     path: `${path}/${entry.name}`,
-                    relativePath: `${path.substring(relativePathIndex + basePath.length + 1)}/${entry.name}`,
+                    relativePath: `${relativePath}/${entry.name}`,
+                    dependencyType: (scriptInConfig) ? scriptInConfig.Type : 'external-dom-script',
+                    language: language
+                })
+                console.log({
+                    filename: entry.name,
+                    scriptType: (scriptInConfig && scriptInConfig.Type === 'external-dom-script' && scriptInConfig.ScriptType) ? scriptInConfig.ScriptType : undefined,
+                    path: `${path}/${entry.name}`,
+                    relativePath: `${relativePath}/${entry.name}`,
                     dependencyType: (scriptInConfig) ? scriptInConfig.Type : 'external-dom-script',
                     language: language
                 })

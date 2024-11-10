@@ -8,9 +8,9 @@ import type { AddonModule } from '../get-addon-modules.ts';
 import type { AddonIcon } from "../get-addon-icon.ts";
 
 import { ADDON_BASE_URL, BUILD_PATH } from "../paths.ts";
-import { Project } from "../cli-deps.ts";
 import { path } from '../../deps.ts';
 import { LOGGER } from '../misc.ts';
+import { transpileTsToJs } from '../misc/transpile-ts-to-js.ts';
 
 const ADDON_FILES = {
     plugin: [
@@ -206,16 +206,4 @@ function serializeEntities(categories: CategoryClassType[]) {
         Conditions: serializeObjectWithFunctions(conditions),
         Expressions: serializeObjectWithFunctions(expressions)
     }
-}
-
-async function transpileTsToJs(filePath: string): Promise<string | null> {
-    const project = new Project({
-        compilerOptions: {
-            target: 8,
-            module: 7   
-        }
-    });
-    const sourceFile = project.addSourceFileAtPath(filePath);
-    const transpiled = sourceFile.getEmitOutput().getOutputFiles()[0]?.getText();
-    return transpiled || null;
 }
