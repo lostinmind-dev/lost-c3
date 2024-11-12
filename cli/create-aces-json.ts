@@ -95,7 +95,6 @@ export async function createAcesJSON({ CATEGORIES }: CreateAcesJSONOptions) {
             AceExpression['returnType'] = ReturnType;
             AceExpression['isVariadicParameters'] = IsVariadicParameters;
             AceExpression['params'] = [];
-
             Params.forEach(param => {
                 const {Type, Id, InitialValue} = param.Options;
                 const AceParam = {} as AceParam;
@@ -103,6 +102,7 @@ export async function createAcesJSON({ CATEGORIES }: CreateAcesJSONOptions) {
                 AceParam['type'] = Type;
                 AceParam['initialValue'] = InitialValue as string;
                 if (Type === 'string') AceParam['autocompleteId'] = param.Options.AutocompleteId;
+                AceExpression['params'].push(AceParam);
             })
             if (category.Deprecated) AceExpression['isDeprecated'] = true;
             AcesJSON[category.Id]['expressions'].push(AceExpression);
