@@ -52,7 +52,7 @@ export async function createAddonPluginJSON({ CONFIG, ICON, SCRIPTS, FILES, MODU
         ]
     };
 
-    SCRIPTS.forEach(script => AddonJSON['file-list'].push(`scripts/${script.relativePath}`));
+    SCRIPTS.forEach(script => AddonJSON['file-list'].push(`scripts${script.relativePath}`));
     FILES.forEach(file => AddonJSON['file-list'].push(`files/${file.filename}`));
     MODULES.forEach(module => AddonJSON['file-list'].push(`c3runtime/Modules/${module.filename}`));
 
