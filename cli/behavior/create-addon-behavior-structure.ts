@@ -22,7 +22,7 @@ const ADDON_FILES = {
 
 interface CreateAddonStructureOptions {
     CONFIG: LostConfig<'behavior'>;
-    PLUGIN_PROPERTIES: Property[];
+    PLUGIN_PROPERTIES: Property<any>[];
     SCRIPTS: AddonScript[];
     FILES: AddonFile[];
     MODULES: AddonModule[];
