@@ -1,4 +1,4 @@
-export type AddonType = 'plugin' | 'behavior' | 'theme' | 'effect';
+export type AddonType = 'plugin' | 'behavior' | 'theme' | 'effect' | 'drawing-plugin';
 
 export type ScriptDependencyType = 'external-dom-script' | 'external-runtime-script';
 
@@ -201,6 +201,68 @@ interface PluginConfig extends ConfigBase {
     IsSingleGlobal?: boolean;
 }
 
+interface DrawingPluginConfig extends ConfigBase {
+    Type: 'drawing-plugin',
+    /**
+     * The category for the plugin when displaying it in the Create New Object Type dialog.
+     * @example "general"
+     */
+    Category: PluginCategory;
+    /**
+     * Pass true to enable resizing instances in the Layout View.
+     */
+    IsResizable: boolean;
+    /**
+     * Pass true to enable the Angle property and rotating instances in the Layout View.
+     */
+    IsRotatable: boolean;
+    /**
+     * Optional. Default is **False**. Pass true to specify that this plugin renders in 3D.
+     * @description This will cause the presence of the plugin in a project to enable 3D rendering when the project Rendering mode property is set to Auto (which is the default setting).
+     */
+    Is3D?: boolean;
+    /**
+     * Optional. Default is **False**. Pass true to add a single editable image, such as used by the Tiled Background plugin.
+     */
+    HasImage?: boolean;
+    /**
+     * Optional. Default is **False**. Pass true to indicate that the image is intended to be tiled.
+     * @description This adjusts the texture wrapping mode when Construct creates a texture for its image.
+     */
+    IsTiled?: boolean;
+    /**
+     * Pass true to allow using Z elevation with this plugin.
+     * @description By default the renderer applies the Z elevation before calling the Draw() method on an instance, which in many cases is sufficient to handle rendering Z elevation correctly, but be sure to take in to account Z elevation in the drawing method if it does more complex rendering.
+     */
+    SupportsZElevation: boolean;
+    /**
+     * Pass true to allow using the built-in color property to tint the object appearance.
+     * @description By default the renderer sets the color before calling the Draw() method on an instance, which in many cases is sufficient to handle rendering with the applied color, but be sure to take in to account the instance color in the drawing method if it does more complex rendering.
+     */
+    SupportsColor: boolean;
+    /**
+     * Pass true to allow using effects, including the Blend mode property, with this plugin.
+     * @description If the plugin does not simply draw a texture the size of the object (as Sprite does), you should also set *MustPreDraw*: **true**.
+     */
+    SupportsEffects: boolean;
+    /**
+     * Pass true to disable an optimisation in the effects engine for objects that simply draw a texture the size of the object (e.g. Sprite).
+     * @description This is necessary for effects to render correctly if the plugin draws anything other than the equivalent the Sprite plugin would.
+     */
+    MustPreDraw: boolean;
+    /**
+     * Add common built-in sets of actions, conditions and expressions (ACEs) to the plugin relating to various built-in features.
+     */
+    CommonACEs?: {
+        Position?: true;
+        SceneGraph?: true;
+        Size?: true;
+        Angle?: true;
+        Appearance?: true;
+        ZOrder?: true;
+    }
+}
+
 type BehaviorCategory = 'attributes' | 'general' | 'movements' | 'other';
 
 interface BehaviorConfig extends ConfigBase {
@@ -385,4 +447,6 @@ export type LostConfig<T extends AddonType> =
     ? ThemeConfig
     : T extends 'effect'
     ? EffectConfig
+    : T extends 'drawing-plugin'
+    ? DrawingPluginConfig
     : never; 

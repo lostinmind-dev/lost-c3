@@ -8,7 +8,7 @@ import type { AddonModule } from '../get-addon-modules.ts';
 import { BUILD_PATH } from "../paths.ts";
 
 interface CreateAddonJSONOptions {
-    CONFIG: LostConfig<'plugin' | 'behavior'>;
+    CONFIG: LostConfig<'plugin' | 'behavior' | 'drawing-plugin'>;
     ICON: AddonIcon;
     SCRIPTS: AddonScript[];
     FILES: AddonFile[];
@@ -21,7 +21,7 @@ export async function createAddonPluginJSON({ CONFIG, ICON, SCRIPTS, FILES, MODU
         "min-construct-version": (CONFIG.MinConstructVersion) ? CONFIG.MinConstructVersion : undefined,
         "is-c3-addon": true,
         "sdk-version": 2,
-        "type": CONFIG.Type,
+        "type": (CONFIG.Type === 'drawing-plugin') ? 'plugin' : CONFIG.Type,
         "name": CONFIG.AddonName,
         "id": CONFIG.AddonId,
         "version": CONFIG.Version,

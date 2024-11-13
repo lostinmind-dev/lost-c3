@@ -1,21 +1,21 @@
-import type { LanguageJSON, LanguageAction, LanguageCondition, LanguageExpression, LanguagePluginProperty, LanguageParam } from "../../lib/json.ts";
-import type { LostConfig } from "../../lib/common.ts";
-import type { Property } from "../../lib/plugin-props.ts";
-import { BUILD_PATH } from "../paths.ts";
-import type { CategoryClassType } from '../../lib/entities.ts';
+import type { LanguageJSON, LanguageAction, LanguageCondition, LanguageExpression, LanguagePluginProperty, LanguageParam } from "../lib/json.ts";
+import type { LostConfig } from "../lib/common.ts";
+import type { Property } from "../lib/plugin-props.ts";
+import { BUILD_PATH } from "./paths.ts";
+import type { CategoryClassType } from '../lib/entities.ts';
 
 interface CreateLanguageJSONOptions {
-    CONFIG: LostConfig<'plugin' | 'behavior'>;
-    PLUGIN_PROPERTIES: Property[];
+    CONFIG: LostConfig<'plugin' | 'behavior' | 'drawing-plugin'>;
+    PLUGIN_PROPERTIES: Property<any>[];
     CATEGORIES: CategoryClassType[];
 }
 
-export async function createAddonPluginLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES}: CreateLanguageJSONOptions) {
+export async function createLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES}: CreateLanguageJSONOptions) {
     const LanguageJSON = {
         "languageTag": "en-US",
         "fileDescription": `Strings for ${CONFIG.AddonName} addon.`,
         "text": {
-            [CONFIG.Type + 's']: {
+            [((CONFIG.Type === 'drawing-plugin') ? 'plugin' : CONFIG.Type) + 's']: {
                 [CONFIG.AddonId.toLowerCase()]: {
                     "name": CONFIG.ObjectName,
                     "description": CONFIG.AddonDescription,

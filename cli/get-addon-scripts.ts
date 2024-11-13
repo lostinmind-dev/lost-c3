@@ -12,7 +12,7 @@ export interface AddonScript {
     language: 'js' | 'ts';
 }
 
-export async function getAddonScripts(config: LostConfig<'plugin' | 'behavior'>) {
+export async function getAddonScripts(config: LostConfig<'plugin' | 'behavior' | 'drawing-plugin'>) {
     LOGGER.Searching('Searching for scripts');
 
     const scripts: AddonScript[] = [];

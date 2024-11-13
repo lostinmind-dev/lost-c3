@@ -13,13 +13,13 @@ import { getCategories } from "./get-categories.ts";
 import { getPluginProperties } from "./get-plugin-properties.ts";
 import { getAddonIcon } from "./get-addon-icon.ts";
 import { createAcesJSON } from "./create-aces-json.ts";
+import { createLanguageJSON } from "./create-language-json.ts";
 import { zipAddon } from "./zip-addon.ts";
 
 /**
  * Plugin Addon Functions
  */
 import { createAddonPluginStructure } from "./plugin/create-addon-plugin-structure.ts";
-import { createAddonPluginLanguageJSON } from "./plugin/create-addon-plugin-language-json.ts";
 import { createAddonPluginJSON } from "./plugin/create-addon-plugin-json.ts";
 
 /**
@@ -44,6 +44,11 @@ import { createAddonEffectStructure } from './effect/create-addon-effect-structu
 import { createAddonEffectJSON } from './effect/create-addon-effect-json.ts';
 import { createAddonEffectLanguageJSON } from './effect/create-addon-effect-language-json.ts';
 
+/**
+ * Drawing Plugin Addon Functions
+ */
+import { createAddonDrawingPluginStructure } from './drawing-plugin/create-addon-drawing-plugin-structure.ts';
+
 export async function build() {
     const startTime = performance.now();
 
@@ -56,6 +61,9 @@ export async function build() {
     switch (CONFIG.Type) {
         case 'plugin':
             await buildPlugin(CONFIG);
+            break;
+        case 'drawing-plugin':
+            await buildDrawingPlugin(CONFIG);
             break;
         case 'theme':
             await buildTheme(CONFIG);
@@ -94,7 +102,27 @@ async function buildPlugin(CONFIG: LostConfig<'plugin'>) {
 
     await createAcesJSON({CATEGORIES});
 
-    await createAddonPluginLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES});
+    await createLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES});
+}
+
+async function buildDrawingPlugin(CONFIG: LostConfig<'drawing-plugin'>) {
+    const PLUGIN_PROPERTIES = await getPluginProperties();
+    LOGGER.LogBetweenLines('📃', Colors.bold('Plugin properties count:'), Colors.bold(Colors.yellow(`${PLUGIN_PROPERTIES.length}`)));
+    const SCRIPTS = await getAddonScripts(CONFIG);
+    const FILES = await getAddonFiles(CONFIG);
+    const MODULES = await getAddonModules();
+    const ICON = await getAddonIcon();
+    const CATEGORIES = await getCategories();
+    LOGGER.Line();
+    LOGGER.Process('Building addon');
+
+    await createAddonDrawingPluginStructure({CONFIG, PLUGIN_PROPERTIES, SCRIPTS, FILES, MODULES, CATEGORIES, ICON});
+
+    await createAddonPluginJSON({CONFIG, ICON, SCRIPTS, FILES, MODULES});
+
+    await createAcesJSON({CATEGORIES});
+
+    await createLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES});
 }
 
 async function buildBehavior(CONFIG: LostConfig<'behavior'>) {
@@ -114,7 +142,7 @@ async function buildBehavior(CONFIG: LostConfig<'behavior'>) {
 
     await createAcesJSON({CATEGORIES});
 
-    await createAddonPluginLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES});
+    await createLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES});
 }
 
 async function buildTheme(CONFIG: LostConfig<'theme'>) {

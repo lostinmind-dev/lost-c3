@@ -9,7 +9,7 @@ export interface AddonFile {
     dependencyType: FileDependencyType;
 }
 
-export async function getAddonFiles(config: LostConfig<'plugin' | 'behavior'>) {
+export async function getAddonFiles(config: LostConfig<'plugin' | 'behavior' | 'drawing-plugin'>) {
     LOGGER.Searching('Searching for files');
     
     const files: AddonFile[] = [];

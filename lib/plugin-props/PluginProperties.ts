@@ -1,4 +1,4 @@
-type PluginPropertyType = 'integer' | 'float' | 'percent' | 'text' | 'longtext' | 'check' | 'font' | 'combo' | 'color' | 'object' | 'group' | 'info';
+type PluginPropertyType = 'integer' | 'float' | 'percent' | 'text' | 'longtext' | 'check' | 'font' | 'combo' | 'color' | 'object' | 'group' | 'info' | 'link';
 
 interface PluginPropertyOptionsBase {
     /**
@@ -184,15 +184,44 @@ interface InfoPropertyOptions extends PluginPropertyOptionsBase {
     Value: string;
 }
 
-type PluginPropertyOptions = 
+interface LinkPropertyOptions<T> extends PluginPropertyOptionsBase {
+    /**
+     * **For plugins only** — creates a clickable link in the Properties Bar.
+     * @description There is no value associated with this property. A linkCallback function must be specified in the options object.
+     */
+    Type: 'link',
+    /**
+     * Specifies how the link callback function is used.
+     * @description This can be one of the following:
+     *
+     * @example 'for-each-instance'
+     * @description the callback is run once per selected instance in the Layout View.
+     * The callback parameter is an instance of your addon (deriving from SDK.IWorldInstanceBase).
+     * This is useful for per-instance modifications, such as a link to make all instances their original size. 
+     * 
+     * @example 'once-for-type'
+     * @description the callback is run once regardless of how many instances are selected in the Layout View.
+     * The callback parameter is your addon's object type (deriving from SDK.ITypeBase).
+     * This is useful for per-type modifications, such as a link to edit the object image.
+     */
+    CallbackType: 'for-each-instance' | 'once-for-type';
+    /**
+     * A function that is called when the link is clicked.
+     * @description The number of calls, and the type of the parameter, are determined by the callbackType option.
+     */
+    Callback: (p: T) => void;
+}
+
+type PluginPropertyOptions<T> = 
     IntegerPropertyOptions | FloatPropertyOptions | PercentPropertyOptions |
     TextPropertyOptions | LongTextPropertyOptions | CheckPropertyOptions |
     FontPropertyOptions | ComboPropertyOptions | ColorPropertyOptions |
-    ObjectPropertyOptions | GroupPropertyOptions | InfoPropertyOptions;
+    ObjectPropertyOptions | GroupPropertyOptions | InfoPropertyOptions |
+    LinkPropertyOptions<T>;
 
-export class Property {
-    readonly Options: PluginPropertyOptions;
-    constructor(Options: PluginPropertyOptions) {
+export class Property<T> {
+    readonly Options: PluginPropertyOptions<T>;
+    constructor(Options: PluginPropertyOptions<T>) {
 
         if (!Options.Description) Options.Description = 'There is no any description yet...';
 

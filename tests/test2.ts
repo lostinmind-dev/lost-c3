@@ -1,7 +1,11 @@
-const module = await import('./test.ts');
+import { Property } from '../mod.ts';
 
-// console.log(module.default)
-
-const _class = new module.default();
-
-console.log(_class.constructor.prototype)
+const a = new Property<SDK.ITypeBase | SDKEditorInstanceClass>({
+    Type: 'link',
+    Id: 'my-link',
+    Name: '',
+    CallbackType: 'once-for-type',
+    Callback: (sdkType) => {
+        console.log(sdkType)
+    }
+})

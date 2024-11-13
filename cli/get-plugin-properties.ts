@@ -3,7 +3,7 @@ import type { Property } from "../lib/plugin-props.ts";
 import { PLUGIN_PROPERTIES_FILE_PATH } from "./paths.ts";
 
 interface PluginPropertiesModule {
-    default: Property[];
+    default: Property<any>[];
 }
 
 export async function getPluginProperties() {
