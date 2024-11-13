@@ -11,22 +11,31 @@ export async function getAddonModules() {
     
     const modules: AddonModule[] = [];
 
-    const readModulesDirectory = async (path: string) => {
-        for await (const entry of Deno.readDir(path)) {
-            if (entry.isDirectory) {
-                await readModulesDirectory(`${path}/${entry.name}`);
-            }
-            if (entry.isFile && entry.name.endsWith('.js')) {
-                LOGGER.Info(`Founded module: ${entry.name}`);
-                modules.push({
-                    filename: entry.name,
-                    path: `${path}/${entry.name}`
-                })
+    try {
+        const dirInfo = await Deno.stat(ADDON_MODULES_FOLDER_PATH);
+
+        const readModulesDirectory = async (path: string) => {
+            for await (const entry of Deno.readDir(path)) {
+                if (entry.isDirectory) {
+                    await readModulesDirectory(`${path}/${entry.name}`);
+                }
+                if (entry.isFile && entry.name.endsWith('.js')) {
+                    LOGGER.Info(`Founded module: ${entry.name}`);
+                    modules.push({
+                        filename: entry.name,
+                        path: `${path}/${entry.name}`
+                    })
+                }
             }
         }
+
+        if (dirInfo.isDirectory) {
+            await readModulesDirectory(ADDON_MODULES_FOLDER_PATH);
+            return modules;
+        }
+    } catch (e) {
+        return modules;
     }
-    
-    await readModulesDirectory(ADDON_MODULES_FOLDER_PATH);
 
     return modules;
 }
