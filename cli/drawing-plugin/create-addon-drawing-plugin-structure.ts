@@ -42,7 +42,7 @@ export async function createAddonDrawingPluginStructure(
     await Deno.mkdir(BUILD_PATH);
     await Deno.mkdir(`${BUILD_PATH}/c3runtime`);
     await Deno.mkdir(`${BUILD_PATH}/lang`);
-    await Deno.mkdir(`${BUILD_PATH}/assets`);
+    // await Deno.mkdir(`${BUILD_PATH}/assets`);
     
     if (SCRIPTS.length > 0) {
         await Deno.mkdir(`${BUILD_PATH}/scripts`);
@@ -107,7 +107,7 @@ export async function createAddonDrawingPluginStructure(
 
     if (!localBase) {
 
-        await Deno.copyFile(`${Deno.cwd()}/Addon/Assets/default.png`, `${BUILD_PATH}/assets/default.png`);
+        // await Deno.copyFile(`${Deno.cwd()}/Addon/Assets/default.png`, `${BUILD_PATH}/assets/default.png`);
 
         if (!ICON.isDefault) {
             await Deno.copyFile(ICON.path, `${BUILD_PATH}/${ICON.filename}`);

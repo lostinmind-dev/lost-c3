@@ -51,9 +51,9 @@ export async function createAddonPluginJSON({ CONFIG, ICON, SCRIPTS, FILES, MODU
             `${ICON.filename}`
         ]
     };
-    if (CONFIG.Type === 'drawing-plugin') {
-        AddonJSON['file-list'].push('assets/default.png');
-    }
+    // if (CONFIG.Type === 'drawing-plugin') {
+    //     AddonJSON['file-list'].push('assets/default.png');
+    // }
     SCRIPTS.forEach(script => AddonJSON['file-list'].push(`scripts${script.relativePath}`));
     FILES.forEach(file => AddonJSON['file-list'].push(`files/${file.filename}`));
     MODULES.forEach(module => AddonJSON['file-list'].push(`c3runtime/Modules/${module.filename}`));
