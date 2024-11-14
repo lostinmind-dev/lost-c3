@@ -87,14 +87,42 @@ export interface LanguageEffectParameter {
     "desc": string;
 }
 
-
 export namespace LanguageJSON {
     export interface Plugin {
         "languageTag": "en-US",
         "fileDescription": string;
         "text": {
-            [addonTypeInPluralForm: string]: {
-                [addonPluginId: string]: {
+            "plugins": {
+                [addonId: string]: {
+                    "name": string;
+                    "description": string;
+                    "help-url": string;
+                    "properties": {
+                        [propertyId: string]: LanguagePluginProperty;
+                    },
+                    "aceCategories": {
+                        [categoryId: string]: string;
+                    },
+                    "conditions": {
+                        [conditionId: string]: LanguageCondition;
+                    },
+                    "actions": {
+                        [actionId: string]: LanguageAction;
+                    },
+                    "expressions": {
+                        [expressionId: string]: LanguageExpression;
+                    }
+                }
+            }
+        }
+    }
+
+    export interface Behavior {
+        "languageTag": "en-US",
+        "fileDescription": string;
+        "text": {
+            "behaviors": {
+                [addonId: string]: {
                     "name": string;
                     "description": string;
                     "help-url": string;
@@ -122,8 +150,8 @@ export namespace LanguageJSON {
         "languageTag": "en-US",
         "fileDescription": string;
         "text": {
-            [addonTypeInPluralForm: string]: {
-                [addonThemeId: string]: {
+            "themes": {
+                [addonId: string]: {
                     "name": string;
                     "description": string;
                     "help-url": string;
@@ -136,8 +164,8 @@ export namespace LanguageJSON {
         "languageTag": "en-US",
         "fileDescription": string;
         "text": {
-            [addonTypeInPluralForm: string]: {
-                [addonEffectId: string]: {
+            "effects": {
+                [addonId: string]: {
                     "name": string;
                     "description": string;
                     "parameters": {

@@ -1,21 +1,21 @@
-import type { LanguageJSON, LanguageAction, LanguageCondition, LanguageExpression, LanguagePluginProperty, LanguageParam } from "../lib/json.ts";
-import type { LostConfig } from "../lib/common.ts";
-import type { Property } from "../lib/plugin-props.ts";
-import { BUILD_PATH } from "./paths.ts";
-import type { CategoryClassType } from '../lib/entities.ts';
+import type { LanguageJSON, LanguageAction, LanguageCondition, LanguageExpression, LanguagePluginProperty, LanguageParam } from "../../lib/json.ts";
+import type { LostConfig } from "../../lib/common.ts";
+import type { Property } from "../../lib/plugin-props.ts";
+import { BUILD_PATH } from "../paths.ts";
+import type { CategoryClassType } from '../../lib/entities.ts';
 
 interface CreateLanguageJSONOptions {
-    CONFIG: LostConfig<'plugin' | 'behavior' | 'drawing-plugin'>;
+    CONFIG: LostConfig<'behavior'>;
     PLUGIN_PROPERTIES: Property<any>[];
     CATEGORIES: CategoryClassType[];
 }
 
-export async function createLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES}: CreateLanguageJSONOptions) {
-    const LanguageJSON = {
+export async function createAddonBehaviorLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES}: CreateLanguageJSONOptions) {
+    const LanguageJSON: LanguageJSON.Behavior = {
         "languageTag": "en-US",
         "fileDescription": `Strings for ${CONFIG.AddonName} addon.`,
         "text": {
-            [((CONFIG.Type === 'drawing-plugin') ? 'plugin' : CONFIG.Type) + 's']: {
+            "behaviors": {
                 [CONFIG.AddonId.toLowerCase()]: {
                     "name": CONFIG.ObjectName,
                     "description": CONFIG.AddonDescription,
@@ -28,9 +28,9 @@ export async function createLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES}
                 }
             }
         }
-    } as LanguageJSON.Plugin;
+    };
 
-    const DeepJSON = LanguageJSON['text'][CONFIG.Type + 's'][CONFIG.AddonId.toLowerCase()];
+    const DeepJSON = LanguageJSON['text']['behaviors'][CONFIG.AddonId.toLowerCase()];
 
     PLUGIN_PROPERTIES.forEach(pp => {
         const {Type, Id, Name, Description} = pp.Options;

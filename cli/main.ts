@@ -13,7 +13,6 @@ import { getCategories } from "./get-categories.ts";
 import { getPluginProperties } from "./get-plugin-properties.ts";
 import { getAddonIcon } from "./get-addon-icon.ts";
 import { createAcesJSON } from "./create-aces-json.ts";
-import { createLanguageJSON } from "./create-language-json.ts";
 import { zipAddon } from "./zip-addon.ts";
 
 /**
@@ -21,11 +20,13 @@ import { zipAddon } from "./zip-addon.ts";
  */
 import { createAddonPluginStructure } from "./plugin/create-addon-plugin-structure.ts";
 import { createAddonPluginJSON } from "./plugin/create-addon-plugin-json.ts";
+import { createAddonPluginLanguageJSON } from "./plugin/create-addon-plugin-language-json.ts";
 
 /**
  * Behavior Addon Functions
  */
 import { createAddonBehaviorStructure } from './behavior/create-addon-behavior-structure.ts';
+import { createAddonBehaviorLanguageJSON } from "./behavior/create-addon-behavior-language-json.ts";
 
 /**
  * Theme Addon Functions
@@ -102,7 +103,7 @@ async function buildPlugin(CONFIG: LostConfig<'plugin'>) {
 
     await createAcesJSON({CATEGORIES});
 
-    await createLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES});
+    await createAddonPluginLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES});
 }
 
 async function buildDrawingPlugin(CONFIG: LostConfig<'drawing-plugin'>) {
@@ -122,7 +123,7 @@ async function buildDrawingPlugin(CONFIG: LostConfig<'drawing-plugin'>) {
 
     await createAcesJSON({CATEGORIES});
 
-    await createLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES});
+    await createAddonPluginLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES});
 }
 
 async function buildBehavior(CONFIG: LostConfig<'behavior'>) {
@@ -142,7 +143,7 @@ async function buildBehavior(CONFIG: LostConfig<'behavior'>) {
 
     await createAcesJSON({CATEGORIES});
 
-    await createLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES});
+    await createAddonBehaviorLanguageJSON({CONFIG, PLUGIN_PROPERTIES, CATEGORIES});
 }
 
 async function buildTheme(CONFIG: LostConfig<'theme'>) {
