@@ -6,7 +6,7 @@ import { Colors } from "./deps.ts";
 import { build } from "./cli/main.ts";
 import { serveAddon } from './cli/serve-addon.ts';
 
-const VERSION = '2.0.2'
+const VERSION = '2.0.3'
 
 type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 

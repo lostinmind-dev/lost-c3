@@ -3,7 +3,7 @@
 <div align="center">
   <h3>
     Lost for easy making Construct 3 Addons. <br />
-    v2.0.2
+    v2.0.3
   </h3>
 </div>
 

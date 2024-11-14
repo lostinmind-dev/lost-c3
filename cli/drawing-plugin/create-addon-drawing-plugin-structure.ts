@@ -14,7 +14,6 @@ import { transpileTsToJs } from '../misc/transpile-ts-to-js.ts';
 
 const ADDON_FILES = {
     'drawing-plugin': [
-        'instance.js',
         'plugin.js',
         'type.js'
     ]
@@ -22,7 +21,7 @@ const ADDON_FILES = {
 
 interface CreateAddonStructureOptions {
     CONFIG: LostConfig<'drawing-plugin'>;
-    PLUGIN_PROPERTIES: Property[];
+    PLUGIN_PROPERTIES: Property<any>[];
     SCRIPTS: AddonScript[];
     FILES: AddonFile[];
     MODULES: AddonModule[];
@@ -87,6 +86,10 @@ export async function createAddonDrawingPluginStructure(
             Deno.copyFile(module.path, `${BUILD_PATH}/c3runtime/Modules/${module.filename}`);
         })
     }
+
+    let worldInstanceFileData = await transpileTsToJs(`${Deno.cwd()}/Addon/WorldInstance.ts`) as string;
+    worldInstanceFileData = `const Config = {AddonId: ${JSON.stringify(CONFIG.AddonId)}};\n${worldInstanceFileData}`
+    await Deno.writeTextFile(`${BUILD_PATH}/instance.js`, worldInstanceFileData);
 
     let instanceFileData = await transpileTsToJs(`${Deno.cwd()}/Addon/Instance.ts`) as string;
     instanceFileData = `const Config = {AddonId: ${JSON.stringify(CONFIG.AddonId)}};\n${instanceFileData}`
