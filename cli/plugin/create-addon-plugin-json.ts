@@ -30,12 +30,12 @@ export async function createAddonPluginJSON({ CONFIG, ICON, SCRIPTS, FILES, MODU
         "documentation": CONFIG.DocsURL,
         "description": CONFIG.AddonDescription,
         "editor-scripts": [
-            `${(CONFIG.Type === 'plugin') ? 'plugin.js' : 'behavior.js'}`,
+            `${(CONFIG.Type === 'plugin' || CONFIG.Type === 'drawing-plugin') ? 'plugin.js' : 'behavior.js'}`,
             "type.js",
             "instance.js"
         ],
         "file-list": [
-            `${(CONFIG.Type === 'plugin') ? 'c3runtime/plugin.js' : 'c3runtime/behavior.js'}`,
+            `${(CONFIG.Type === 'plugin' || CONFIG.Type === 'drawing-plugin') ? 'c3runtime/plugin.js' : 'c3runtime/behavior.js'}`,
             "c3runtime/type.js",
             "c3runtime/instance.js",
             "c3runtime/conditions.js",
@@ -45,13 +45,15 @@ export async function createAddonPluginJSON({ CONFIG, ICON, SCRIPTS, FILES, MODU
             "lang/en-US.json",
             "aces.json",
             "addon.json",
-            `${(CONFIG.Type === 'plugin') ? 'plugin.js' : 'behavior.js'}`,
+            `${(CONFIG.Type === 'plugin' || CONFIG.Type === 'drawing-plugin') ? 'plugin.js' : 'behavior.js'}`,
             "instance.js",
             "type.js",
             `${ICON.filename}`
         ]
     };
-
+    if (CONFIG.Type === 'drawing-plugin') {
+        AddonJSON['file-list'].push('assets/default.png');
+    }
     SCRIPTS.forEach(script => AddonJSON['file-list'].push(`scripts${script.relativePath}`));
     FILES.forEach(file => AddonJSON['file-list'].push(`files/${file.filename}`));
     MODULES.forEach(module => AddonJSON['file-list'].push(`c3runtime/Modules/${module.filename}`));

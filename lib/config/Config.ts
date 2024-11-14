@@ -222,10 +222,6 @@ interface DrawingPluginConfig extends ConfigBase {
      */
     Is3D?: boolean;
     /**
-     * Optional. Default is **False**. Pass true to add a single editable image, such as used by the Tiled Background plugin.
-     */
-    HasImage?: boolean;
-    /**
      * Optional. Default is **False**. Pass true to indicate that the image is intended to be tiled.
      * @description This adjusts the texture wrapping mode when Construct creates a texture for its image.
      */

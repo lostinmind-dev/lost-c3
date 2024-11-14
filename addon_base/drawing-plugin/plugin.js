@@ -21,7 +21,8 @@ const PLUGIN_CLASS = SDK.Plugins[ADDON_ID] = class LostDrawingPlugin extends SDK
         this._info.SetIsResizable(CONFIG.IsResizable);
         this._info.SetIsRotatable(CONFIG.IsRotatable);
         this._info.SetIs3D(CONFIG.Is3D || false);
-        this._info.SetHasImage(CONFIG.HasImage || false);
+        this._info.SetHasImage(true);
+        this._info.SetDefaultImageURL('default.png');
         this._info.SetIsTiled(CONFIG.IsTiled || false);
         this._info.SetSupportsZElevation(CONFIG.SupportsZElevation);
         this._info.SetSupportsColor(CONFIG.SupportsColor);
