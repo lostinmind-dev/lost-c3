@@ -12,7 +12,7 @@ export async function createAddonThemeLanguageJSON({CONFIG}: CreateLanguageJSONO
         "languageTag": "en-US",
         "fileDescription": `Strings for ${CONFIG.AddonName} addon.`,
         "text": {
-            [CONFIG.Type + 's']: {
+            "themes": {
                 [CONFIG.AddonId.toLowerCase()]: {
                     "name": CONFIG.AddonName,
                     "description": CONFIG.AddonDescription,

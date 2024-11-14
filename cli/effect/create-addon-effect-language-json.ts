@@ -15,7 +15,7 @@ export async function createAddonEffectLanguageJSON({CONFIG, PARAMETERS}: Create
         "languageTag": "en-US",
         "fileDescription": `Strings for ${CONFIG.AddonName} addon.`,
         "text": {
-            [CONFIG.Type + 's']: {
+            "effects": {
                 [CONFIG.AddonId.toLowerCase()]: {
                     "name": CONFIG.AddonName,
                     "description": CONFIG.AddonDescription,
@@ -25,7 +25,7 @@ export async function createAddonEffectLanguageJSON({CONFIG, PARAMETERS}: Create
         }
     } as LanguageJSON.Effect;
 
-    const DeepJSON = LanguageJSON['text'][CONFIG.Type + 's'][CONFIG.AddonId.toLowerCase()];
+    const DeepJSON = LanguageJSON['text']['effects'][CONFIG.AddonId.toLowerCase()];
 
     PARAMETERS.forEach(parameter => {
         const {Id, Name, Description} = parameter.Options;
