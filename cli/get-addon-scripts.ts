@@ -13,8 +13,6 @@ export interface AddonScript {
 }
 
 export async function getAddonScripts(config: LostConfig<'plugin' | 'behavior' | 'drawing-plugin'>) {
-    LOGGER.Searching('Searching for scripts');
-
     const scripts: AddonScript[] = [];
 
     try {
@@ -52,6 +50,7 @@ export async function getAddonScripts(config: LostConfig<'plugin' | 'behavior' |
         }
 
         if (dirInfo.isDirectory) {
+            LOGGER.Searching('Searching for scripts');
             await readScriptsDirectory(ADDON_SCRIPTS_FOLDER_PATH);
             return scripts;
         }

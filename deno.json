@@ -3,7 +3,8 @@
     "version": "2.0.4",
     "exports": {
         ".": "./mod.ts",
-        "./cli": "./cli.ts"
+        "./cli": "./cli.ts",
+        "./misc": "./misc.ts"
     },
     "fmt": {
         "indentWidth": 4,

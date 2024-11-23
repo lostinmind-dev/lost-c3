@@ -28,7 +28,7 @@ interface ExpressionEntityOptions extends EntityOptionsWithSpecificParams<Allowe
 export function Expression<T>(Options: ExpressionEntityOptions) {
     return function (
         value: (this: any, ...args: any[]) => void,
-        context: ClassMethodDecoratorContext<T, (this: any, ...args: any[]) => void>
+        context: ClassMethodDecoratorContext<T, (this: any, ...args: any[]) => string | number>
     ) {
         context.addInitializer(function (this: any, ...args: any[]) {
 

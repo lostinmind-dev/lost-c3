@@ -7,8 +7,6 @@ export interface AddonModule {
 }
 
 export async function getAddonModules() {
-    LOGGER.Searching('Searching for modules');
-    
     const modules: AddonModule[] = [];
 
     try {
@@ -30,6 +28,7 @@ export async function getAddonModules() {
         }
 
         if (dirInfo.isDirectory) {
+            LOGGER.Searching('Searching for modules');
             await readModulesDirectory(ADDON_MODULES_FOLDER_PATH);
             return modules;
         }

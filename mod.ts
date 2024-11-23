@@ -22,8 +22,3 @@ export { EffectParameter } from './lib/params.ts';
  * Common
  */
 export { type LostConfig, type AddonType, STABLE, BETA, LTS } from './lib/common.ts';
-
-/**
- * Misc
- */
-export { Bold, Code, Italic, Strikethrough, Underline } from './lib/misc.ts';

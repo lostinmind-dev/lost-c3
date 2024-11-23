@@ -31,7 +31,8 @@ export type FileMIMEType =
     | 'video/mpeg'
     | 'video/ogg'
     | 'video/webm'
-    | 'video/quicktime';
+    | 'video/quicktime'
+    | 'application/wasm';
 
 export function getMIMEFileType(filename: string): FileMIMEType | undefined {
     if (filename.endsWith('.json')) {
@@ -132,6 +133,9 @@ export function getMIMEFileType(filename: string): FileMIMEType | undefined {
     }
     if (filename.endsWith('.mov')) {
         return 'video/quicktime';
+    }
+    if (filename.endsWith('.wasm')) {
+        return 'application/wasm';
     }
     // Если расширение не найдено, возвращаем undefined
     return undefined;

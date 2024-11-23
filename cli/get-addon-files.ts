@@ -10,7 +10,6 @@ export interface AddonFile {
 }
 
 export async function getAddonFiles(config: LostConfig<'plugin' | 'behavior' | 'drawing-plugin'>) {
-    LOGGER.Searching('Searching for files');
     
     const files: AddonFile[] = [];
 
@@ -41,6 +40,7 @@ export async function getAddonFiles(config: LostConfig<'plugin' | 'behavior' | '
         }
 
         if (dirInfo.isDirectory) {
+            LOGGER.Searching('Searching for files');
             await readFilesDirectory(ADDON_FILES_FOLDER_PATH);
             return files;
         }

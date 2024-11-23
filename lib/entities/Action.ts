@@ -24,10 +24,10 @@ interface ActionEntityOptions extends EntityOptionsBase {
     IsAsync?: boolean;
 }
 
-export function Action<T>(Options: ActionEntityOptions) {
+export function Action<I>(Options: ActionEntityOptions) {
     return function (
         value: (this: any, ...args: any[]) => void,
-        context: ClassMethodDecoratorContext<T, (this: any, ...args: any[]) => void>
+        context: ClassMethodDecoratorContext<I, (this: any, ...args: any[]) => void>
     ) {
         context.addInitializer(function (this: any, ...args: any[]) {
 

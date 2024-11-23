@@ -34,7 +34,7 @@ export async function getCategories() {
                         const {Id, Name, Deprecated, InDevelopment} = Category;
 
                         if (!InDevelopment) {
-                            LOGGER.Process(`Checking category with Id: ${Colors.magenta(Category.Id)} for issues`);
+                            // LOGGER.Process(`Checking category with Id: ${Colors.magenta(Category.Id)} for issues`);
 
                             if (Id === '') {
                                 LOGGER.Error('build', ErrorMessage.CATEGORY_ID_EMPTY);
