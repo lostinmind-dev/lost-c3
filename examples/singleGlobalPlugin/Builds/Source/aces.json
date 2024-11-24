@@ -1,0 +1,46 @@
+{
+    "id": {
+        "actions": [
+            {
+                "id": "doAction",
+                "scriptName": "doAction",
+                "highlight": false,
+                "isDeprecated": false,
+                "isAsync": false,
+                "params": [
+                    {
+                        "id": "a",
+                        "type": "number",
+                        "initialValue": "0"
+                    }
+                ]
+            }
+        ],
+        "conditions": [
+            {
+                "id": "onCondition",
+                "scriptName": "onCondition",
+                "highlight": false,
+                "isDeprecated": false,
+                "isTrigger": true,
+                "isFakeTrigger": false,
+                "isStatic": false,
+                "isLooping": false,
+                "isInvertible": true,
+                "isCompatibleWithTriggers": true,
+                "params": []
+            }
+        ],
+        "expressions": [
+            {
+                "id": "Expre",
+                "expressionName": "Expre",
+                "highlight": false,
+                "isDeprecated": false,
+                "returnType": "any",
+                "isVariadicParameters": false,
+                "params": []
+            }
+        ]
+    }
+}

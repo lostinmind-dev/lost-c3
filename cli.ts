@@ -1,14 +1,9 @@
-#!/usr/bin/env deno run --allow-read --allow-write --unstable
-import type { AddonType } from "./lib/common.ts";
-
+import DenoJson from './deno.json' with { type: "json" };
 import { parseArgs } from "jsr:@std/cli@1.0.6";
-import { Colors } from "./deps.ts";
-import { build } from "./cli/main.ts";
-import { serveAddon } from './cli/serve-addon.ts';
+import { Colors, Logger } from './deps.ts';
+import Build from './cli/main.ts';
+import Serve from './cli/serve-addon.ts';
 
-const VERSION = '2.0.4'
-
-type LostCommand = 'none' | 'help' | 'version' | 'build' | 'create' | 'serve';
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
@@ -17,50 +12,47 @@ async function main() {
         "--": true,
       });
 
-    const command = (_[0]) ? String(_[0]) as LostCommand : 'none';
+    const command = _[0]
 
     switch (command) {
         case 'help':
             printHelp();
             break;
         case 'version':
-            console.log('✅', Colors.bold(`Lost ➜  ${Colors.yellow(VERSION)} by ${Colors.italic(Colors.magenta('lostinmind.'))}`))
+            Logger.LogBetweenLines(Colors.bold(`Lost ➜  ${Colors.yellow(DenoJson.version)} by ${Colors.italic(Colors.magenta('lostinmind.'))}`))
             break;
         case 'create':
             if (!flags.plugin) {
-                console.log('🎓', Colors.blue(Colors.italic('Specify one of the available types of addon:')))
-                console.log('   ⚙️', Colors.gray('  --plugin, -p'), '   Creates a bare-bones for "plugin" addon type.');
-                console.log('   ⚙️', Colors.gray('  --behavior, -b'), '   Creates a bare-bones for "behavior" addon type.');
-                console.log('   ⚙️', Colors.gray('  --theme, -t'), '   Creates a bare-bones for "theme" addon type.');
-                console.log('   ⚙️', Colors.gray('  --effect, -e'), '   Creates a bare-bones for "effect" addon type.');
+                Logger.Log('🎓', Colors.blue(Colors.italic('Specify one of the available types of addon:')))
+                printCreate();
                 break;
             }
             if (flags.plugin) {
-                await createBareBones('plugin');
+                // await createBareBones('plugin');
                 break;
             }
             if (flags.behavior) {
-                await createBareBones('behavior');
+                // await createBareBones('behavior');
                 break;
             }
             if (flags.effect) {
-                await createBareBones('effect');
+                // await createBareBones('effect');
                 break;
             }
             if (flags.theme) {
-                await createBareBones('theme');
+                // await createBareBones('theme');
                 break;
             }
             break;
         case 'build':
-            await build();
+            await Build();
             break;
         case 'serve':
-            await serveAddon(65432);
+            await Serve(65432);
             break;
         case 'none':
-            console.error('❌', Colors.red(Colors.bold(`Unknown command:`)), Colors.italic(command));
-            console.log(Colors.blue(Colors.italic('Enter')), Colors.italic(Colors.bold(`${Colors.yellow('lost')} help`)), Colors.italic(Colors.blue('to get of available commands.')))
+            Logger.Log(`❌ ${Colors.red(Colors.bold(`Unknown command:`)), Colors.italic(command)}`);
+            Logger.Log(Colors.blue(Colors.italic('Enter')), Colors.italic(Colors.bold(`${Colors.yellow('lost')} help`)), Colors.italic(Colors.blue('to get of available commands.')))
             Deno.exit(1);
     }
 
@@ -70,12 +62,12 @@ if (import.meta.main) {
     await main();
 }
 
-async function createBareBones(addonType: AddonType) {
-    console.log('⏳', Colors.bold(Colors.yellow((Colors.italic(`Creating bare-bones for ${Colors.magenta(`"${addonType}"`)} addon type`)))), '...');
-    await cloneRepo(`https://github.com/lostinmind-dev/lostc3-${addonType}-bare-bones.git`, addonType);
-}
+// async function createBareBones(addonType: AddonType) {
+//     console.log('⏳', Colors.bold(Colors.yellow((Colors.italic(`Creating bare-bones for ${Colors.magenta(`"${addonType}"`)} addon type`)))), '...');
+//     await cloneRepo(`https://github.com/lostinmind-dev/lostc3-${addonType}-bare-bones.git`, addonType);
+// }
 
-async function cloneRepo(url: string, addonType: AddonType) {
+async function cloneRepo(url: string) {
     const command = new Deno.Command('git', {
         args: ['clone', url, './'],
         stdout: "piped",
@@ -92,18 +84,22 @@ async function cloneRepo(url: string, addonType: AddonType) {
 }
 
 function printHelp() {
-    console.log('📃', Colors.bold("Usage: lost <command> [options]"));
+    Logger.Info(Colors.bold('Usage: lost <command> [options]'));
 
-    console.log('✅', Colors.bold("Valid commands:"));
-    console.log(`  ${Colors.yellow('help')}`);
-    console.log(`  ${Colors.yellow('version')}`);
+    Logger.Log('✅', Colors.bold("Valid commands:"));
+    Logger.Log(`  ${Colors.yellow('help')}`);
+    Logger.Log(`  ${Colors.yellow('version')}`);
     
-    console.log(`  ${Colors.yellow('create')}`);
-    console.log('   ⚙️', Colors.gray('  --plugin, -p'), '   Creates a bare-bones for "plugin" addon type.');
-    console.log('   ⚙️', Colors.gray('  --behavior, -b'), '   Creates a bare-bones for "behavior" addon type.');
-    console.log('   ⚙️', Colors.gray('  --theme, -t'), '   Creates a bare-bones for "theme" addon type.');
-    console.log('   ⚙️', Colors.gray('  --effect, -e'), '   Creates a bare-bones for "effect" addon type.');
+    Logger.Log(`  ${Colors.yellow('create')}`);
+    printCreate();
 
-    console.log(`  ${Colors.yellow('build')}`);
-    console.log(`  ${Colors.yellow('serve')}`);
+    Logger.Log(`  ${Colors.yellow('build')}`);
+    Logger.Log(`  ${Colors.yellow('serve')}`);
+}
+
+function printCreate() {
+    Logger.Log('   ⚙️', Colors.gray('  --plugin, -p'), Colors.italic('   Creates a bare-bones for "plugin" addon type.'));
+    Logger.Log('   ⚙️', Colors.gray('  --behavior, -b'), Colors.italic('   Creates a bare-bones for "behavior" addon type.'));
+    Logger.Log('   ⚙️', Colors.gray('  --theme, -t'), Colors.italic('   Creates a bare-bones for "theme" addon type.'));
+    Logger.Log('   ⚙️', Colors.gray('  --effect, -e'), Colors.italic('   Creates a bare-bones for "effect" addon type.'));
 }

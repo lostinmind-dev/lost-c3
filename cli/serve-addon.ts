@@ -1,13 +1,12 @@
-import { Colors } from "../deps.ts";
-import { LOGGER } from "./misc.ts";
-import { BUILD_PATH } from "./paths.ts";
+import { Logger, Colors, join } from "../deps.ts";
+import { Paths } from "../shared/paths.ts";
 
-export async function serveAddon(port: number) {
-    LOGGER.Line();
-    LOGGER.Process('Starting addon server');
+export default async function serveAddon(port: number) {
+    Logger.Line();
+    Logger.Log('🌐', 'Starting addon server...');
 
     const getContentType = (filePath: string): string | undefined => {
-        const extension = filePath.split(".").pop();
+        const extension = filePath.split('.').pop();
         const contentTypes: { [key: string]: string } = {
             "js": "application/javascript",
             "css": "text/css",
@@ -25,8 +24,9 @@ export async function serveAddon(port: number) {
     const handler = async (req: Request): Promise<Response> => {
         try {
             const url = new URL(req.url);
-            let filePath = `${BUILD_PATH}${url.pathname}`;
-    
+            // let filePath = url.pathname;
+            let filePath = join(Paths.Build, url.pathname);
+
             try {
                 const fileInfo = await Deno.stat(filePath);
                 if (fileInfo.isDirectory) {
@@ -35,15 +35,15 @@ export async function serveAddon(port: number) {
             } catch {
                 return new Response("File not found", { status: 404 });
             }
-    
+
             const file = await Deno.readFile(filePath);
-            const contentType = getContentType(filePath) || "application/octet-stream";
-    
+            const contentType = getContentType(filePath) || 'application/octet-stream';
+
             return new Response(file, {
                 status: 200,
                 headers: {
                     "Content-Type": contentType,
-                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Origin": '*',
                 },
             });
         } catch (err) {
@@ -54,7 +54,10 @@ export async function serveAddon(port: number) {
     Deno.serve({
         port,
         onListen() {
-            console.log(`${Colors.bold('Addon server started!')} ${Colors.magenta(Colors.bold(`--> http://localhost:${port}/addon.json <--`))}`)
+            Logger.Log(
+                '✅',
+                `${Colors.bold('Server running!')} ${Colors.magenta(Colors.bold(`--> http://localhost:${port}/addon.json <--`))}`
+            )
         }
     }, handler)
 }

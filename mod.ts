@@ -1,24 +1,21 @@
 /**
  * Entities
  */
-export { Category, Action, Condition, Expression } from './lib/entities.ts';
+export { Plugin } from './lib/plugin.ts';
+export { category } from './lib/entities/category.ts';
+export { action } from './lib/entities/action.ts';
+export { condition } from './lib/entities/condition.ts';
+export { expression } from './lib/entities/expression.ts';
+export { param, Param } from './lib/entities/parameter.ts';
+export { Property } from './lib/entities/plugin-property.ts';
 
-/**
- * Params
- */
-export { Param } from './lib/params.ts';
-
-/**
- * Plugin Properties
- */
-export { Property } from './lib/plugin-props.ts';
 
 /**
  * Effect Parameters
  */
-export { EffectParameter } from './lib/params.ts';
+// export { EffectParameter } from './lib/params.ts';
 
 /**
  * Common
  */
-export { type LostConfig, type AddonType, STABLE, BETA, LTS } from './lib/common.ts';
+export type { LostConfig } from './lib/config.ts';

@@ -1,65 +1,113 @@
-import type { Param, ParamOptions } from "../params/Params.ts";
+import { bold, italic } from '../misc/text-formatting.ts';
+import type { ExpressionParamOptions, Parameter, ParamOptions } from './parameter.ts';
 
-export type LostEntityType = 'Action' | 'Condition' | 'Expression';
-
-export interface LostEntityOptions {
-    ScriptName: string;
-    Script: any;
-    Highlight: boolean;
-    Deprecated: boolean;
+export enum EntityType {
+    Action = 'action',
+    Condition = 'condition',
+    Expression = 'expression'
 }
 
-export interface LostEntity {
-    Type: LostEntityType;
-    Id: string;
-    Name: string;
-    Description: string;
-    Options: LostEntityOptions,
-    Params: Param<ParamOptions>[];
+interface EntityFuncReturnTypeMap {
+    [EntityType.Action]: void;
+    [EntityType.Condition]: boolean;
+    [EntityType.Expression]: number | string;
 }
 
-export interface LostEntityWithSpecificParams<T extends ParamOptions['Type']> extends LostEntity {
-    Params: Param<Extract<ParamOptions, { Type: T }>>[];
+export type EntityFuncReturnType<E extends EntityType> = EntityFuncReturnTypeMap[E];
+
+export abstract class Entity<E extends EntityType> {
+    readonly _type: E;
+    readonly _id: string;
+    readonly _name: string;
+    _displayText: string;
+    readonly _description: string;
+    readonly _params: Array<Parameter<E>>;
+    readonly _func: (this: any, ...args: any[]) => EntityFuncReturnType<E>;
+    
+    _isDeprecated: boolean = false;
+
+    constructor(
+        type: E,
+        name: string,
+        description: string,
+        func: (this: any, ...args: any[]) => EntityFuncReturnType<E>,
+        displayText?: string,
+        params?: Array<Parameter<E>>
+    ) {
+        this._id = func.name;
+        this._type = type;
+        this._name = name;
+        this._description = description;
+        this._func = func;
+        this._displayText = displayText || '';
+        this._params = params || [];
+
+        if (
+            this._type === EntityType.Action ||
+            this._type === EntityType.Condition
+        ) {
+            this._checkDisplayText();
+        }
+    }
+
+    private _setDisplayTextToDefault() {
+        const _displayText: string = this.removePlaceholders(this._displayText);
+
+        const _params: string[] = [];
+
+        this._params.forEach((param, i) => {
+            if (i === this._params.length - 1) {
+                _params.push(`${italic(param._name)}: ${bold(`{${i}}`)}`);
+            } else {
+                _params.push(`${italic(param._name)}: ${bold(`{${i}}`)}` + ', ');
+            }
+        })
+
+        const finalDisplayText = `${_displayText} (${_params.join('')})`;
+        this._displayText = finalDisplayText;
+        return this;
+    }
+
+    private _isDisplayTextCorrect(displayText: string): boolean {
+        for (let i = 0; i < this._params.length; i++) {
+            if (!displayText.includes(`{${i}}`))
+            return false;
+        }
+        return true;
+    }
+
+    private removePlaceholders(str: string) {
+        return str.replace(/,\s*\{\d+\}|\{\d+\},?|\s*,\s*$|\s*\(.*?\)/g, '').trim();
+    }
+
+    private _checkDisplayText() {
+        if (this._params.length > 0) {
+            if (!this._isDisplayTextCorrect(this._displayText)) {
+                this._setDisplayTextToDefault();
+            }
+        }
+    }
+}  
+
+/** Object represents base options for each entity type */
+export type EntityOptions<T extends EntityType> = {
+    /**
+     * *Optional*. Entity parameters.
+     */
+    readonly params?: Array<Parameter<T>>;
+    /**
+     * *Optional*. Default is **False**.
+     * Set to true to highlight the ACE in the condition/action/expression picker dialogs. 
+     */
+    readonly highlight?: boolean;
 }
 
-export interface EntityOptionsBase {
-    /**
-     * A string specifying a unique ID for the ACE. 
-     * @description This is used in the language file. 
-     * By convention this is lowercase with dashes for separators
-     * @example "my-condition".
-     */
-    Id: string,
-    /**
-     * The name that appears in the condition/action picker dialog.
-     * @example "Do action"
-     */
-    Name: string,
-    /**
-     * Optional. A description of the action or condition, which appears as a tip at the top of the condition/action picker dialog.
-     * @example "This action is doing something good."
-     */
-    Description?: string, 
-    /**
-     * Optional. Default is **False**. Set to true to highlight the ACE in the condition/action/expression picker dialogs. 
-     * @description This should only be used for the most regularly used ACEs, to help users pick them out from the list easily.
-     * @example true
-     */
-    Highlight?: boolean;
-    /**
-     * Optional. Default is **False**. Set to true to deprecate the ACE. 
-     * @description This hides it in the editor, but allows existing projects to continue using it.
-     * @example true
-     */
-    Deprecated?: boolean;
-    /**
-     * Optional. Array of ACE params.
-     * @description Use Param class to define any parameter.
-     * @example [new Param({Type: "string", Id: "myNumber", Name: "Number"})]
-     */
-    Params?: Param<ParamOptions>[];
+/** Map of Parameter options for evert entity type. */
+interface EntityParamOptionsMap {
+    [EntityType.Action]: ParamOptions;
+    [EntityType.Condition]: ParamOptions;
+    [EntityType.Expression]: ExpressionParamOptions;
 }
 
-export interface EntityOptionsWithSpecificParams<T extends ParamOptions['Type']> extends EntityOptionsBase {
-    Params?: Param<Extract<ParamOptions, { Type: T }>>[];
-}
+/** Seperated parameter options for every entity type. */
+export type EntityParamOptions<T extends EntityType> = EntityParamOptionsMap[T];

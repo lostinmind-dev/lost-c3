@@ -6,20 +6,19 @@
         "./cli": "./cli.ts",
         "./misc": "./misc.ts"
     },
-    "fmt": {
-        "indentWidth": 4,
-        "semiColons": true,
-        "singleQuote": true,
-        "useTabs": false,
-        "exclude": []
-    },
     "tasks": {
         "uninstall:cli": "deno uninstall lost -g",
         "install:cli:local": "deno install --name lost ./cli.ts --global -f -A",
         "test:cli": "deno run -A ./cli.ts"
     },
     "compilerOptions": {
-        "noImplicitOverride": false
+        "noImplicitOverride": false,
+        "lib": [
+            "deno.window",
+            "dom",
+            "deno.ns"
+        ],
+        "types": ["./types"]
     },
     "publish": {
         "include": [

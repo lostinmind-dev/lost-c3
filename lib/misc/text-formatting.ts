@@ -1,34 +1,34 @@
 /**
  * Returns --> **text**
  */
-export function Bold(Text: string): string {
-    return (`[b]${Text}[/b]`);
+export function bold(text: string): string {
+    return (`[b]${text}[/b]`);
 };
 
 /**
  * Returns --> *text*
  */
-export function Italic(Text: string): string {
-    return (`[i]${Text}[/i]`);
+export function italic(text: string): string {
+    return (`[i]${text}[/i]`);
 };
 
 /**
  * Returns --> t͟e͟x͟t͟
  */
-export function Underline(Text: string): string {
-    return (`[u]${Text}[/u]`);
+export function underline(text: string): string {
+    return (`[u]${text}[/u]`);
 };
 
 /**
  * Returns --> ~text~
  */
-export function Strikethrough(Text: string): string {
-    return (`[s]${Text}[/s]`);
+export function strikethrough(text: string): string {
+    return (`[s]${text}[/s]`);
 };
 
 /**
  * Returns --> `text`
  */
-export function Code(Text: string): string {
-    return (`[code]${Text}[/code]`);
+export function code(text: string): string {
+    return (`[code]${text}[/code]`);
 };

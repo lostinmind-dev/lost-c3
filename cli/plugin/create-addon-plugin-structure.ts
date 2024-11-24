@@ -10,7 +10,7 @@ import type { AddonIcon } from "../get-addon-icon.ts";
 import { ADDON_BASE_URL, BUILD_PATH } from "../paths.ts";
 import { path } from '../../deps.ts';
 import { LOGGER } from '../misc.ts';
-import { transpileTsToJs } from '../misc/transpile-ts-to-js.ts';
+import { transpileTsToJs } from '../../shared/transpile-ts.ts';
 
 const ADDON_FILES = {
     plugin: [

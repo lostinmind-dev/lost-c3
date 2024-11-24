@@ -1,7 +1,7 @@
 // deno-lint-ignore-file
-import type { LostConfig } from "../../lib/common.ts";
-import type { Property } from "../../lib/plugin-props.ts";
-import type { CategoryClassType } from "../../lib/entities.ts";
+// import type { LostConfig } from "../../lib/common.ts";
+// import type { Property } from "../../lib/plugin-props.ts";
+// import type { CategoryClassType } from "../../lib/entities.ts";
 import type { AddonScript } from "../get-addon-scripts.ts";
 import type { AddonFile } from "../get-addon-files.ts";
 import type { AddonModule } from '../get-addon-modules.ts';
@@ -9,8 +9,8 @@ import type { AddonIcon } from "../get-addon-icon.ts";
 
 import { ADDON_BASE_URL, BUILD_PATH } from "../paths.ts";
 import { path } from '../../deps.ts';
-import { LOGGER } from '../misc.ts';
-import { transpileTsToJs } from '../misc/transpile-ts-to-js.ts';
+// import { LOGGER } from '../misc.ts';
+// import { transpileTsToJs } from '../../shared/transpile-ts.ts';
 
 const ADDON_FILES = {
     'drawing-plugin': [
