@@ -109,166 +109,104 @@ lost create --plugin    # Creates a bare-bones project for 'plugin' addon
 Let's setup _`lost.config.ts`_ config file at first.
 
 ```typescript
-import { type LostConfig, STABLE, BETA, LTS } from "jsr:@lost-c3/lib";
+import type { LostConfig } from "jsr:@lost-c3/lib@";
 
-const Config: LostConfig<'plugin'> = {
+const config: LostConfig = {
     /**
      * Set addon type
      */
-    Type: 'plugin',
+    type: 'plugin',
     /**
      * Set a boolean of whether the addon is deprecated or not.
      */
-    Deprecated?: false,
+    deprecated?: false,
 
     /**
      * A boolean indicating whether the addon supports Construct's worker mode, where the entire runtime is hosted in a Web Worker instead of the main thread.
      */
-    SupportsWorkerMode?: false,
+    supportsWorkerMode?: false,
     /**
      * The minimum Construct version required to load your addon, e.g. "r399".
      */
-    MinConstructVersion?: STABLE.R407_2, 
+    minConstructVersion?: 'r416', 
     /**
      * Pass false to prevent the addon from being bundled via the Bundle addons project property.
      */
-    CanBeBundled?: false,
+    canBeBundled?: false,
     /**
      * Pass true to set the plugin to be a single-global type.
      */
-    IsSingleGlobal?: true,
+    isSingleGlobal?: true,
 
     /**
      * An object name that will applied after plugin was installed/added to project.
      */
-    ObjectName: 'LostPluginName',
-    AddonId: 'Lost_MyAddon',
-    AddonName: 'Lost addon for Construct 3',
-    AddonDescription: 'Amazing addon made with Lost.',
-    Category: 'general',
-    Version: '1.0.0.0',
-    Author: 'lostinmind.',
-    WebsiteURL: `https://addon.com`,
-    DocsURL: `https://docs.addon.com`,
-    
-    /**
-     * Setup your scripts from 'Scripts' folder.
-     */    
-    Scripts?: [],
-    /**
-     * Add a remote URL to load a script from.
-     */
-    RemoteScripts?: [],
-    /**
-     *  Setup your files from 'Files' folder.
-     */
-    Files?: []
+    objectName: 'LostPluginName',
+
+    addonId: 'Lost_MyAddon',
+    addonName: 'Lost addon for Construct 3',
+    addonDescription: 'Amazing addon made with Lost.',
+    category: 'general',
+    version: '1.0.0.0',
+    author: 'lostinmind.',
+    websiteUrl: `https://addon.com`,
+    docsUrl: `https://docs.addon.com`,
+    helpUrl: {
+        EN: 'https://myaddon.com/help/en'
+    }
 }
 
-export default Config;
+export default config;
 ```
 
-### 📜 Specifying plugin properties
-Use _`properties.ts`_ file to specify any plugin properties for your
-addon. That file located in following path: `./properties.ts`.
-
-**List of available plugin property types:**
-
-| Type | Description |
-| ----------- | ----------- |
-| ```"integer"``` | **An integer number property, always rounded to a whole number.** |
-| ```"float"``` | **A floating-point number property.** |
-| ```"percent"``` | **A floating-point number in the range [0-1] represented as a percentage.** |
-| ```"text"``` | **A field the user can enter a string in to.** |
-| ```"longtext"``` | **The same as "text", but a button with an ellipsis ("...") appears on the right side of the field.** |
-| ```"check"``` | **A checkbox property, returning a boolean.** |
-| ```"font"``` | **A field which displays the name of a font and provides a button to open a font picker dialog.** |
-| ```"combo"``` | **A dropdown list property.** |
-| ```"color"``` | **A color picker property.** |
-| ```"object"``` | **An object picker property allowing the user to pick an object class.** |
-| ```"group"``` | **Creates a new group in the Properties Bar.** |
-| ```"info"``` | **Creates a read-only string that cannot be edited.** |
-
-*Example*
+### ⚙️ Addon setup
+Let's setup _`addon.ts`_ file at second.
 
 ```typescript
-import { Property } from 'jsr:@lost-c3/lib';
+import { Plugin, Property } from 'jsr:@lost-c3/lib@3.0.0';
+import config from "./lost.config.ts";
 
-const Properties: Property[] = [
-    new Property({
-        Type: 'integer',
-        Id: 'integerProperty',
-        Name: 'Integer',
-        InitialValue: 0,
-    }),
-    new Property({
-        Type: 'float',
-        Id: 'floatProperty',
-        Name: 'Float',
-        InitialValue: 0,
-    }),
-    new Property({
-        Type: 'percent',
-        Id: 'percentProperty',
-        Name: 'Percent',
-        InitialValue: 1,
-    }),
-    new Property({
-        Type: 'text',
-        Id: 'textProperty',
-        Name: 'Text',
-        InitialValue: '...',
-    }),
-    new Property({
-        Type: 'longtext',
-        Id: 'longtextProperty',
-        Name: 'Long Text',
-        InitialValue: '',
-    }),
-    new Property({
-        Type: 'check',
-        Id: 'checkProperty',
-        Name: 'Check',
-        InitialValue: true,
-    }),
-    new Property({
-        Type: 'font',
-        Id: 'fontProperty',
-        Name: 'Font',
-    }),
-    new Property({
-        Type: 'combo',
-        Id: 'comboProperty',
-        Name: 'Combo',
-        Items: [
-            ['item1','Item 1'],
-            ['item2', 'Item 2'],
-        ],
-    }),
-    new Property({
-        Type: 'color',
-        Id: 'colorProperty',
-        Name: 'Color',
-    }),
-    new Property({
-        Type: 'object',
-        Id: 'objectProperty',
-        Name: 'Object',
-    }),
-    new Property({
-        Type: 'group',
-        Id: 'groupProperty',
-        Name: 'Awesome Group',
-    }),
-    new Property({
-        Type: 'info',
-        Id: 'infoProperty',
-        Name: 'Info',
-        Value: 'lostinmind.',
-    }),
-];
+const Addon = new Plugin(config)
 
-export default Properties;
+Addon
+    .addFilesToOutput()
+
+    .setRuntimeScripts()
+
+    .addRemoteScripts('https://cdn/index.js')
+
+    /** @Properties  */
+    .addPluginProperty('integer', 'Integer', { type: Property.Integer })
+    .addPluginProperty('float', 'Float', { type: Property.Float })
+    .addPluginProperty('percent', 'Percent', { type: Property.Percent })
+    .addPluginProperty('text', 'Text', { type: Property.Text })
+    .addPluginProperty('longText', 'Long Text', { type: Property.LongText })
+    .addPluginProperty('check', 'Check', { type: Property.Checkbox })
+    .addPluginProperty('font', 'Font', { type: Property.Font })
+    .addPluginProperty('combo', 'Combo', {
+        type: Property.Combo,
+        items: [['item1', 'item2']]
+    })
+    .addPluginProperty('color', 'Color', { type: Property.Color, initialValue: [255, 210, 155] })
+    .createGroup('group', 'Awesome Group')
+        .addPluginProperty('info', 'Info', { type: Property.Info, info: 'Lost' })
+        .addPluginProperty('link', 'Link', {
+            type: Property.Link,
+            callbackType: 'for-each-instance',
+            callback: (inst) => {
+                console.log('Link property for each instance');
+            }
+        })
+        .addPluginProperty('link2', 'Link', {
+            type: Property.Link,
+            callbackType: 'once-for-type',
+            callback: (type) => {
+                console.log('Link property once for type');
+            }
+        })
+;
+
+export default Addon;
 ```
 
 ### 📁 Creating category
@@ -628,7 +566,7 @@ To use any script you should copy OR create _**script.js**_ OR _**script.ts**_ f
 *Example*
 
 ```typescript
-import { Plugin, Property } from 'jsr:@lost-c3/lib@2.1.0';
+import { Plugin, Property } from 'jsr:@lost-c3/lib@3.0.0';
 import config from "./lost.config.ts";
 
 const Addon = new Plugin(config)
@@ -652,7 +590,7 @@ To use any file you should copy OR create _**file.***_ file at path:
 *Example*
 
 ```typescript
-import { Plugin, Property } from 'jsr:@lost-c3/lib@2.1.0';
+import { Plugin, Property } from 'jsr:@lost-c3/lib@3.0.0';
 import config from "./lost.config.ts";
 
 const Addon = new Plugin(config)
