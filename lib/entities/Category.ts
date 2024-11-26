@@ -1,6 +1,6 @@
-import type { Action } from './action.ts';
-import type { Condition } from './condition.ts';
-import type { Expression } from './expression.ts';
+import type { ActionEntity } from './action.ts';
+import type { ConditionEntity } from './condition.ts';
+import type { ExpressionEntity } from './expression.ts';
 
 interface ICategoryOptions {
     /**
@@ -16,14 +16,14 @@ interface ICategoryOptions {
 }
 
 export type CategoryClassType = {
-    _id: string;
-    _name: string;
-    _isDeprecated: boolean;
-    _inDevelopment: boolean;
+    readonly _id: string;
+    readonly _name: string;
+    readonly _isDeprecated: boolean;
+    readonly _inDevelopment: boolean;
 
-    _actions: Action[];
-    _conditions: Condition[];
-    _expressions: Expression[];
+    readonly _actions: ActionEntity[];
+    readonly _conditions: ConditionEntity[];
+    readonly _expressions: ExpressionEntity[];
 }
 
 
@@ -33,10 +33,13 @@ export type CategoryClassType = {
  * @param name Category name that will be displayed in action/condition picker dialog.
  * @param opts *Optional*. Custom options.
  */
-export function category(id: string, name: string, opts?: ICategoryOptions ) {
+export function Category(id: string, name: string, opts?: ICategoryOptions ) {
     return function (target: any, context: ClassDecoratorContext) {
         target.prototype._id = id;
         target.prototype._name = name;
+        if (name.length === 0) {
+            target.prototype._name = id;
+        }
         target.prototype._isDeprecated = opts?.isDeprecated || false;
         target.prototype._inDevelopment = opts?.inDevelopment || false;
 

@@ -3,7 +3,7 @@ import type { LostConfig } from '../lib/config.ts';
 import type { PluginProperty } from '../lib/entities/plugin-property.ts';
 
 export type LostAddonData = {
-    readonly icon: AddonIconFile;
+    readonly icon: AddonIconFile | null;
     readonly config: LostConfig;
     readonly remoteScripts: string[];
     readonly userScripts: AddonScriptFile[];

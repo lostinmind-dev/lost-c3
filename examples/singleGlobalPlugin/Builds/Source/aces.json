@@ -1,24 +1,31 @@
 {
-    "id": {
+    "id1": {
         "actions": [
             {
-                "id": "doAction",
+                "id": "test",
                 "scriptName": "doAction",
                 "highlight": false,
                 "isDeprecated": false,
-                "isAsync": false,
+                "isAsync": true,
                 "params": [
                     {
-                        "id": "a",
-                        "type": "number",
-                        "initialValue": "0"
+                        "id": "te",
+                        "type": "string",
+                        "initialValue": "",
+                        "autocompleteId": ""
+                    },
+                    {
+                        "id": "te1",
+                        "type": "string",
+                        "initialValue": "",
+                        "autocompleteId": ""
                     }
                 ]
             }
         ],
         "conditions": [
             {
-                "id": "onCondition",
+                "id": "myId",
                 "scriptName": "onCondition",
                 "highlight": false,
                 "isDeprecated": false,
@@ -33,7 +40,7 @@
         ],
         "expressions": [
             {
-                "id": "Expre",
+                "id": "id1",
                 "expressionName": "Expre",
                 "highlight": false,
                 "isDeprecated": false,

@@ -66,9 +66,16 @@ export class Logger {
         })
     };
 
-    static Error(step: 'build' | 'serve', errorMessage: string, ...data: any[]) {
+    static Error(step: 'build' | 'serve' | 'cli', errorMessage: string, ...data: any[]) {
         this.Line();
         switch (step) {
+            case 'cli':
+                console.log('⛔', Colors.bold(Colors.red('Lost CLI error.')));
+                this.Info(Colors.italic(errorMessage));
+                data.forEach(entry => {
+                    this.Info(entry)
+                })
+                break;
             case 'build':
                 console.log('⛔', Colors.bold(Colors.red('Addon build error.')));
                 this.Info(Colors.italic(errorMessage));

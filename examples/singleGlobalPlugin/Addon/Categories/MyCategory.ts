@@ -1,18 +1,16 @@
-import { action } from "../../../../lib/entities/action.ts";
-import { category } from "../../../../lib/entities/category.ts";
-import { condition } from "../../../../lib/entities/condition.ts";
-import { expression, ExpressionReturnType } from "../../../../lib/entities/expression.ts";
-import { Param, param } from "../../../../lib/entities/parameter.ts";
+import { Category, Action, Condition, Expression, addParam, Param } from "../../../../mod.ts";
 import type { Instance } from "../Instance.ts";
 
 
-@category('id', 'name')
+@Category('id1', 'name')
 export default class {
     
-    @action('', '', '', {
+    @Action('test', '', '', {
         params: [
-            param('a', 'a',{ type: Param.Number })
-        ]
+            addParam('te', '', { type: Param.String }),
+            addParam('te1', '', { type: Param.String })
+        ],
+        isAsync: true
     })
     doAction(): void {
         /**
@@ -20,14 +18,14 @@ export default class {
          */
     }
 
-    @condition('', '', '', {
+    @Condition('myId', '', '', {
         isTrigger: true
     })
     onCondition(this: Instance): boolean {
         return false;
     }
 
-    @expression('')
+    @Expression('id1', '')
     Expre(): string | number {
         return 2
     }

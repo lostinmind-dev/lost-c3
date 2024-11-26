@@ -12,9 +12,9 @@ import { Paths } from "../shared/paths.ts";
 
 export default async function createAddonJsonFiles(plugin: Plugin) {
 
-    await createAddonJson();
-    await createAcesJson();
     await createLanguageJson();
+    await createAcesJson();
+    await createAddonJson();
 
     async function createAddonJson() {
         const addonJson: AddonJson = {
@@ -275,7 +275,7 @@ export default async function createAddonJsonFiles(plugin: Plugin) {
         plugin._categories.forEach(category => {
             DeepJSON['aceCategories'][category._id] = category._name;        
     
-            category._actions.forEach(async action => {
+            category._actions.forEach(action => {
                 const {_id, _name, _displayText, _description, _params} = action;
                 const LanguageAction = {} as LanguageAction;
                 LanguageAction['list-name'] = _name;

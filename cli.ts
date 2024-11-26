@@ -1,16 +1,50 @@
 import DenoJson from './deno.json' with { type: "json" };
 import { parseArgs } from "jsr:@std/cli@1.0.6";
-import { Colors, Logger } from './deps.ts';
+import { Colors, join, Logger } from './deps.ts';
 import Build from './cli/main.ts';
 import Serve from './cli/serve-addon.ts';
+import { Paths } from './shared/paths.ts';
+import type { AddonType } from "./lib/config.ts";
 
+let rebuildTimeout: number | undefined;
+
+async function BuildAndWatch() {
+    const watcher = Deno.watchFs([
+        join(Paths.Main, 'Addon'),
+        join(Paths.Main, 'addon.ts'),
+        join(Paths.Main, 'lost.config.ts')
+    ]);
+
+    await Build(true);
+
+    for await (const event of watcher) {
+        if (event.kind === 'modify') {
+            for (const path of event.paths) {
+                if (
+                    path.endsWith('.ts') ||
+                    path.endsWith('.js') ||
+                    path.endsWith('.css')
+                ) {
+
+                    if (!rebuildTimeout) {
+                        clearTimeout(rebuildTimeout);
+                    }
+
+                    rebuildTimeout = setTimeout(async () => {
+                        await Build(true);
+                    }, 500);
+                }
+            }
+        }
+    }
+}
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
-        boolean: ["plugin", "behavior", "theme", "effect"],
-        alias: {p: "plugin", b: "behavior", t: "theme", e: "effect"},
+        boolean: ['plugin'],
+        alias: { p: 'plugin' },
         "--": true,
-      });
+    });
 
     const command = _[0]
 
@@ -26,32 +60,26 @@ async function main() {
                 Logger.Log('🎓', Colors.blue(Colors.italic('Specify one of the available types of addon:')))
                 printCreate();
                 break;
-            }
-            if (flags.plugin) {
-                // await createBareBones('plugin');
-                break;
-            }
-            if (flags.behavior) {
-                // await createBareBones('behavior');
-                break;
-            }
-            if (flags.effect) {
-                // await createBareBones('effect');
-                break;
-            }
-            if (flags.theme) {
-                // await createBareBones('theme');
-                break;
+            } else {
+                await createBareBones('plugin');
             }
             break;
         case 'build':
+            // if (flags.watch) {
+            //     await BuildAndWatch();
+            // } else {
+            //     await Build();
+            // }
             await Build();
             break;
         case 'serve':
             await Serve(65432);
             break;
-        case 'none':
-            Logger.Log(`❌ ${Colors.red(Colors.bold(`Unknown command:`)), Colors.italic(command)}`);
+        case 'types':
+            await installTypes();
+            break;
+        default:
+            Logger.Log(`❌ ${Colors.red(Colors.bold(`Unknown command:`)), Colors.italic(String(command))}`);
             Logger.Log(Colors.blue(Colors.italic('Enter')), Colors.italic(Colors.bold(`${Colors.yellow('lost')} help`)), Colors.italic(Colors.blue('to get of available commands.')))
             Deno.exit(1);
     }
@@ -62,10 +90,27 @@ if (import.meta.main) {
     await main();
 }
 
-// async function createBareBones(addonType: AddonType) {
-//     console.log('⏳', Colors.bold(Colors.yellow((Colors.italic(`Creating bare-bones for ${Colors.magenta(`"${addonType}"`)} addon type`)))), '...');
-//     await cloneRepo(`https://github.com/lostinmind-dev/lostc3-${addonType}-bare-bones.git`, addonType);
-// }
+async function installTypes() {
+    try {
+        const response = await fetch(Paths.ConstructTypes)
+
+        if (!response.ok) {
+            Logger.Error('cli', 'Error while installing "construct.d.ts" file', `Status: ${response.statusText}`);
+            Deno.exit(1);
+        }
+
+        const fileContent = await response.text();
+        await Deno.writeTextFile(join(Paths.Main, 'Addon', 'Types', 'construct.d.ts'), fileContent);
+    } catch (e) {
+        Logger.Error('cli', 'Error while installing construct types file', `Error: ${e}`);
+        Deno.exit(1);
+    }
+}
+
+async function createBareBones(addonType: AddonType) {
+    Logger.Process(`Creating bare-bones for ${Colors.magenta(`"${addonType}"`)} addon type`);
+    await cloneRepo(Paths.BareBones[addonType]);
+}
 
 async function cloneRepo(url: string) {
     const command = new Deno.Command('git', {
@@ -77,9 +122,9 @@ async function cloneRepo(url: string) {
     const { code, stdout, stderr } = await command.output();
 
     if (code === 0) {
-        console.log('✅', Colors.bold(`${Colors.green('Successfully')} created bare-bones for ${Colors.magenta(`"${addonType}"`)} addon type!`));
+        Logger.Success(Colors.bold(`${Colors.green('Successfully')} created bare-bones for ${Colors.magenta(`"${''}"`)} addon type!`));
     } else {
-        console.error('❌', Colors.red(Colors.bold(`Error occured while creating bare-bones.`)), `Error code: ${code}`);
+        Logger.Error('cli', 'Error occured while creating bare-bones.', `Error code: ${code}`);
     }
 }
 
@@ -89,17 +134,18 @@ function printHelp() {
     Logger.Log('✅', Colors.bold("Valid commands:"));
     Logger.Log(`  ${Colors.yellow('help')}`);
     Logger.Log(`  ${Colors.yellow('version')}`);
-    
+
     Logger.Log(`  ${Colors.yellow('create')}`);
     printCreate();
 
     Logger.Log(`  ${Colors.yellow('build')}`);
     Logger.Log(`  ${Colors.yellow('serve')}`);
+    Logger.Log(`  ${Colors.yellow('types')}`);
 }
 
 function printCreate() {
     Logger.Log('   ⚙️', Colors.gray('  --plugin, -p'), Colors.italic('   Creates a bare-bones for "plugin" addon type.'));
-    Logger.Log('   ⚙️', Colors.gray('  --behavior, -b'), Colors.italic('   Creates a bare-bones for "behavior" addon type.'));
-    Logger.Log('   ⚙️', Colors.gray('  --theme, -t'), Colors.italic('   Creates a bare-bones for "theme" addon type.'));
-    Logger.Log('   ⚙️', Colors.gray('  --effect, -e'), Colors.italic('   Creates a bare-bones for "effect" addon type.'));
+    // Logger.Log('   ⚙️', Colors.gray('  --behavior, -b'), Colors.italic('   Creates a bare-bones for "behavior" addon type.'));
+    // Logger.Log('   ⚙️', Colors.gray('  --theme, -t'), Colors.italic('   Creates a bare-bones for "theme" addon type.'));
+    // Logger.Log('   ⚙️', Colors.gray('  --effect, -e'), Colors.italic('   Creates a bare-bones for "effect" addon type.'));
 }

@@ -16,18 +16,24 @@
         "instance.js"
     ],
     "file-list": [
+        "c3runtime/modules/test/index.js",
         "c3runtime/modules/module.js",
         "c3runtime/expressions.js",
         "c3runtime/conditions.js",
         "c3runtime/instance.js",
         "c3runtime/actions.js",
+        "files/other/info.txt",
         "c3runtime/plugin.js",
         "c3runtime/main.js",
         "c3runtime/type.js",
         "files/styles.css",
         "scripts/index.js",
-        "files/info.txt",
+        "lang/en-US.json",
+        "instance.js",
         "addon.json",
-        "icon.svg"
+        "aces.json",
+        "plugin.js",
+        "icon.svg",
+        "type.js"
     ]
 }

@@ -7,43 +7,38 @@
                 "name": "LostPlugin",
                 "description": "My awesome addon was made with Lost",
                 "help-url": "https://myaddon.com/help/en",
-                "properties": {
-                    "test": {
-                        "name": "",
-                        "desc": "There is no any description yet..."
-                    },
-                    "tr": {
-                        "name": "",
-                        "desc": "There is no any description yet..."
-                    }
-                },
+                "properties": {},
                 "aceCategories": {
-                    "id": "name"
+                    "id1": "name"
                 },
                 "conditions": {
-                    "onCondition": {
-                        "list-name": "",
-                        "display-text": "",
-                        "description": "",
+                    "myId": {
+                        "list-name": "myId",
+                        "display-text": "myId",
+                        "description": "There is no any description yet...",
                         "params": {}
                     }
                 },
                 "actions": {
-                    "doAction": {
-                        "list-name": "",
-                        "display-text": " ([i]a[/i]: [b]{0}[/b])",
-                        "description": "",
+                    "test": {
+                        "list-name": "test",
+                        "display-text": "test ([i]te[/i]: [b]{0}[/b], [i]te1[/i]: [b]{1}[/b])",
+                        "description": "There is no any description yet...",
                         "params": {
-                            "a": {
-                                "name": "a",
+                            "te": {
+                                "name": "te",
+                                "desc": "There is no any description yet..."
+                            },
+                            "te1": {
+                                "name": "te1",
                                 "desc": "There is no any description yet..."
                             }
                         }
                     }
                 },
                 "expressions": {
-                    "Expre": {
-                        "translated-name": "",
+                    "id1": {
+                        "translated-name": "id1",
                         "description": "There is no any description yet...",
                         "params": {}
                     }

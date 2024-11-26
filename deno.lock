@@ -1,0 +1,69 @@
+{
+  "version": "4",
+  "specifiers": {
+    "jsr:@david/code-block-writer@13": "13.0.3",
+    "jsr:@hugoalh/underscore-path@2.0.3": "2.0.3",
+    "jsr:@std/cli@1.0.6": "1.0.6",
+    "jsr:@std/fmt@1.0.2": "1.0.2",
+    "jsr:@std/fs@1": "1.0.5",
+    "jsr:@std/path@1": "1.0.8",
+    "jsr:@std/path@1.0.6": "1.0.6",
+    "jsr:@std/path@1.0.8": "1.0.8",
+    "jsr:@std/path@^1.0.7": "1.0.8",
+    "jsr:@ts-morph/common@0.25": "0.25.0",
+    "jsr:@ts-morph/ts-morph@24.0.0": "24.0.0",
+    "jsr:@zip-js/zip-js@2.7.53": "2.7.53",
+    "npm:ts-md5@1.3.1": "1.3.1"
+  },
+  "jsr": {
+    "@david/code-block-writer@13.0.3": {
+      "integrity": "f98c77d320f5957899a61bfb7a9bead7c6d83ad1515daee92dbacc861e13bb7f"
+    },
+    "@hugoalh/underscore-path@2.0.3": {
+      "integrity": "fcfc968161b6ca8d625e3060e737887f86b68118331ff1ed38fba8d18fa37a4b"
+    },
+    "@std/cli@1.0.6": {
+      "integrity": "d22d8b38c66c666d7ad1f2a66c5b122da1704f985d3c47f01129f05abb6c5d3d"
+    },
+    "@std/fmt@1.0.2": {
+      "integrity": "87e9dfcdd3ca7c066e0c3c657c1f987c82888eb8103a3a3baa62684ffeb0f7a7"
+    },
+    "@std/fs@1.0.5": {
+      "integrity": "41806ad6823d0b5f275f9849a2640d87e4ef67c51ee1b8fb02426f55e02fd44e",
+      "dependencies": [
+        "jsr:@std/path@^1.0.7"
+      ]
+    },
+    "@std/path@1.0.6": {
+      "integrity": "ab2c55f902b380cf28e0eec501b4906e4c1960d13f00e11cfbcd21de15f18fed"
+    },
+    "@std/path@1.0.7": {
+      "integrity": "76a689e07f0e15dcc6002ec39d0866797e7156629212b28f27179b8a5c3b33a1"
+    },
+    "@std/path@1.0.8": {
+      "integrity": "548fa456bb6a04d3c1a1e7477986b6cffbce95102d0bb447c67c4ee70e0364be"
+    },
+    "@ts-morph/common@0.25.0": {
+      "integrity": "e3ed1771e2fb61fbc3d2cb39ebbc4f89cd686d6d9bc6d91a71372be055ac1967",
+      "dependencies": [
+        "jsr:@std/fs",
+        "jsr:@std/path@1"
+      ]
+    },
+    "@ts-morph/ts-morph@24.0.0": {
+      "integrity": "d72074cb953e45f53ec85181dffaf32b68a722188a145e3008410fd2782690ec",
+      "dependencies": [
+        "jsr:@david/code-block-writer",
+        "jsr:@ts-morph/common"
+      ]
+    },
+    "@zip-js/zip-js@2.7.53": {
+      "integrity": "acea5bd8e01feb3fe4c242cfbde7d33dd5e006549a4eb1d15283bc0c778ed672"
+    }
+  },
+  "npm": {
+    "ts-md5@1.3.1": {
+      "integrity": "sha512-DiwiXfwvcTeZ5wCE0z+2A9EseZsztaiZtGrtSaY5JOD7ekPnR/GoIVD5gXZAlK9Na9Kvpo9Waz5rW64WKAWApg=="
+    }
+  }
+}

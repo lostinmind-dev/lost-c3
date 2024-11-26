@@ -24,21 +24,25 @@ export abstract class Entity<E extends EntityType> {
     readonly _params: Array<Parameter<E>>;
     readonly _func: (this: any, ...args: any[]) => EntityFuncReturnType<E>;
     
-    _isDeprecated: boolean = false;
+    readonly _isDeprecated: boolean;
 
     constructor(
         type: E,
+        id: string,
         name: string,
         description: string,
         func: (this: any, ...args: any[]) => EntityFuncReturnType<E>,
+        isDeprecated: boolean,
         displayText?: string,
         params?: Array<Parameter<E>>
     ) {
-        this._id = func.name;
+        this._id = id;
         this._type = type;
         this._name = name;
+        if (name.length === 0) this._name = this._id;
         this._description = description;
         this._func = func;
+        this._isDeprecated = isDeprecated;
         this._displayText = displayText || '';
         this._params = params || [];
 
@@ -81,6 +85,9 @@ export abstract class Entity<E extends EntityType> {
     }
 
     private _checkDisplayText() {
+        if (this._displayText.length === 0) {
+            this._displayText = this._name;
+        }
         if (this._params.length > 0) {
             if (!this._isDisplayTextCorrect(this._displayText)) {
                 this._setDisplayTextToDefault();
@@ -91,6 +98,10 @@ export abstract class Entity<E extends EntityType> {
 
 /** Object represents base options for each entity type */
 export type EntityOptions<T extends EntityType> = {
+    /**
+     * 
+     */
+    readonly isDeprecated?: boolean;
     /**
      * *Optional*. Entity parameters.
      */

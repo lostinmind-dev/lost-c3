@@ -21,8 +21,6 @@ async function getCategory(path: string) {
 }
 
 export async function addCategories(plugin: Plugin) {
-    Logger.Searching('Searching for categories');
-
     async function readDir(path: string) {
         for await (const entry of Deno.readDir(path)) {
             if (entry.isDirectory) {
@@ -35,7 +33,10 @@ export async function addCategories(plugin: Plugin) {
                 try {
                     const category = await getCategory(`file://${path}/${entry.name}`);
 
-                    if (category !== null) {
+                    if (
+                        category !== null &&
+                        !category._inDevelopment
+                    ) {
                         plugin._categories.push(category);
                     }
 

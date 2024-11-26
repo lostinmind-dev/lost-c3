@@ -1,8 +1,6 @@
 export { }
 declare global {
 
-
-
 	/** I8DirectionBehaviorInstance.d.ts */
 	type SimulateControlType8Direction = "left" | "right" | "up" | "down";
 
@@ -3335,4 +3333,3 @@ declare global {
 	}
 
 }
-

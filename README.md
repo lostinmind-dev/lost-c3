@@ -3,7 +3,7 @@
 <div align="center">
   <h3>
     Lost for easy making Construct 3 Addons. <br />
-    v2.0.3
+    v3.0.0
   </h3>
 </div>
 
@@ -18,9 +18,9 @@ lostinmind.
 - **[💪 Advantages](#-advantages)**
 - **[🚀 Quickstart](#-quickstart)**
 - **[🔌 Creating ***`Plugin`*** addon](#-creating-plugin-addon)**
-- **[🎛️ Creating ***`Behavior`*** addon](#️-creating-behavior-addon)**
+<!-- - **[🎛️ Creating ***`Behavior`*** addon](#️-creating-behavior-addon)**
 - **[🎨 Creating ***`Theme`*** addon](#-creating-theme-addon)**
-- **[✨ Creating ***`Effect`*** addon](#-creating-effect-addon)**
+- **[✨ Creating ***`Effect`*** addon](#-creating-effect-addon)** -->
 - **[🏗️ Building addon](#️-building-addon)**
 - **[🧪 Testing addon](#-testing-addons-in-developer-mode)**
 
@@ -64,13 +64,13 @@ lost create
 lost create --plugin    # Creates a bare-bones project for 'plugin' addon
 ```
 
-```bash
+<!-- ```bash
 lost create --theme    # Creates a bare-bones project for 'theme' addon
 ```
 
 ```bash
 lost create --effect    # Creates a bare-bones project for 'effect' addon
-```
+``` -->
 
 
 >[!IMPORTANT] Check and install the latest version of Lost CLI!
@@ -91,9 +91,6 @@ lost create --plugin    # Creates a bare-bones project for 'plugin' addon
 │   ├── Scripts/                # Addon scripts folder
 │   ├── Modules/                # Addon modules folder
 │   ├── Types/                  # Addon scripts folder
-│       ├── ts-defs/            # Construct 3 declaration files
-│           ├── ...
-│           └── lost.d.ts/      # Lost types declaration file
 │       └── global.d.ts         # Declaration file for your purposes
 │   ├── icon.svg                # Your .svg OR .png addon icon
 │   ├── Instance.ts             # Addon Instance class
@@ -104,8 +101,8 @@ lost create --plugin    # Creates a bare-bones project for 'plugin' addon
 │       └── ...
 │   └── AddonId_Version.c3addon # Final .c3addon file
 ├── deno.json                   # deno.json file for Deno enviroment
+├── addon.ts                    # Main addon file
 ├── lost.config.ts              # Addon config file
-├── properties.ts               # Plugin properties file
 ```
 
 ### ⚙️ Config setup
@@ -281,28 +278,22 @@ project **`!cc`** to create default Category structure or copy-paste below
 script.
 
 ```typescript
-import { Category, Action, Condition, Expression, Param } from "jsr:@lost-c3/lib";
+import { Category, Action, Condition, Expression, addParam } from "jsr:@lost-c3/lib";
 import type { Instance } from "../Instance.ts";
 
-@Category({Id: 'myCategory', Name: 'Category Name', Deprecated?: false, InDevelopment?: false})
+@Category('myCategory', 'Category Name', { isDeprecated: false, inDevelopment: false })
 export default class MyCategory {
-    /**
-     * Actions
-     */
+    /** @Actions */
 
-    /**
-     * Conditions
-     */
+    /** @Conditions */
 
-    /**
-     * Expressions
-     */
+    /** @Expressions */
 }
 ```
 
->[!INFO] *Deprecated* property in @Category decorator deprecates all category Actions, Conditions, Expressions.
+>[!INFO] *isDeprecated* property in options for category in @Category decorator deprecates all category Actions, Conditions, Expressions.
 
->[!WARNING] *InDevelopment* property in @Category decorator removes all category Actions, Conditions, Expressions from addon.
+>[!WARNING] *inDevelopment* property in options for category in @Category decorator removes all category Actions, Conditions, Expressions from addon.
 
 #### ⚡️ Create action
 
@@ -318,54 +309,51 @@ import type { Instance } from '../Instance.ts';
 /**
  * Setup your category settings here
  */
-@Category({Id: 'categoryId', Name: 'Category Name'})
+@Category('categoryId', 'Category Name')
 export default class MyCategory {
-    @Action({
+    @Action(
         /**
          * A string specifying a unique ID for the ACE.
          */
-        Id: `doSomething`,
+        `doSomething`,
         /**
          * The name that appears in the action picker dialog.
          */
-        Name: `Do something`,
+        `Do something`,
         /**
          * The text that appears in the event sheet. 
          * You can use simple BBCode tags like [b] and [i], and use {0}, {1} etc. as parameter placeholders.
          * For easy BBCode import functions from @lost-c3/lib --> Bold, Italic, Underline, Strikethrough, Code
          */
-        DisplayText: `Do something`,
+        `Do something`,
         /**
          * A description of the action or condition, which appears as a tip at the top of the condition/action picker dialog.
          */
-        Description?: `Awesome description...`,
-        /**
-         * Set to true to mark the action as asynchronous. 
-         */
-        IsAsync?: false,
-        /*
-         * Set to true to highlight.
-         */
-        Highlighted?: false
-        /**
-         * Set to true to deprecate.
-         */
-        Deprecated?: false,
-        /**
-         * Setup your parameters here.
-         */
-        Params?: []
-    })
+        `Awesome description...`,
+        {
+            /**
+             * Set to true to mark the action as asynchronous. 
+             */
+            isAsync: false,
+            /**
+             * Set to true to deprecate.
+             */
+            isDeprecated: false,
+            /*
+             * Set to true to highlight.
+             */
+            highlight: true,
+            /**
+             * Setup your parameters here.
+             */
+            params: []
+        }
+    )
     doSomething() {
         console.log('Do something');
     };    
 }
 ```
-
-> [!WARNING]
-> It's important to use {0}, {1} as parameter placeholders inside _DisplayText_
-> property if you have any parameters inside your function (excluding _this_
-> parameter as _Instance_ Type)
 
 > [!TIP]
 > You can use build-in [BBCode](#-fast-bbcode-features) functions for fast and
@@ -382,49 +370,46 @@ Example
 import { Category, Action, Condition, Expression } from 'jsr:@lost-c3/lib';
 import type { Instance } from '../Instance.ts';
 
-@Category({Id: 'categoryId', Name: 'Category Name'})
+@Category('categoryId', 'Category Name')
 export default class MyCategory {
-    @Condition({
-        Id: `onEvent`,
-        Name: `On event`,
-        DisplayText: `On event`,
-        Description?: '',
-        /**
-         * Specifies a trigger condition.
-         */
-        IsTrigger: true,
-        /**
-         * Allow the condition to be used in the same branch as a trigger.
-         */
-        IsCompatibleWithTriggers?: false,
-        /**
-         * Specifies a fake trigger.
-         */
-        IsFakeTrigger?: false,
-        /**
-         * Allow the condition to be inverted in the event sheet.
-         */
-        IsInvertible?: false,
-        /**
-         * Display an icon in the event sheet to indicate the condition loops.
-         */
-        IsLooping?: false,
-        /**
-         * Normally, the condition runtime method is executed once per picked instance.
-         */
-        IsStatic?: false,
-        Deprecated?: false,
-        Highlight?: false,
-        Params?: []
-    })
+    @Condition(
+        `onEvent`,
+        `On event`,
+        `On event`,
+        'Trigger when something done...',
+        {
+            /**
+             * Specifies a trigger condition.
+             */
+            isTrigger: true,
+            /**
+             * Allow the condition to be used in the same branch as a trigger.
+             */
+            isCompatibleWithTriggers: false,
+            /**
+             * Specifies a fake trigger.
+             */
+            isFakeTrigger: false,
+            /**
+             * Allow the condition to be inverted in the event sheet.
+             */
+            isInvertible: false,
+            /**
+             * Display an icon in the event sheet to indicate the condition loops.
+             */
+            isLooping: false,
+            /**
+             * Normally, the condition runtime method is executed once per picked instance.
+             */
+            isStatic: false,
+            isDeprecated: false,
+            highlight: false,
+            params: []
+        }
+    )
     onEvent(this: Instance) { return true };
 }
 ```
-
-> [!WARNING]
-> It's important to use {0}, {1} as parameter placeholders inside _DisplayText_
-> property if you have any parameters inside your function (excluding _this_
-> parameter as _Instance_ Type)
 
 > [!TIP]
 > You can use build-in [BBCode](#-fast-bbcode-features) functions for fast and
@@ -441,24 +426,26 @@ Example
 import { Category, Action, Condition, Expression } from 'jsr:@lost-c3/lib';
 import type { Instance } from '../Instance.ts';
 
-@Category({Id: 'categoryId', Name: 'Category Name'})
+@Category('categoryId', 'Category Name')
 export default class MyCategory {
-    @Expression({
-        Id: `getValue`,
-        Name: `getValue`,
-        Description?: ``,
-        /**
-         * One of "number", "string", "any".
-         */
-        ReturnType: 'string',
-        /**
-         * Allow the user to enter any number of parameters beyond those defined.
-         */
-        IsVariadicParameters?: false,
-        Deprecated?: false,
-        Highlight?: false,
-        Params?: []
-    })
+    @Expression(
+        `getValue`,
+        `GetValue`,
+        `Returns some value`,
+        {
+            /**
+             *  "number" OR "string" OR "any".
+             */
+            returnType: 'string',
+            /**
+             * Allow the user to enter any number of parameters beyond those defined.
+             */
+            isVariadicParameters: false,
+            isDeprecated: false,
+            highlight: false,
+            params: []
+        }
+    )
     getValue(this: Instance) { return 'value' };
 }
 ```
@@ -469,62 +456,49 @@ export default class MyCategory {
 
 #### 🔧 Setting up Action/Condition/Expression parameters
 
-To setup parameters in your Action/Condition/Expression you should use 'Params'
-field when you creating on of the entity.
+To setup parameters in your Action/Condition/Expression you should use 'params'
+field when you creating on of the entity. Also you should use `addParam()` method AND `Param` enum that you can import from library.
 
 **List of available parameter types:**
 
 | Type | Description |
 | ----------- | ----------- |
-| ```"number"``` | **A number parameter.** |
-| ```"string"``` | **A string parameter.** |
-| ```"any"``` | **Either a number or a string.** |
-| ```"boolean"``` | **A boolean parameter, displayed as a checkbox.** |
-| ```"combo"``` | **A dropdown list.** |
-| ```"cmp"``` | **A dropdown list with comparison options like "equal to", "less than" etc.** |
-| ```"object"``` | **An object picker.** |
-| ```"objectname"``` | **A string parameter which is interpreted as an object name.** |
-| ```"layer"``` | **A string parameter which is interpreted as a layer name.** |
-| ```"layout"``` | **A dropdown list with every layout in the project.** |
-| ```"keyb"``` | **A keyboard key picker.** |
-| ```"instancevar"``` | **A dropdown list with the non-boolean instance variables the object has.** |
-| ```"instancevarbool"``` | **A dropdown list with the boolean instance variables the object has.** |
-| ```"eventvar"``` | **A dropdown list with non-boolean event variables in scope.** |
-| ```"eventvarbool"``` | **A dropdown list with boolean event variables in scope.** |
-| ```"animation"``` | **A string parameter which is interpreted as an animation name in the object.** |
-| ```"objinstancevar"``` | **A dropdown list with non-boolean instance variables available in a prior "object" parameter.** |
+| ```"Number"``` | **A number parameter.** |
+| ```"String"``` | **A string parameter.** |
+| ```"Any"``` | **Either a number or a string.** |
+| ```"Boolean"``` | **A boolean parameter, displayed as a checkbox.** |
+| ```"Combo"``` | **A dropdown list.** |
+| ```"Cmp"``` | **A dropdown list with comparison options like "equal to", "less than" etc.** |
+| ```"Object"``` | **An object picker.** |
+| ```"ObjectName"``` | **A string parameter which is interpreted as an object name.** |
+| ```"Layer"``` | **A string parameter which is interpreted as a layer name.** |
+| ```"Layout"``` | **A dropdown list with every layout in the project.** |
+| ```"Keyb"``` | **A keyboard key picker.** |
+| ```"InstanceVar"``` | **A dropdown list with the non-boolean instance variables the object has.** |
+| ```"InstanceVarBool"``` | **A dropdown list with the boolean instance variables the object has.** |
+| ```"EventVar"``` | **A dropdown list with non-boolean event variables in scope.** |
+| ```"EventVarBool"``` | **A dropdown list with boolean event variables in scope.** |
+| ```"Animation"``` | **A string parameter which is interpreted as an animation name in the object.** |
+| ```"ObjInstanceVar"``` | **A dropdown list with non-boolean instance variables available in a prior "object" parameter.** |
 
 *Example*
 
 ```typescript
-import { Category, Action, Condition, Expression, Param, Bold } from 'jsr:@lost-c3/lib';
+import { Category, Action, Condition, Expression, addParam, Param } from 'jsr:@lost-c3/lib';
+import { bold } from 'jsr:@lost-c3/lib/misc';
 import type { Instance } from '../Instance.ts';
 
-@Category({Id: 'categoryId', Name: 'Category Name'})
+@Category('categoryId', 'Category Name')
 export default class MyCategory {
     @Action({
-        Id: `doActionWithParams`,
-        Name: `Do action`,
-        /**
-         * Note that here we specified '{0}' for displaying user value
-         */
-        DisplayText: `Do action with value: ${Bold('{0}')}`,
-        Params: [
-            new Param({
-                Type: 'string',
-                Id: 'value',
-                Name: 'Value',
-                Description?: '',
-                /**
-                 * A string which is used as the initial expression for expression-based parameters. 
-                 * @description This is still a string for "number" type parameters. 
-                 * It can contain any valid expression for the parameter, such as "1 + 1".
-                 * For "boolean" type parameters, use a string of either "true" or "false".
-                 * For "combo" type parameters, this is the initial item ID.
-                 */
-                InitialValue?: ''
-            })
-        ]
+        `doActionWithParams`,
+        `Do action`,
+        `Do action with value: ${Bold('{0}')}`,
+        {
+            params: [
+                addParam('value', 'Value', { type: Param.String, initialValue?: '' })
+            ]
+        }
     })
     doActionWithParams(this: Instance, value: string) {
         console.log('Do action with value', value);
@@ -542,25 +516,22 @@ export default class MyCategory {
 > https://www.construct.net/en/make-games/manuals/addon-sdk/guide/defining-aces#internalH1Link0
 
 How to mark any Action, Condition OR Expression as deprecated? Each Action,
-Condition OR Expression has _Deprecated_ property in decorator, so you can set
+Condition OR Expression has _isDeprecated_ property in decorator options property, so you can set
 it to _`true`_ to deprecate.
 
 Example
 
 ```typescript
-import { Action, Bold, Category, Condition, Expression, Param } from 'jsr:@lost-c3/lib';
+import { Action, Category, Condition, Expression } from 'jsr:@lost-c3/lib';
 import type { Instance } from '../Instance.ts';
 
-@Category({Id: 'categoryId', Name: 'Category Name'})
+@Category('categoryId', 'Category Name')
 export default class MyCategory {
-    @Action({
-        Id: `doAction`,
-        Name: `Do action`,
-        DisplayText: `Do action`,
+    @Action(`doAction`, `Do action`, `Do action`, {
         /**
          * Default is False. Set to true to deprecate the ACE.
          */
-        Deprecated: true,
+        isDeprecated: true
     })
     doActionWithParams() { /* do something */ }
 }
@@ -583,7 +554,7 @@ class LostInstance extends globalThis.ISDKInstanceBase {
     /**
      * Use this property to call any condition in your addon
      */
-    readonly PluginConditions = C3.Plugins[Config.AddonId].Cnds;
+    readonly Conditions = C3.Plugins[Lost.addonId].Cnds;
 
     constructor() {
         super();
@@ -609,27 +580,22 @@ class LostInstance extends globalThis.ISDKInstanceBase {
     }
 }
 
-C3.Plugins[Config.AddonId].Instance = LostInstance;
+C3.Plugins[Lost.addonId].Instance = LostInstance;
 export type { LostInstance as Instance };
 ```
 
 _MyCategory.ts_
 
 ```typescript
-import { Action, Category, Condition, Expression, Param } from 'jsr:@lost-c3/lib';
+import { Action, Category, Condition, Expression } from 'jsr:@lost-c3/lib';
 /**
  * Import your instance type
  */
 import type { Instance } from '../Instance.ts';
 
-@Category({Id: 'categoryId', Name: 'Category Name'},
-)
+@Category('categoryId', 'Category Name')
 export default class MyCategory {
-    @Expression({
-        Id: `GetValue`,
-        Name: `GetValue`,
-        ReturnType: 'string'
-    })
+    @Expression(`getValue`, `GetValue`)
     /**
      * Set the first argument of your method to: this: Instance
      */
@@ -640,7 +606,7 @@ export default class MyCategory {
 ```
 
 ### 📚 Using Scripts (Javascript / Typescript)
-It's available to use custom **Javascript** OR **Typescript** in your addon.
+It's available to use custom **Javascript** OR **Typescript** script in your addon.
 
 To use any script you should copy OR create _**script.js**_ OR _**script.ts**_ file at path:
 `./Addon/Scripts`. Your script will automatically will be loaded with type:
@@ -657,28 +623,22 @@ To use any script you should copy OR create _**script.js**_ OR _**script.ts**_ f
 
 > [!NOTE]
 > If you want to load your script with type **external-runtime-script**, you
-> should add some settings in your _**`lost.config.ts`**_ file.
-
-> [!NOTE]
-> If you want to load your script with other dependency type, you should add your script with your dependency type in your _**`lost.config.ts`**_ file.
+> should call `setRuntimeScripts(path)` in your Addon object in _**`addon.ts`**_ file.
 
 *Example*
 
 ```typescript
-import type { LostConfig } from 'jsr:@lost-c3/lib';
+import { Plugin, Property } from 'jsr:@lost-c3/lib@2.1.0';
+import config from "./lost.config.ts";
 
-const Config: LostConfig<'plugin'> = {
-    Scripts: [
-        {FileName: 'library.js', Type: 'external-runtime-script'},
-    ],
-};
+const Addon = new Plugin(config)
 
-export default Config;
+Addon
+    .setRuntimeScripts('runtime-index.js')
+;
+
+export default Addon;
 ```
-
-> [!NOTE]
-> Useful information for choosing _`Type`_ property value:
-> https://www.construct.net/en/make-games/manuals/addon-sdk/reference/specifying-dependencies#internalH1Link0
 
 ### 📄 Using Files
 It's available to use files in your addon.
@@ -687,24 +647,25 @@ To use any file you should copy OR create _**file.***_ file at path:
 `./Addon/Files`. Your file will automatically will be loaded with auto-detected type.
 
 > [!NOTE]
-> If you want to load your file with other type, you should add your file with your type in your _**`lost.config.ts`**_ file.
+> If you want to include your file in project build, you should call `addFilesToOutput(path)` in your Addon object in _**`addon.ts`**_ file.
 
 *Example*
 
 ```typescript
-import type { LostConfig } from 'jsr:@lost-c3/lib';
+import { Plugin, Property } from 'jsr:@lost-c3/lib@2.1.0';
+import config from "./lost.config.ts";
 
-const Config: LostConfig<'plugin'> = {
-    Files: [
-        {FileName: 'styles.css', Type: 'copy-to-output'},
-    ],
-};
+const Addon = new Plugin(config)
 
-export default Config;
+Addon
+    .addFilesToOutput('myfile.wasm')
+;
+
+export default Addon;
 ```
 
 ### 📦 Using Modules
-It's available to use modules in your addon.
+It's available to use custom **Javascript** OR **Typescript** module in your addon.
 
 To use any module you should copy OR create _**mymodule.js**_ file at path:
 `./Addon/Modules`.
@@ -712,13 +673,13 @@ To use any module you should copy OR create _**mymodule.js**_ file at path:
 *Example*
 
 ```typescript
-import * as MyModule from './Modules/mymodule.js';
+import * as MyModule from './Modules/mymodule.ts';
 
 const C3 = globalThis.C3;
 
 class LostInstance extends globalThis.ISDKInstanceBase {
 
-	readonly PluginConditions = C3.Plugins[Config.AddonId].Cnds;
+	readonly PluginConditions = C3.Plugins[Lost.addonId].Cnds;
 	constructor() {
 		super();
 		const properties = this._getInitProperties();
@@ -737,9 +698,12 @@ class LostInstance extends globalThis.ISDKInstanceBase {
 
 };
 
-C3.Plugins[Config.AddonId].Instance = LostInstance;
+C3.Plugins[Lost.addonId].Instance = LostInstance;
 export type { LostInstance as Instance };
 ```
+
+> [!NOTE]
+> All **Typescript** files will be compiled into .js files after addon building.
 
 >[!WARNING] Note this is only supported from r401+.
 
@@ -755,34 +719,34 @@ customize displaying text in your addon.
 
 | Function | Result |
 | ----------- | ----------- |
-| ```Bold('Do action')``` | **Do action** |
-| ```Italic('Do action')``` | *Do action* |
-| ```Strikethrough('Do action')``` | ~~Do action~~ |
-| ```Underline('Do action')``` | <u>Do action</u> |
-| ```Code('Do action')``` | <code>Do action</code> |
+| ```bold('Do action')``` | **Do action** |
+| ```italic('Do action')``` | *Do action* |
+| ```strikethrough('Do action')``` | ~~Do action~~ |
+| ```underline('Do action')``` | <u>Do action</u> |
+| ```code('Do action')``` | <code>Do action</code> |
 
 *Example*
 
 ```typescript
-import { Action, Bold, Category, Code, Italic, Strikethrough, Underline } from 'jsr:@lost-c3/lib';
+import { bold, code, italic, strikethrough, underline } from 'jsr:@lost-c3/lib/misc';
+import { Action, Category } from 'jsr:@lost-c3/lib';
 import type { Instance } from '../Instance.ts';
 
-@Category({Id: 'categoryId', Name: 'Category Name'})
+@Category('categoryId', 'Category Name')
 export default class MyCategory {
-    @Action({
-        Id: `doAction`,
-        Name: `${Bold('Action name')}`,
-        DisplayText: `${Italic('Do something')} and ${Strikethrough('NOT')}`,
-        Description: `${Underline('Underlined description...')} with ${Code('SOMETHING')}`,
-        }
+    @Action(
+        `doAction`,
+        `${bold('Action name')}`,
+        `${italic('Do something')} and ${strikethrough('NOT')}`,
+        `${underline('Underlined description...')} with ${code('SOMETHING')}`
     )
-    doAction(this: Instance,) { /* do something */}
+    doAction(this: Instance) { /* do something */}
 }
 ```
 
-## 🎛️ Creating `Behavior` addon
+<!-- ## 🎛️ Creating `Behavior` addon -->
 
-## 🎨 Creating `Theme` addon
+<!-- ## 🎨 Creating `Theme` addon
 ```bash
 lost create --theme    # Creates a bare-bones project for 'theme' addon
 ```
@@ -834,9 +798,9 @@ export default Config;
 ### 🛠️ Theme development
 >[!TIP] For more info about developing themes you can read official docs
 >
-> https://www.construct.net/en/make-games/manuals/addon-sdk/guide/themes
+> https://www.construct.net/en/make-games/manuals/addon-sdk/guide/themes -->
 
-## ✨ Creating `Effect` addon
+<!-- ## ✨ Creating `Effect` addon
 ```bash
 lost create --effect    # Creates a bare-bones project for 'effect' addon
 ```
@@ -968,7 +932,7 @@ export default EffectParameters;
 >[!TIP] For more info about developing WebGPU shaders you can read official docs
 >
 > https://www.construct.net/en/make-games/manuals/addon-sdk/guide/configuring-effects/webgpu-shaders
-
+ -->
 
 ## 🏗️ Building addon
 

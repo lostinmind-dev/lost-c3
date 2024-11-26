@@ -18,6 +18,7 @@ export class Parameter<E extends EntityType> {
     ) {
         this._id = id;
         this._name = name;
+        if (name.length === 0) this._name = id;
         this._description = description;
 
         if (opts.type === Param.String) {
@@ -248,37 +249,47 @@ interface ObjInstanceVarParam extends ParamOptionsBase {
 
 /**
  * Adds parameter to action/condition/expression entity.
- * @param name The name that appears in the action/condition/expressin parameters dialog.
+ * @param id The unique identifier for the parameter.
+ * @param name The name that appears in the action/condition/expression parameters dialog.
  * @param opts Parameter options.
  */
-export function param<E extends EntityType>(id: string, name: string, opts: EntityParamOptions<E>): Parameter<E>;
+export function addParam<E extends EntityType>(id: string, name: string, opts: EntityParamOptions<E>): Parameter<E>;
 /**
  * Adds parameter to action/condition/expression entity.
- * @param name The name that appears in the action/condition/expressin parameters dialog.
- * @param description *Optional*. The parameter description.
+ * @param id The unique identifier for the parameter.
+ * @param name The name that appears in the action/condition/expression parameters dialog.
+ * @param description Optional. The parameter description.
  * @param opts Parameter options.
  */
-export function param<E extends EntityType>(id: string, name: string, description: string, opts: EntityParamOptions<E>): Parameter<E>;
+export function addParam<E extends EntityType>(id: string, name: string, description: string, opts: EntityParamOptions<E>): Parameter<E>;
 /**
  * Adds parameter to action/condition/expression entity.
- * @param name The name that appears in the action/condition/expressin parameters dialog.
- * @param descriptionOrOpts The parameter description. **OR** Parameter options.
+ * @param id The unique identifier for the parameter.
+ * @param name The name that appears in the action/condition/expression parameters dialog.
+ * @param descriptionOrOpts The parameter description OR parameter options.
  * @param opts Parameter options.
- * @returns 
  */
-export function param<E extends EntityType>(id: string, name: string, descriptionOrOpts: string | EntityParamOptions<E>, opts?: EntityParamOptions<E>): Parameter<E> {
+export function addParam<E extends EntityType>(
+    id: string,
+    name: string,
+    descriptionOrOpts: string | EntityParamOptions<E>,
+    opts?: EntityParamOptions<E>
+): Parameter<E> {
     let description: string = 'There is no any description yet...';
     let options: EntityParamOptions<E>;
+
     if (typeof descriptionOrOpts === 'string' && opts) {
+        // Если переданы описание и опции
         description = descriptionOrOpts;
         options = opts;
     } else if (typeof descriptionOrOpts === 'object') {
+        // Если переданы только опции
         options = descriptionOrOpts;
     } else {
-        //Logger.Error('build', `Incorrect parameter options`, 'Please specify options object.', `Action Name: ${this._name}`);
-        Deno.exit(1);
+        throw new Error(
+            `Invalid parameter options provided. Ensure you pass either a description and options, or only options.`
+        );
     }
 
-    return new Parameter<E>(id, name, description, options)
-
+    return new Parameter<E>(id, name, description, options);
 }

@@ -3,15 +3,16 @@ import { Entity, type EntityFuncReturnType, type EntityOptions, EntityType } fro
 /**
  * @class represents Expression entity.
  */
-export class Expression extends Entity<EntityType.Expression> {
+export class ExpressionEntity extends Entity<EntityType.Expression> {
     readonly _opts?: IExpressionOptions;
     constructor(
+        id: string,
         name: string,
         description: string,
         func: (this: any, ...args: any[]) => EntityFuncReturnType<EntityType.Expression>,
         opts?: IExpressionOptions
     ) {
-        super(EntityType.Expression, name, description, func);
+        super(EntityType.Expression, id, name, description, func, opts?.isDeprecated || false);
         this._opts = opts;
     }
 }
@@ -32,37 +33,43 @@ export interface IExpressionOptions extends EntityOptions<EntityType.Expression>
 /** Expression return type */
 export type ExpressionReturnType = 'string' | 'number' | 'any';
 
-
-export function expression<T>(name: string): any;
-export function expression<T>(name: string, descriptionOrOpts: string | IExpressionOptions, opts: IExpressionOptions): any
-export function expression<T>(name: string, descriptionOrOpts?: string | IExpressionOptions, opts?: IExpressionOptions): any {
+export function Expression<T>(id: string, name: string): any;
+export function Expression<T>(id: string, name: string, opts: IExpressionOptions): any;
+export function Expression<T>(id: string, name: string, description: string): any;
+export function Expression<T>(id: string, name: string, description: string, opts: IExpressionOptions): any;
+export function Expression<T>(
+    id: string, 
+    name: string,
+    descriptionOrOpts?: string | IExpressionOptions,
+    opts?: IExpressionOptions
+): any {
     return function (
         value: (this: any, ...args: any[]) => number | string,
         context: ClassMethodDecoratorContext<T, (this: any, ...args: any[]) => string | number>
     ) {
-        context.addInitializer(function (this: any, ...args: any[]) {
-
+        context.addInitializer(function (this: any) {
             let description: string = 'There is no any description yet...';
             let options: IExpressionOptions | undefined;
 
+            // Обработка аргументов
             if (typeof descriptionOrOpts === 'string') {
-                description = descriptionOrOpts;
-
-                if (typeof opts === 'object') {
-                    options = opts;
+                description = descriptionOrOpts; // Если второй аргумент строка, это описание
+                if (opts && typeof opts === 'object') {
+                    options = opts; // Если передан третий аргумент, это опции
                 }
-            } else {
-                //
+            } else if (descriptionOrOpts && typeof descriptionOrOpts === 'object') {
+                options = descriptionOrOpts; // Если второй аргумент объект, это опции
             }
 
+            // Инициализация массива выражений
             if (!this.constructor.prototype._expressions) {
                 this.constructor.prototype._expressions = [];
             }
 
+            // Добавление нового выражения
             this.constructor.prototype._expressions.push(
-                new Expression(name, description, value, options)
-            )
-
-        })
-    }    
+                new ExpressionEntity(id, name, description, value, options)
+            );
+        });
+    };
 }

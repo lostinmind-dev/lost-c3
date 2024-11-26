@@ -96,7 +96,7 @@ export class Plugin extends Addon {
                                         dependencyType: 'copy-to-output',
                                         mimeType: MIME.getFileType(entry.name)
                                     })
-                                    Logger.Loading(`Founded file at path: ${Colors.green(`${join('Addon', 'Files', relativePath)}`)}, will be included in project build`);
+                                    Logger.Loading(`Founded file at path: ${Colors.green(`${Colors.bold(join('Addon', 'Files', relativePath))}`)}, will be included in project build`);
                                     break;
                                 // deno-lint-ignore no-case-declarations
                                 case 'external-css':
@@ -111,7 +111,7 @@ export class Plugin extends Addon {
                                             dependencyType: 'copy-to-output',
                                             mimeType: MIME.getFileType(entry.name)
                                         })
-                                        Logger.Loading(`Founded file at path: ${Colors.green(`${join('Addon', 'Files', relativePath)}`)}, will be included in project build`);
+                                        Logger.Loading(`Founded file at path: ${Colors.bold(Colors.green(`${join('Addon', 'Files', relativePath)}`))}, will be included in project build`);
                                     } else {
                                         this._userFiles.push({
                                             type: 'file',
@@ -120,7 +120,7 @@ export class Plugin extends Addon {
                                             relativePath: getRelativePath(_path, Paths.Files, entry.name),
                                             dependencyType: 'external-css'
                                         })
-                                        Logger.Loading(`Founded CSS file at path: ${Colors.brightBlue(`${join('Addon', 'Files', relativePath)}`)}`);
+                                        Logger.Loading(`Founded CSS file at path: ${Colors.bold(Colors.dim(`${join('Addon', 'Files', relativePath)}`))}`);
                                     }
                                     break;
                             }
@@ -169,7 +169,7 @@ export class Plugin extends Addon {
                                 type: 'script',
                                 fileName: entry.name,
                                 path,
-                                relativePath,
+                                relativePath: relativePath.replace('.ts', '.js'),
                                 dependencyType: (isRuntimeScript) ? 'external-runtime-script' : 'external-dom-script',
                                 isTypescript
                                 // scriptType: 'module'
@@ -177,11 +177,11 @@ export class Plugin extends Addon {
 
                             if (isTypescript) {
                                 Logger.Loading(
-                                    `Founded script at path: ${Colors.blue(`${join('Addon', 'Scripts', relativePath)}`)}`
+                                    `Founded script at path: ${Colors.blue(`${Colors.bold(join('Addon', 'Scripts', relativePath))}`)}`
                                 );
                             } else {
                                 Logger.Loading(
-                                    `Founded script at path: ${Colors.yellow(`${join('Addon', 'Scripts', relativePath)}`)}`
+                                    `Founded script at path: ${Colors.yellow(`${Colors.bold(join('Addon', 'Scripts', relativePath))}`)}`
                                 );
                             }
 
@@ -225,17 +225,17 @@ export class Plugin extends Addon {
                                 type: 'module',
                                 fileName: entry.name,
                                 path: join(_path, entry.name),
-                                relativePath,
+                                relativePath: relativePath.replace('.ts', '.js'),
                                 isTypescript
                             })
 
                             if (isTypescript) {
                                 Logger.Loading(
-                                    `Founded module at path: ${Colors.blue(`${join('Addon', 'Modules', relativePath)}`)}`
+                                    `Founded module at path: ${Colors.blue(`${Colors.bold(join('Addon', 'Modules', relativePath))}`)}`
                                 );
                             } else {
                                 Logger.Loading(
-                                    `Founded module at path: ${Colors.yellow(`${join('Addon', 'Modules', relativePath)}`)}`
+                                    `Founded module at path: ${Colors.yellow(`${Colors.bold(join('Addon', 'Modules', relativePath))}`)}`
                                 );
                             }
                         }
@@ -289,12 +289,18 @@ export class Plugin extends Addon {
                 Deno.exit(1);
             }
 
-            if (id.length > 0) {
+            if (
+                id.length > 0 &&
+                name.length > 0
+            ) {
                 this._pluginProperties.push(
                     new PluginProperty(id, name, description, options)
                 );
-            } else {
-                Logger.Error('build', `Plugin property Id can't be empty.`, 'Please specify your property Id.')
+            } else if (id.length === 0) {
+                Logger.Error('build', `Plugin property id can't be empty.`, 'Please specify your property Id.')
+                Deno.exit(1);
+            } else if (name.length === 0) {
+                Logger.Error('build', `Plugin property name can't be empty.`, 'Please specify your property name.')
                 Deno.exit(1);
             }
             return this;
@@ -312,10 +318,16 @@ export class Plugin extends Addon {
      */
     createGroup(id: string, name: string): this {
         if (!this.isPluginPropertyAlreadyExist(id)) {
-            if (id.length > 0) {
+            if (
+                id.length > 0 &&
+                name.length > 0
+            ) {
                 this.addPluginProperty(id, name, { type: Property.Group });
-            } else {
-                Logger.Error('build', `Group Id can't be empty.`, 'Please specify your group Id.')
+            }  else if (id.length === 0) {
+                Logger.Error('build', `Group id can't be empty.`, 'Please specify your group Id.')
+                Deno.exit(1);
+            } else if (name.length === 0) {
+                Logger.Error('build', `Group name can't be empty.`, 'Please specify your group name.')
                 Deno.exit(1);
             }
             return this;
@@ -360,7 +372,8 @@ export class Plugin extends Addon {
          * Check to https link
          */
         url.forEach(u => {
-            if (url.includes('https')) {
+            if (u.includes('https')) {
+                Logger.Log(`🌐 Added remoted script with url: ${Colors.dim(u)}`)
                 this._remoteScripts.push(u);
             } else {
                 Logger.Error('build', `Failed to add remote script with url: (${u})`, 'You must either use secure HTTPS, or a same-protocol URL.')

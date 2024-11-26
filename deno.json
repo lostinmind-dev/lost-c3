@@ -1,42 +1,30 @@
 {
     "name": "@lost-c3/lib",
-    "version": "2.0.4",
+    "version": "3.0.0",
     "exports": {
         ".": "./mod.ts",
         "./cli": "./cli.ts",
         "./misc": "./misc.ts"
     },
     "tasks": {
-        "uninstall:cli": "deno uninstall lost -g",
-        "install:cli:local": "deno install --name lost ./cli.ts --global -f -A",
-        "test:cli": "deno run -A ./cli.ts"
+        "publish": "npx jsr publish",
+        "uninstall": "deno uninstall lost -g",
+        "install": " deno task uninstall | deno install --name lost ./cli.ts --global -f -A",
+        "build:base": "deno run --watch -A ./addon_base/main.ts"
     },
     "compilerOptions": {
-        "noImplicitOverride": false,
         "lib": [
             "deno.window",
             "dom",
             "deno.ns"
         ],
-        "types": ["./types"]
+        "noImplicitOverride": false
     },
     "publish": {
-        "include": [
-            "deps.ts",
-            "mod.ts",
-            "cli.ts",
-            "./lib/",
-            "./cli/",
-            "README.md",
-            "cover.png"
-        ],
         "exclude": [
-            ".github",
-            "tests",
-            "addon_base",
-            "package.json",
-            "tsconfig.json",
-            "src/"
+            "examples",
+            ".addon_base",
+            ".github"
         ]
     }
 }

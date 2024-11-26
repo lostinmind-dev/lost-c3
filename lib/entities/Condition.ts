@@ -3,16 +3,17 @@ import { Entity, type EntityFuncReturnType, type EntityOptions, EntityType } fro
 /**
  * @class represents Condition entity.
  */
-export class Condition extends Entity<EntityType.Condition> {
+export class ConditionEntity extends Entity<EntityType.Condition> {
     readonly _opts?: IConditionOptions;
     constructor(
+        id: string,
         name: string,
         displayText: string,
         description: string,
         func: (this: any, ...args: any[]) => EntityFuncReturnType<EntityType.Condition>,
         opts?: IConditionOptions
     ) {
-        super(EntityType.Condition, name, description, func, displayText);
+        super(EntityType.Condition, id, name, description, func, opts?.isDeprecated || false, displayText);
         this._opts = opts;
     }
 }
@@ -56,37 +57,43 @@ export interface IConditionOptions extends EntityOptions<EntityType.Condition> {
 }
 
 
-export function condition<I>(name: string, displayText: string): any;
-export function condition<I>(name: string, displayText: string, description: string): any;
-export function condition<I>(name: string, displayText: string, description: string, opts: IConditionOptions): any;
-export function condition<I>(name: string, displayText: string, descriptionOrOpts?: string | IConditionOptions, opts?: IConditionOptions): any {
+export function Condition<I>(id: string, name: string, displayText: string): any;
+export function Condition<I>(id: string, name: string, displayText: string, opts: IConditionOptions): any;
+export function Condition<I>(id: string, name: string, displayText: string, description: string): any;
+export function Condition<I>(id: string, name: string, displayText: string, description: string, opts: IConditionOptions): any;
+export function Condition<I>(
+    id: string,
+    name: string,
+    displayText: string,
+    descriptionOrOpts?: string | IConditionOptions,
+    opts?: IConditionOptions
+): any {
     return function (
         value: (this: any, ...args: any[]) => boolean,
         context: ClassMethodDecoratorContext<I, (this: any, ...args: any[]) => boolean>
     ) {
         context.addInitializer(function (this: any) {
-           
-            let description: string = 'There is no any description yet...';
+            let description = 'There is no any description yet...';
             let options: IConditionOptions | undefined;
 
+            // Обработка аргументов
             if (typeof descriptionOrOpts === 'string') {
-                description = descriptionOrOpts;
-
-                if (typeof opts === 'object') {
-                    options = opts;
+                description = descriptionOrOpts; // Если третий аргумент — строка, это описание
+                if (opts && typeof opts === 'object') {
+                    options = opts; // Четвёртый аргумент — опции
                 }
-            } else {
-                //
+            } else if (descriptionOrOpts && typeof descriptionOrOpts === 'object') {
+                options = descriptionOrOpts; // Если третий аргумент — объект, это опции
             }
 
             if (!this.constructor.prototype._conditions) {
                 this.constructor.prototype._conditions = [];
             }
-            
-            this.constructor.prototype._conditions.push(
-                new Condition(name, displayText, description, value, options)
-            )
 
-        })
-    }
+            this.constructor.prototype._conditions.push(
+                new ConditionEntity(id, name, displayText, description, value, options)
+            );
+
+        });
+    };
 }
