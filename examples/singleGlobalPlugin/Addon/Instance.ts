@@ -6,7 +6,7 @@ class LostInstance extends globalThis.ISDKInstanceBase {
 
     constructor() {
         super();
-        const properties = this._getInitProperties();
+        const properties = this._getInitProperties() as PluginProperties;
 
     }
 

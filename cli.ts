@@ -14,8 +14,10 @@ async function BuildAndWatch() {
         join(Paths.Main, 'addon.ts'),
         join(Paths.Main, 'lost.config.ts')
     ]);
-
-    await Build(true);
+    Logger.Clear();
+    Logger.Log(
+        '\n👀', Colors.blue('Watching for file changes...\n')
+    );
 
     for await (const event of watcher) {
         if (event.kind === 'modify') {
@@ -65,12 +67,12 @@ async function main() {
             }
             break;
         case 'build':
-            // if (flags.watch) {
-            //     await BuildAndWatch();
-            // } else {
-            //     await Build();
-            // }
-            await Build();
+            if (flags.watch) {
+                await BuildAndWatch();
+            } else {
+                await Build();
+            }
+            // await Build();
             break;
         case 'serve':
             await Serve(65432);

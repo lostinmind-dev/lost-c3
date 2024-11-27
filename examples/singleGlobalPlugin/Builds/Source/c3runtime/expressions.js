@@ -2,7 +2,7 @@ const Lost = {"addonId":"LostPluginId"};
 
 const C3 = globalThis.C3;
  C3.Plugins[Lost.addonId].Exps = {
-  Expre: function Expre() {
+  GetValue: function GetValue() {
     return 2;
   }
 }

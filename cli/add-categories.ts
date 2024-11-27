@@ -31,7 +31,7 @@ export async function addCategories(plugin: Plugin) {
                 entry.name.endsWith('.ts')
             ) {
                 try {
-                    const category = await getCategory(`file://${path}/${entry.name}`);
+                    const category = await getCategory(`file://${path}/${entry.name}?t=${Date.now()}`);
 
                     if (
                         category !== null &&

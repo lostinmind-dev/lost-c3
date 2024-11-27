@@ -7,8 +7,7 @@ export default class {
     
     @Action('test', '', '', {
         params: [
-            addParam('te', '', { type: Param.String }),
-            addParam('te1', '', { type: Param.String })
+            addParam('', '', { type: Param.String })
         ],
         isAsync: true
     })
@@ -16,6 +15,7 @@ export default class {
         /**
          * 
          */
+        console.log('hello')
     }
 
     @Condition('myId', '', '', {
@@ -26,7 +26,7 @@ export default class {
     }
 
     @Expression('id1', '')
-    Expre(): string | number {
+    GetValue(): string | number {
         return 2
     }
 }

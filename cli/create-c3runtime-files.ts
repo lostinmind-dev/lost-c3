@@ -16,7 +16,7 @@ type EntityCollection = {
     [key: string]: Function;
 }
 
-export default async function createC3RuntimeFiles(plugin: Plugin) {
+export default async function createC3RuntimeFiles(plugin: Plugin, watch?: true) {
 
     await addCategories(plugin);
     checkCategories();
@@ -85,24 +85,24 @@ export default async function createC3RuntimeFiles(plugin: Plugin) {
                                         if (p._id.length > 0) {
                                             if (isParameterIdAlreadyExists(p._id)) {
                                                 Logger.Error('build', `Action with id: "${e._id}" has duplicated parameters id's (${p._id})!`, 'Please change your parameter id.');
-                                                Deno.exit(1);
+                                                if (!watch) Deno.exit(1);
                                             }
                                         } else {
                                             Logger.Error('build', `Action with id: "${e._id}" has empty parameter id!`, 'Please specify your parameter id.');
-                                            Deno.exit(1);
+                                            if (!watch) Deno.exit(1);
                                         }
                                     })
                                 }
                             } else if (isIdAlreadyExists(e._id)) {
                                 Logger.Error('build', `Action with id: "${e._id}" is already exists in plugin!`, 'Please change your action id.');
-                                Deno.exit(1);
+                                if (!watch) Deno.exit(1);
                             } else if (isFunctionNameAlreadyExists(e._func.name)) {
                                 Logger.Error('build', `Action with id: "${e._id}" has method name that is already exists in plugin!`, 'Please change your action method name.');
-                                Deno.exit(1);
+                                if (!watch) Deno.exit(1);
                             }
                         } else {
                             Logger.Error('build', `Action id cannot be empty!`, 'Please specify your action id.', `Category id: ${category._id}`);
-                            Deno.exit(1);
+                            if (!watch) Deno.exit(1);
                         }
                     })
 
@@ -148,24 +148,24 @@ export default async function createC3RuntimeFiles(plugin: Plugin) {
                                         if (p._id.length > 0) {
                                             if (isParameterIdAlreadyExists(p._id)) {
                                                 Logger.Error('build', `Condition with id: "${e._id}" has duplicated parameters id's (${p._id})!`, 'Please change your parameter id.');
-                                                Deno.exit(1);
+                                                if (!watch) Deno.exit(1);
                                             }
                                         } else {
                                             Logger.Error('build', `Condition with id: "${e._id}" has empty parameter id!`, 'Please specify your parameter id.');
-                                            Deno.exit(1);
+                                            if (!watch) Deno.exit(1);
                                         }
                                     })
                                 }
                             } else if (isIdAlreadyExists(e._id)) {
                                 Logger.Error('build', `Condition with id: "${e._id}" is already exists in plugin!`, 'Please change your condition id.');
-                                Deno.exit(1);
+                                if (!watch) Deno.exit(1);
                             } else if (isFunctionNameAlreadyExists(e._func.name)) {
                                 Logger.Error('build', `Condition with id: "${e._id}" has method name that is already exists in plugin!`, 'Please change your condition method name.');
-                                Deno.exit(1);
+                                if (!watch) Deno.exit(1);
                             }
                         } else {
                             Logger.Error('build', `Condition id cannot be empty!`, 'Please specify your condition id.', `Category id: ${category._id}`);
-                            Deno.exit(1);
+                            if (!watch) Deno.exit(1);
                         }
                     })
 
@@ -211,34 +211,34 @@ export default async function createC3RuntimeFiles(plugin: Plugin) {
                                         if (p._id.length > 0) {
                                             if (isParameterIdAlreadyExists(p._id)) {
                                                 Logger.Error('build', `Expression with id: "${e._id}" has duplicated parameters id's (${p._id})!`, 'Please change your parameter id.');
-                                                Deno.exit(1);
+                                                if (!watch) Deno.exit(1);
                                             }
                                         } else {
                                             Logger.Error('build', `Expression with id: "${e._id}" has empty parameter id!`, 'Please specify your parameter id.');
-                                            Deno.exit(1);
+                                            if (!watch) Deno.exit(1);
                                         }
                                     })
                                 }
                             } else if (isIdAlreadyExists(e._id)) {
                                 Logger.Error('build', `Expression with id: "${e._id}" is already exists in plugin!`, 'Please change your expression id.');
-                                Deno.exit(1);
+                                if (!watch) Deno.exit(1);
                             } else if (isFunctionNameAlreadyExists(e._func.name)) {
                                 Logger.Error('build', `Expression with id: "${e._id}" has method name that is already exists in plugin!`, 'Please change your expression method name.');
-                                Deno.exit(1);
+                                if (!watch) Deno.exit(1);
                             }
                         } else {
                             Logger.Error('build', `Expression id cannot be empty!`, 'Please specify your expression id.', `Category id: ${category._id}`);
-                            Deno.exit(1);
+                            if (!watch) Deno.exit(1);
                         }
                     })
 
                 } else {
                     Logger.Error('build', `Category with id: "${category._id}" is already exists in plugin!`, 'Please change your category id.');
-                    Deno.exit(1);
+                    if (!watch) Deno.exit(1);
                 }
             } else {
                 Logger.Error('build', `Category id cannot be empty!`, 'Please specify your category id.');
-                Deno.exit(1);
+                if (!watch) Deno.exit(1);
             }
         })
     }

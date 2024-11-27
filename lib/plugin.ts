@@ -30,10 +30,70 @@ export class Plugin extends Addon {
         await this.loadUserFiles();
         await this.loadUserScripts();
         await this.loadUserModules();
+        await this.createTypes();
+    }
+
+    private async createTypes() {
+        if (this._pluginProperties.length > 0) {
+            let fileContent = `declare type PluginProperties = [`
+            this._pluginProperties.forEach((property, i) => {
+                switch (property._opts.type) {
+                    case Property.Integer:
+                        fileContent = fileContent + `number`
+                        break;
+                    case Property.Float:
+                        fileContent = fileContent + `number`
+                        break;
+                    case Property.Percent:
+                        fileContent = fileContent + `number`
+                        break;
+                    case Property.Text:
+                        fileContent = fileContent + `string`
+                        break;
+                    case Property.LongText:
+                        fileContent = fileContent + `string`
+                        break;
+                    case Property.Checkbox:
+                        fileContent = fileContent + `boolean`
+                        break;
+                    case Property.Font:
+                        fileContent = fileContent + `string`
+                        break;
+                    case Property.Combo:
+                        fileContent = fileContent + `number`
+                        break;
+                    case Property.Color:
+                        fileContent = fileContent + `[number, number, number]`
+                        break;
+                    case Property.Object:
+                        fileContent = fileContent + `number`
+                        break;
+                    case Property.Group:
+                        fileContent = fileContent + `unknown`
+                        break;
+                    case Property.Info:
+                        fileContent = fileContent + `unknown`
+                        break;
+                    case Property.Link:
+                        fileContent = fileContent + `unknown`
+                        break;
+                }
+
+                if (i < this._pluginProperties.length - 1) {
+                    fileContent = fileContent + `, `
+                }
+            })
+
+            fileContent = fileContent + `]`
+
+            await Deno.mkdir(join(Paths.Main, 'Addon', 'Types'), { recursive: true });
+
+            await Deno.writeTextFile(join(Paths.Main, 'Addon', 'Types', 'properties.d.ts'), fileContent);
+        }
     }
 
     private async loadAddonIcon() {
-        for await (const entry of Deno.readDir(Paths.Main)) {
+        for await (const entry of Deno.readDir(join(Paths.Main))) {
             if (
                 entry.isFile &&
                 (entry.name.endsWith('.png') || entry.name.endsWith('.svg'))

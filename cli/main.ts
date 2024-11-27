@@ -1,3 +1,4 @@
+import './global.ts';
 import { Colors, join, Logger } from "../deps.ts";
 import Zip from "./zip-addon.ts";
 
@@ -10,48 +11,47 @@ import createC3RuntimeFiles from "./create-c3runtime-files.ts";
 import createAddonJsonFiles from "./create-addon-json-files.ts";
 import createMainAddonFiles from "./create-main-addon-files.ts";
 
-const addonModulePath = `file://${join(Paths.Main, 'addon.ts')}`;
-
-let isBuilding = false;
+const addonModulePath = import.meta.resolve(`file://${join(Paths.Main, 'addon.ts')}`);
 
 export default async function build(watch?: true) {
+
     if (!isBuilding) {
+        isBuildError = false;
         isBuilding = true;
         const startTime = performance.now();
-
         Logger.Clear();
         Logger.LogBetweenLines('🚀 Starting build process...');
-
-        const addon = (await import(`${addonModulePath}`)).default as Addon;
-
+        const addon = (await import(`${addonModulePath}?t=${Date.now()}`)).default as Addon;
         switch (addon._type) {
             // deno-lint-ignore no-case-declarations
             case 'plugin':
                 const plugin = addon as Plugin;
 
-                await createAddonStructure(plugin);
+                if (!isBuildError) await createAddonStructure(plugin);
 
-                await createC3RuntimeFiles(plugin);
+                if (!isBuildError) await createC3RuntimeFiles(plugin, watch);
 
-                await createMainAddonFiles(plugin);
+                if (!isBuildError) await createMainAddonFiles(plugin);
 
-                await createAddonJsonFiles(plugin);
+                if (!isBuildError) await createAddonJsonFiles(plugin);
 
                 break;
             default:
                 break;
         }
 
-        if (!watch) {
-            Logger.Process('Creating .c3addon file');
-            await Zip(addon._config);
+        if (!isBuildError) {
+            if (!watch) {
+                Logger.Process('Creating .c3addon file');
+                await Zip(addon._config);
+            }
+    
+            const elapsedTime = (performance.now()) - startTime;
+            Logger.LogBetweenLines(
+                '✅', `Addon [${Colors.yellow(addon._config.addonId)}] has been ${Colors.green('successfully')} built`,
+                '\n⏱️ ', `Addon build time: ${Colors.bold(Colors.yellow(String(elapsedTime.toFixed(2))))} ms!`
+            );
         }
-
-        const elapsedTime = (performance.now()) - startTime;
-        Logger.LogBetweenLines(
-            '✅', `Addon [${Colors.yellow(addon._config.addonId)}] has been ${Colors.green('successfully')} built`,
-            '\n⏱️ ', `Addon build time: ${Colors.bold(Colors.yellow(String(elapsedTime.toFixed(2))))} ms!`
-        );
 
         if (watch) {
             Logger.Log(
@@ -60,7 +60,7 @@ export default async function build(watch?: true) {
         } else {
             Deno.exit(1);
         }
+        
         isBuilding = false;
-
     }
 }
