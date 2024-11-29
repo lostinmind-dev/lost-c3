@@ -1,7 +1,7 @@
 import { transpileTs } from '../shared/transpile-ts.ts';
 import { Logger, join } from "../deps.ts";
 
-const folderPath = join(Deno.cwd(), 'addon_base');
+const folderPath = join(Deno.cwd(), '.addon_base');
 
 async function main() {
     Logger.Process('Building');

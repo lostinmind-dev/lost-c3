@@ -43,8 +43,8 @@ async function BuildAndWatch() {
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
-        boolean: ['plugin'],
-        alias: { p: 'plugin' },
+        boolean: ['plugin', 'watch'],
+        alias: { p: 'plugin', w: 'watch' },
         "--": true,
     });
 
@@ -72,7 +72,6 @@ async function main() {
             } else {
                 await Build();
             }
-            // await Build();
             break;
         case 'serve':
             await Serve(65432);
@@ -141,6 +140,7 @@ function printHelp() {
     printCreate();
 
     Logger.Log(`  ${Colors.yellow('build')}`);
+    Logger.Log('   ⚙️', Colors.gray('  --watch, -w'), Colors.italic('   Runs build command with auto-reload.'));
     Logger.Log(`  ${Colors.yellow('serve')}`);
     Logger.Log(`  ${Colors.yellow('types')}`);
 }

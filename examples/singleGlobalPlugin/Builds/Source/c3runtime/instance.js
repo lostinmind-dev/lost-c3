@@ -1,5 +1,8 @@
 const Lost = {"addonId":"LostPluginId"};
+import { GPUResourceManager } from './modules/index.js';
 const C3 = globalThis.C3;
+const a = new GPUResourceManager();
+console.log(a);
 class LostInstance extends globalThis.ISDKInstanceBase {
     constructor() {
         super();
@@ -10,4 +13,3 @@ class LostInstance extends globalThis.ISDKInstanceBase {
     }
 }
 C3.Plugins[Lost.addonId].Instance = LostInstance;
-export {};

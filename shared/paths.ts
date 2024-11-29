@@ -6,12 +6,13 @@ type BareBonesCollection = {
 }
 
 export abstract class Paths {
+    static readonly Main = Deno.cwd();
     static readonly ConstructTypes = 'https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/types/construct.d.ts';
     static readonly BareBones: BareBonesCollection = {
         plugin: 'https://github.com/lostinmind-dev/lostc3-plugin-bare-bones.git'
     };
     static readonly AddonBase = 'https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/.addon_base';
-    static readonly Main = Deno.cwd();
+    static readonly LocalAddonBase = join(this.Main, '.addon_base');
     static readonly Build = join(this.Main, 'Builds', 'Source');
 
     /** Addon */

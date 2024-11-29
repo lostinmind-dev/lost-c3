@@ -7,7 +7,7 @@ export default class {
     
     @Action('test', '', '', {
         params: [
-            addParam('', '', { type: Param.String })
+            addParam('1', '', { type: Param.String })
         ],
         isAsync: true
     })

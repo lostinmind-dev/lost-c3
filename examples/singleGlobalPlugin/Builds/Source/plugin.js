@@ -1,4 +1,75 @@
-
+const _lostData = {
+    "icon": {
+        "type": "icon",
+        "fileName": "icon.svg",
+        "path": "-",
+        "relativePath": "icon.svg",
+        "iconType": "image/svg+xml"
+    },
+    "config": {
+        "type": "plugin",
+        "isSingleGlobal": true,
+        "objectName": "LostPlugin",
+        "addonId": "LostPluginId",
+        "category": "general",
+        "addonName": "Lost plugin for Construct 3",
+        "addonDescription": "My awesome addon was made with Lost",
+        "version": "1.0.0.0",
+        "author": "lostinmind.",
+        "docsUrl": "https://myaddon.com/docs",
+        "helpUrl": {
+            "EN": "https://myaddon.com/help/en"
+        },
+        "websiteUrl": "https://myaddon.com"
+    },
+    "remoteScripts": [],
+    "userFiles": [
+        {
+            "type": "file",
+            "fileName": "info.txt",
+            "path": "C:\\Users\\dakln\\OneDrive\\Документы\\GitHub\\lostinmind-dev\\lost-c3\\main\\examples\\singleGlobalPlugin\\Addon\\Files\\other\\info.txt",
+            "relativePath": "other/info.txt",
+            "dependencyType": "copy-to-output",
+            "mimeType": "text/plain"
+        },
+        {
+            "type": "file",
+            "fileName": "styles.css",
+            "path": "C:\\Users\\dakln\\OneDrive\\Документы\\GitHub\\lostinmind-dev\\lost-c3\\main\\examples\\singleGlobalPlugin\\Addon\\Files\\styles.css",
+            "relativePath": "styles.css",
+            "dependencyType": "external-css"
+        }
+    ],
+    "userScripts": [
+        {
+            "type": "script",
+            "fileName": "index.ts",
+            "path": "C:\\Users\\dakln\\OneDrive\\Документы\\GitHub\\lostinmind-dev\\lost-c3\\main\\examples\\singleGlobalPlugin\\Addon\\Scripts\\index.ts",
+            "relativePath": "index.js",
+            "dependencyType": "external-dom-script",
+            "isTypescript": true
+        }
+    ],
+    "userModules": [
+        {
+            "type": "module",
+            "fileName": "index.ts",
+            "path": "C:\\Users\\dakln\\OneDrive\\Документы\\GitHub\\lostinmind-dev\\lost-c3\\main\\examples\\singleGlobalPlugin\\Addon\\Modules\\index.ts",
+            "relativePath": "index.js",
+            "isTypescript": true
+        }
+    ],
+    "pluginProperties": [
+        {
+            "_id": "test",
+            "_name": "Test 1",
+            "_description": "There is no any description yet...",
+            "_opts": {
+                "type": "text"
+            }
+        }
+    ]
+};
 const { config, icon } = _lostData;
 const SDK = globalThis.SDK;
 const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.IPluginBase {
@@ -40,14 +111,14 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         _lostData.userFiles.forEach(file => {
             if (file.dependencyType === 'copy-to-output') {
                 this._info.AddFileDependency({
-                    filename: `files/${file.relativePath}`,
+                    filename: `files/${file.fileName}`,
                     type: file.dependencyType,
                     fileType: file.mimeType
                 });
             }
             else {
                 this._info.AddFileDependency({
-                    filename: `files/${file.relativePath}`,
+                    filename: `files/${file.fileName}`,
                     type: file.dependencyType
                 });
             }

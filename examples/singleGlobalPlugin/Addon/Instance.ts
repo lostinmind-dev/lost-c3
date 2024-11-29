@@ -1,4 +1,10 @@
+import { GPUResourceManager } from "./Modules/index.ts";
+
 const C3 = globalThis.C3;
+
+const a = new GPUResourceManager();
+
+console.log(a)
 
 class LostInstance extends globalThis.ISDKInstanceBase {
 

@@ -9,10 +9,9 @@ import { EntityType } from "../lib/entities/entity.ts";
 import { addCategories } from "./add-categories.ts";
 import { Paths } from "../shared/paths.ts";
 import { transpileTs } from "../shared/transpile-ts.ts";
-import { Action, ActionEntity } from "../lib/entities/action.ts";
-import { Parameter } from "../lib/entities/parameter.ts";
 
 type EntityCollection = {
+    // deno-lint-ignore ban-types
     [key: string]: Function;
 }
 
@@ -305,9 +304,11 @@ export default async function createC3RuntimeFiles(plugin: Plugin, watch?: true)
 
 }
 
+// deno-lint-ignore no-explicit-any
 const serializeObjectWithFunctions = (obj: any): string => {
     let str = '{\n';
     for (const key in obj) {
+        // deno-lint-ignore no-prototype-builtins
         if (obj.hasOwnProperty(key)) {
             const value = obj[key];
             if (typeof value === 'function') {

@@ -1,6 +1,6 @@
 {
     "name": "@lost-c3/lib",
-    "version": "3.0.1",
+    "version": "3.0.2",
     "exports": {
         ".": "./mod.ts",
         "./cli": "./cli.ts",
@@ -10,7 +10,7 @@
         "publish": "npx jsr publish",
         "uninstall": "deno uninstall lost -g",
         "install": " deno task uninstall | deno install --name lost ./cli.ts --global -f -A",
-        "build:base": "deno run --watch -A ./addon_base/main.ts"
+        "build:base": "deno run --watch -A ./.addon_base/main.ts"
     },
     "compilerOptions": {
         "types": ["./cli/global.d.ts"],

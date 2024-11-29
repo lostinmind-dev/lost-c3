@@ -1,3 +1,4 @@
+// deno-lint-ignore-file
 // deno-lint-ignore-file no-fallthrough no-case-declarations
 import { Property } from '../../lib/entities/plugin-property.ts';
 import type { LostAddonData } from '../../shared/types.ts';
@@ -54,13 +55,13 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         _lostData.userFiles.forEach(file => {
             if (file.dependencyType === 'copy-to-output') {
                 this._info.AddFileDependency({
-                    filename: `files/${file.fileName}`,
+                    filename: `files/${file.relativePath}`,
                     type: file.dependencyType,
                     fileType: file.mimeType
                 })
             } else {
                 this._info.AddFileDependency({
-                    filename: `files/${file.fileName}`,
+                    filename: `files/${file.relativePath}`,
                     type: file.dependencyType
                 })
             }

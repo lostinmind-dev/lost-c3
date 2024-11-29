@@ -1,4 +1,3 @@
-
 const { config, icon } = _lostData;
 const SDK = globalThis.SDK;
 const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.IPluginBase {
@@ -40,14 +39,14 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         _lostData.userFiles.forEach(file => {
             if (file.dependencyType === 'copy-to-output') {
                 this._info.AddFileDependency({
-                    filename: `files/${file.relativePath}`,
+                    filename: `files/${file.fileName}`,
                     type: file.dependencyType,
                     fileType: file.mimeType
                 });
             }
             else {
                 this._info.AddFileDependency({
-                    filename: `files/${file.relativePath}`,
+                    filename: `files/${file.fileName}`,
                     type: file.dependencyType
                 });
             }
