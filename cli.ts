@@ -82,7 +82,7 @@ async function main() {
             }
             break;
         case 'serve':
-            await Serve(65432);
+            Serve(65432);
             break;
         case 'types':
             await installTypes();

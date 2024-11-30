@@ -1,7 +1,7 @@
 import { Logger, Colors, join } from "../deps.ts";
 import { Paths } from "../shared/paths.ts";
 
-export default async function serveAddon(port: number) {
+export default function serveAddon(port: number) {
     Logger.Line();
     Logger.Log('🌐', 'Starting addon server...');
 
