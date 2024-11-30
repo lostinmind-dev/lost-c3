@@ -6,5 +6,13 @@ const Addon = new Plugin(config);
 
 Addon
     .addPluginProperty('test', 'Test 1', { type: Property.Text })
+    .addPluginProperty('test2', 'test 2', {
+        type: Property.Combo,
+        items: [
+            ['test', 'Test1'],
+            ['test2', 'Test2']
+        ],
+        initialValue: ''
+    })
 
 export default Addon;

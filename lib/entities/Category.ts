@@ -33,7 +33,7 @@ export type CategoryClassType = {
  * @param name Category name that will be displayed in action/condition picker dialog.
  * @param opts *Optional*. Custom options.
  */
-export function Category(id: string, name: string, opts?: ICategoryOptions ) {
+export function Category<C extends string[]>(id: C[number], name: string, opts?: ICategoryOptions) {
     return function (target: any, context: ClassDecoratorContext) {
         target.prototype._id = id;
         target.prototype._name = name;

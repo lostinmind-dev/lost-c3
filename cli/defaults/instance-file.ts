@@ -1,11 +1,91 @@
-import type { AddonType } from "../../lib/config.ts";
+import type { AddonType, LostConfig } from "../../lib/config.ts";
 import { dedent } from "../../shared/misc.ts";
 import Lost from "./lost.ts";
 
-export default function getDefaultAddonInstanceFile(addonId: string, addonType: AddonType) {
+export default function instanceFile(config: LostConfig<AddonType>) {
+
+const DrawingPlugin = dedent`
+${Lost(config.addonId)}
+const SDK = globalThis.SDK;
+
+const PLUGIN_CLASS = SDK.Plugins[Lost.addonId];
+
+PLUGIN_CLASS.Instance = class LostDrawingInstance extends SDK.IWorldInstanceBase {
+	constructor(sdkType, inst) {
+		super(sdkType, inst);
+	}
+	
+	Release() { }
+	
+	OnCreate() { }
+	
+	OnPlacedInLayout() {
+		this.OnMakeOriginalSize();
+	}
+	
+	Draw(iRenderer, iDrawParams) {
+		const texture = this.GetTexture();
+		
+		if (texture) {
+			this._inst.ApplyBlendMode(iRenderer);
+			iRenderer.SetTexture(texture);
+			iRenderer.SetColor(this._inst.GetColor());
+			iRenderer.Quad3(this._inst.GetQuad(), this.GetTexRect());
+		} else {
+			iRenderer.SetAlphaBlend();
+			iRenderer.SetColorFillMode();
+			
+			if (this.HadTextureError()) {
+				iRenderer.SetColorRgba(0.25, 0, 0, 0.25);
+            } else {
+				iRenderer.SetColorRgba(0, 0, 0.1, 0.1);
+            }
+			
+			iRenderer.Quad(this._inst.GetQuad());
+		}
+	}
+	
+	GetTexture() {
+		const image = this.GetObjectType().GetImage();
+		return super.GetTexture(image);
+	}
+	
+	IsOriginalSizeKnown() {
+		return true;
+	}
+	
+	GetOriginalWidth() {
+		return this.GetObjectType().GetImage().GetWidth();
+	}
+	
+	GetOriginalHeight() {
+		return this.GetObjectType().GetImage().GetHeight();
+	}
+	
+	OnMakeOriginalSize() {
+		const image = this.GetObjectType().GetImage();
+		this._inst.SetSize(image.GetWidth(), image.GetHeight());
+	}
+	
+	HasDoubleTapHandler() {
+		return true;
+	}
+	
+	OnDoubleTap() {
+		this.GetObjectType().EditImage();
+	}
+	
+	OnPropertyChanged(id, value) {
+	}
+	
+	LoadC2Property(name, valueString) {
+		return false;
+	}
+};
+`;
 
 const Plugin = dedent`
-${Lost(addonId)}
+${Lost(config.addonId)}
 const SDK = globalThis.SDK;
 
 const PLUGIN_CLASS = SDK.Plugins[Lost.addonId];
@@ -15,11 +95,10 @@ PLUGIN_CLASS.Instance = class LostInstance extends SDK.IInstanceBase {
         super(sdkType, inst);
     }
 };
-export {};
 `;
 
 const Behavior = dedent`
-${Lost(addonId)}
+${Lost(config.addonId)}
 const SDK = globalThis.SDK;
 
 const BEHAVIOR_CLASS = SDK.Behaviors[Lost.addonId];
@@ -29,14 +108,20 @@ BEHAVIOR_CLASS.Instance = class LostBehaviorInstance extends SDK.IBehaviorInstan
         super(sdkBehType, behInst);
     }
 };
-export {};
 `;
 
-switch (addonType) {
-    case 'plugin':
-        return Plugin;
-    case 'behavior':
-        return Behavior;
+if (config.type === 'plugin') {
+    switch(config.pluginType) {
+        case "object":
+            return Plugin;
+        case "world":
+            return DrawingPlugin;
+
+    }
+} else if (config.type === 'behavior') {
+    return Behavior;
+} else {
+    return Plugin;
 }
 
 }

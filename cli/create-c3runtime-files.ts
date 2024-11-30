@@ -293,7 +293,7 @@ export default async function createC3RuntimeFiles(addon: Plugin | Behavior, wat
             entities[enitity._func.name] = enitity._func;
         }))
 
-        const fileContent = `${EntityFile(addon._config.addonId, addon._type, EntityType.Action)} ${serializeObjectWithFunctions(entities)}`;
+        const fileContent = `${EntityFile(addon._config, EntityType.Action)} ${serializeObjectWithFunctions(entities)}`;
         await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'actions.js'), fileContent);
     }
 
@@ -304,7 +304,7 @@ export default async function createC3RuntimeFiles(addon: Plugin | Behavior, wat
             entities[entity._func.name] = entity._func;
         }))
 
-        const fileContent = `${EntityFile(addon._config.addonId, addon._type, EntityType.Condition)} ${serializeObjectWithFunctions(entities)}`;
+        const fileContent = `${EntityFile(addon._config, EntityType.Condition)} ${serializeObjectWithFunctions(entities)}`;
         await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'conditions.js'), fileContent);
     }
 
@@ -315,7 +315,7 @@ export default async function createC3RuntimeFiles(addon: Plugin | Behavior, wat
             entities[entity._func.name] = entity._func;
         }))
 
-        const fileContent = `${EntityFile(addon._config.addonId, addon._type, EntityType.Expression)} ${serializeObjectWithFunctions(entities)}`;
+        const fileContent = `${EntityFile(addon._config, EntityType.Expression)} ${serializeObjectWithFunctions(entities)}`;
         await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'expressions.js'), fileContent);
     }
 

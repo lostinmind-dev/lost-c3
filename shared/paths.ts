@@ -33,4 +33,5 @@ export abstract class Paths {
     static readonly Files = join(this.Main, 'Addon', 'Files');
     static readonly Scripts = join(this.Main, 'Addon', 'Scripts');
     static readonly Modules = join(this.Main, 'Addon', 'Modules');
+    static readonly DomSideScripts = join(this.Main, 'Addon', 'DomSide');
 }

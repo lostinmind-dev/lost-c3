@@ -1,7 +1,7 @@
 import { Paths } from "../../shared/paths.ts";
-import type { LostAddonData } from "../../shared/types.ts";
+import type { LostAddonPluginData } from "../../shared/types.ts";
 
-export default async function getDefaultPluginFile(lostData: LostAddonData) {
+export default async function pluginFile(lostData: LostAddonPluginData) {
     let fileContent = await Deno.readTextFile(Paths.LocalAddonBase['plugin'])
 
     fileContent = `const _lostData = ${JSON.stringify(lostData)};\n` + fileContent;

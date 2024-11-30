@@ -18,7 +18,7 @@ export class ExpressionEntity extends Entity<EntityType.Expression> {
 }
 
 /** Object that represents options for Expression entity. */
-export interface IExpressionOptions extends EntityOptions<EntityType.Expression> {
+export interface IExpressionOptions extends EntityOptions {
     /**
      * *Optional*. Default is **any**. The runtime function must return the corresponding type, and "any" must still return either a number or a string.
      */
@@ -33,11 +33,11 @@ export interface IExpressionOptions extends EntityOptions<EntityType.Expression>
 /** Expression return type */
 export type ExpressionReturnType = 'string' | 'number' | 'any';
 
-export function Expression<T>(id: string, name: string): any;
-export function Expression<T>(id: string, name: string, opts: IExpressionOptions): any;
-export function Expression<T>(id: string, name: string, description: string): any;
-export function Expression<T>(id: string, name: string, description: string, opts: IExpressionOptions): any;
-export function Expression<T>(
+export function Expression(id: string, name: string): any;
+export function Expression(id: string, name: string, opts: IExpressionOptions): any;
+export function Expression(id: string, name: string, description: string): any;
+export function Expression(id: string, name: string, description: string, opts: IExpressionOptions): any;
+export function Expression(
     id: string, 
     name: string,
     descriptionOrOpts?: string | IExpressionOptions,
@@ -45,7 +45,7 @@ export function Expression<T>(
 ): any {
     return function (
         value: (this: any, ...args: any[]) => number | string,
-        context: ClassMethodDecoratorContext<T, (this: any, ...args: any[]) => string | number>
+        context: ClassMethodDecoratorContext<any, (this: any, ...args: any[]) => string | number>
     ) {
         context.addInitializer(function (this: any) {
             let description: string = 'There is no any description yet...';

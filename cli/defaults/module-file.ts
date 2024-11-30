@@ -1,7 +1,7 @@
 import type { AddonType } from "../../lib/config.ts";
 import { dedent } from "../../shared/misc.ts";
 
-export default function getDefaultModuleFile(addonType: AddonType) {
+export default function moduleFile(addonType: AddonType) {
 
 const Plugin = dedent`
 import './plugin.js';

@@ -15,6 +15,7 @@ export class Plugin extends Addon<'plugin'> {
     readonly _runtimeScripts: string[] = [];
     readonly _userScripts: AddonScriptFile[] = [];
     readonly _userModules: AddonModuleFile[] = [];
+    readonly _userDomSideScripts: AddonDomSideScriptFile[] = [];
 
     readonly _remoteScripts: string[] = [];
     readonly _pluginProperties: PluginProperty[] = [];
@@ -27,10 +28,55 @@ export class Plugin extends Addon<'plugin'> {
 
     private async _load(): Promise<void> {
         await this.loadAddonIcon();
+        await this.loadUserDomSideScripts();
         await this.loadUserFiles();
         await this.loadUserScripts();
         await this.loadUserModules();
         await this.createTypes();
+    }
+
+    private async loadUserDomSideScripts() {
+        try {
+            const dirStat = await Deno.stat(Paths.DomSideScripts);
+
+            if (dirStat) {
+
+                const readDir = async (_path: string) => {
+                    for await (const entry of Deno.readDir(_path)) {
+                        if (entry.isDirectory) {
+                            await readDir(join(_path, entry.name))
+                        }
+                        if (
+                            entry.isFile &&
+                            entry.name.endsWith('.ts')
+                        ) {
+                            const relativePath = getRelativePath(_path, Paths.Scripts, entry.name);
+                            const path = join(_path, entry.name);
+
+                            this._userDomSideScripts.push({
+                                type: 'dom-side-script',
+                                fileName: entry.name,
+                                path,
+                                relativePath: relativePath.replace('.ts', '.js'),
+                            })
+
+                            Logger.Loading(
+                                `Founded DOM side script at path: ${Colors.dim(`${Colors.bold(join('Addon', 'DomSide', relativePath))}`)}`
+                            );
+
+                        }
+                    }
+                }
+
+                if (dirStat.isDirectory) {
+                    await readDir(Paths.DomSideScripts);
+                }
+            }
+        } catch (_e) {
+            //
+        }
+
+        return this._userDomSideScripts;
     }
 
     private async createTypes() {
@@ -190,7 +236,7 @@ export class Plugin extends Addon<'plugin'> {
                     await readDir(Paths.Files);
                 }
             }
-        } catch (e) {
+        } catch (_e) {
             // throw new Error('Files folder does not exist!')
         }
 
@@ -254,7 +300,7 @@ export class Plugin extends Addon<'plugin'> {
                     await readDir(Paths.Scripts);
                 }
             }
-        } catch (e) {
+        } catch (_e) {
             // throw new Error('Files folder does not exist!')
         }
 
@@ -304,7 +350,7 @@ export class Plugin extends Addon<'plugin'> {
                     await readDir(Paths.Modules);
                 }
             }
-        } catch (e) {
+        } catch (_e) {
             // throw new Error('Files folder does not exist!')
         }
 

@@ -1,4 +1,4 @@
-import type { AddonType } from "../../lib/config.ts";
+import type { AddonType, LostConfig } from "../../lib/config.ts";
 import { EntityType } from '../../lib/entities/entity.ts';
 import { dedent } from "../../shared/misc.ts";
 import Lost from './lost.ts';
@@ -22,13 +22,13 @@ const EntityPath: EntityPathType = {
     },
 }
 
-export default function getDefaultEntityFile(addonId: string, addonType: AddonType, entityType: EntityType) {
+export default function entityFile(config: LostConfig<AddonType>, entityType: EntityType) {
 
 const _default = dedent`
-${Lost(addonId)}
+${Lost(config.addonId)}
 const C3 = globalThis.C3;
 
-${EntityPath[addonType][entityType]} =
+${EntityPath[config.type][entityType]} =
 `;
 
 return _default;

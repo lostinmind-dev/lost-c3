@@ -1,20 +1,22 @@
 import { Md5 } from "../../deps.ts";
 import type { EntityParamOptions, EntityType } from './entity.ts';
 
+export type ComboIdArray = string[];
+
 /**
  * @class represents ACE's parameter info.
  */
-export class Parameter<E extends EntityType> {
+export class Parameter<A extends ComboIdArray = ComboIdArray, E extends EntityType = EntityType> {
     readonly _id: string;
     readonly _name: string;
     readonly _description: string;
-    readonly _opts: EntityParamOptions<E>;
+    readonly _opts: EntityParamOptions<E, A>;
     
     constructor(
         id: string,
         name: string,
         description: string,
-        opts: EntityParamOptions<E>
+        opts: EntityParamOptions<E, A>
     ) {
         this._id = id;
         this._name = name;
@@ -54,12 +56,12 @@ export enum Param {
 }
 
 /** All available ACE's parameter options  */
-export type ParamOptions = 
+export type ParamOptions<A extends ComboIdArray> = 
     NumberParam |
     StringParam |
     AnyParam |
     BooleanParam |
-    ComboParam |
+    ComboParam<A> |
     CmpParam |
     ObjectParam |
     ObjectNameParam |
@@ -130,17 +132,17 @@ interface BooleanParam extends ParamOptionsBase {
 }
 
 /** Object represents 'combo' parameter */
-interface ComboParam extends ParamOptionsBase {
+interface ComboParam<A extends ComboIdArray> extends ParamOptionsBase {
     type: Param.Combo;
     /**
      * Must be used to specify the available items.
      * @example [["item_one", "Item 1"], ["item_two", "Item 2"]]
      */
-    items: [string, string][];
+    items: [A[number], string][];
     /**
      * *Optional*. A dropdown list. Items must be specified with the "items" property.
      */
-    initialValue?: string;
+    initialValue?: A[number];
 }
 
 /** Object represents 'cmp' parameter */
@@ -253,7 +255,7 @@ interface ObjInstanceVarParam extends ParamOptionsBase {
  * @param name The name that appears in the action/condition/expression parameters dialog.
  * @param opts Parameter options.
  */
-export function addParam<E extends EntityType>(id: string, name: string, opts: EntityParamOptions<E>): Parameter<E>;
+export function addParam<A extends ComboIdArray = ComboIdArray>(id: string, name: string, opts: EntityParamOptions<EntityType, A>): Parameter<A>;
 /**
  * Adds parameter to action/condition/expression entity.
  * @param id The unique identifier for the parameter.
@@ -261,7 +263,7 @@ export function addParam<E extends EntityType>(id: string, name: string, opts: E
  * @param description Optional. The parameter description.
  * @param opts Parameter options.
  */
-export function addParam<E extends EntityType>(id: string, name: string, description: string, opts: EntityParamOptions<E>): Parameter<E>;
+export function addParam<A extends ComboIdArray = ComboIdArray>(id: string, name: string, description: string, opts: EntityParamOptions<EntityType, A>): Parameter<A>;
 /**
  * Adds parameter to action/condition/expression entity.
  * @param id The unique identifier for the parameter.
@@ -269,14 +271,14 @@ export function addParam<E extends EntityType>(id: string, name: string, descrip
  * @param descriptionOrOpts The parameter description OR parameter options.
  * @param opts Parameter options.
  */
-export function addParam<E extends EntityType>(
+export function addParam<A extends ComboIdArray = ComboIdArray>(
     id: string,
     name: string,
-    descriptionOrOpts: string | EntityParamOptions<E>,
-    opts?: EntityParamOptions<E>
-): Parameter<E> {
+    descriptionOrOpts: string | EntityParamOptions<EntityType, A>,
+    opts?: EntityParamOptions<EntityType, A>
+): Parameter<A> {
     let description: string = 'There is no any description yet...';
-    let options: EntityParamOptions<E>;
+    let options: EntityParamOptions<EntityType, A>;
 
     if (typeof descriptionOrOpts === 'string' && opts) {
         // Если переданы описание и опции
@@ -291,5 +293,5 @@ export function addParam<E extends EntityType>(
         );
     }
 
-    return new Parameter<E>(id, name, description, options);
+    return new Parameter<A>(id, name, description, options);
 }

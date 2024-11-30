@@ -1,8 +1,10 @@
-export { BlobReader, BlobWriter, TextReader, TextWriter, ZipReader, ZipWriter } from "jsr:@zip-js/zip-js@2.7.53";
+export { BlobReader, BlobWriter, TextReader, TextWriter, ZipReader, ZipWriter } from 'jsr:@zip-js/zip-js@2.7.53';
 
 export { Project, Node } from 'jsr:@ts-morph/ts-morph@24.0.0';
 
 export { walk } from 'jsr:@std/fs@1/walk';
+
+export { parseArgs } from 'jsr:@std/cli@1.0.6';
 
 export { join } from 'jsr:@std/path@1.0.8'
 

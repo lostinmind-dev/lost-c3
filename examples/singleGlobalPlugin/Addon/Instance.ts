@@ -6,7 +6,7 @@ const a = new GPUResourceManager();
 
 console.log(a)
 
-class LostInstance extends globalThis.ISDKInstanceBase {
+class Instance extends globalThis.ISDKInstanceBase {
 
     readonly Conditions = C3.Plugins[Lost.addonId].Cnds;
 
@@ -21,5 +21,5 @@ class LostInstance extends globalThis.ISDKInstanceBase {
 	}
 }
 
-C3.Plugins[Lost.addonId].Instance = LostInstance;
-export type { LostInstance as Instance };
+C3.Plugins[Lost.addonId].Instance = Instance;
+export type { Instance };

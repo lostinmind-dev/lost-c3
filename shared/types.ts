@@ -2,7 +2,18 @@ import type { Param } from '../lib/entities/parameter.ts';
 import type { AddonType, LostConfig } from '../lib/config.ts';
 import type { PluginProperty } from '../lib/entities/plugin-property.ts';
 
-export type LostAddonData = {
+export type LostAddonPluginData = {
+    readonly icon: AddonIconFile;
+    readonly config: LostConfig<AddonType>;
+    readonly remoteScripts: string[];
+    readonly userScripts: AddonScriptFile[];
+    readonly userDomSideScripts: AddonDomSideScriptFile[];
+    readonly userFiles: AddonUserFile[];
+    readonly userModules: AddonModuleFile[];
+    readonly pluginProperties: PluginProperty[];
+}
+
+export type LostAddonBehaviorData = {
     readonly icon: AddonIconFile;
     readonly config: LostConfig<AddonType>;
     readonly remoteScripts: string[];

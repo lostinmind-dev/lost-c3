@@ -1,5 +1,4 @@
 import { Entity, type EntityFuncReturnType, type EntityOptions, EntityType } from './entity.ts';
-
 /**
  * @class represents Condition entity.
  */
@@ -19,7 +18,7 @@ export class ConditionEntity extends Entity<EntityType.Condition> {
 }
 
 /** Object that represents options for Condition entity. */
-export interface IConditionOptions extends EntityOptions<EntityType.Condition> {
+export interface IConditionOptions extends EntityOptions {
     /**
      * *Optional*. Default is **True**. Specifies a trigger condition.
      * @description This appears with an arrow in the event sheet. 
@@ -57,11 +56,11 @@ export interface IConditionOptions extends EntityOptions<EntityType.Condition> {
 }
 
 
-export function Condition<I>(id: string, name: string, displayText: string): any;
-export function Condition<I>(id: string, name: string, displayText: string, opts: IConditionOptions): any;
-export function Condition<I>(id: string, name: string, displayText: string, description: string): any;
-export function Condition<I>(id: string, name: string, displayText: string, description: string, opts: IConditionOptions): any;
-export function Condition<I>(
+export function Condition(id: string, name: string, displayText: string): any;
+export function Condition(id: string, name: string, displayText: string, opts: IConditionOptions): any;
+export function Condition(id: string, name: string, displayText: string, description: string): any;
+export function Condition(id: string, name: string, displayText: string, description: string, opts: IConditionOptions): any;
+export function Condition(
     id: string,
     name: string,
     displayText: string,
@@ -70,7 +69,7 @@ export function Condition<I>(
 ): any {
     return function (
         value: (this: any, ...args: any[]) => boolean,
-        context: ClassMethodDecoratorContext<I, (this: any, ...args: any[]) => boolean>
+        context: ClassMethodDecoratorContext<any, (this: any, ...args: any[]) => boolean>
     ) {
         context.addInitializer(function (this: any) {
             let description = 'There is no any description yet...';

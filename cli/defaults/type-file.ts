@@ -1,12 +1,12 @@
-import type { AddonType } from "../../lib/config.ts";
+import type { AddonType, LostConfig } from "../../lib/config.ts";
 import { dedent } from "../../shared/misc.ts";
 import Lost from "./lost.ts";
 
-export default function getDefaultAddonTypeFile(addonId: string, addonType: AddonType) {
+export default function typeFile(config: LostConfig<AddonType>) {
 
 const Plugin = dedent`
 
-${Lost(addonId)}
+${Lost(config.addonId)}
 const SDK = globalThis.SDK;
 
 const PLUGIN_CLASS = SDK.Plugins[Lost.addonId];
@@ -21,7 +21,7 @@ export {};
 
 const Behavior = dedent`
 
-${Lost(addonId)}
+${Lost(config.addonId)}
 const SDK = globalThis.SDK;
 
 const BEHAVIOR_CLASS = SDK.Behaviors[Lost.addonId];
@@ -34,7 +34,7 @@ BEHAVIOR_CLASS.Type = class LostBehaviorType extends SDK.IBehaviorTypeBase {
 export {};
 `;
 
-switch (addonType) {
+switch (config.type) {
     case 'plugin':
         return Plugin;
     case 'behavior':

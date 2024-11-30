@@ -1,8 +1,8 @@
 import type { BehaviorConfig } from "../../lib/config.ts";
 import { Property } from '../../lib/entities/plugin-property.ts';
-import type { LostAddonData } from '../../shared/types.ts';
+import type { LostAddonBehaviorData } from '../../shared/types.ts';
 
-const _lostData: LostAddonData = {} as LostAddonData;
+const _lostData: LostAddonBehaviorData = {} as LostAddonBehaviorData;
 const config = _lostData.config as BehaviorConfig;
 const { icon } = _lostData;
 

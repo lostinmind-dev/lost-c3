@@ -11,10 +11,18 @@
                     "test": {
                         "name": "Test 1",
                         "desc": "There is no any description yet..."
+                    },
+                    "test2": {
+                        "name": "test 2",
+                        "desc": "There is no any description yet...",
+                        "items": {
+                            "test": "Test1",
+                            "test2": "Test2"
+                        }
                     }
                 },
                 "aceCategories": {
-                    "id1": "name"
+                    "main": "name"
                 },
                 "conditions": {
                     "myId": {
@@ -27,12 +35,20 @@
                 "actions": {
                     "test": {
                         "list-name": "test",
-                        "display-text": "test ([i]1[/i]: [b]{0}[/b])",
+                        "display-text": "test ([i]1[/i]: [b]{0}[/b], [i]2[/i]: [b]{1}[/b])",
                         "description": "There is no any description yet...",
                         "params": {
                             "1": {
                                 "name": "1",
                                 "desc": "There is no any description yet..."
+                            },
+                            "2": {
+                                "name": "2",
+                                "desc": "There is no any description yet...",
+                                "items": {
+                                    "hello": "Test",
+                                    "id2": "Test 2"
+                                }
                             }
                         }
                     }
@@ -45,6 +61,9 @@
                     }
                 }
             }
-        }
+        },
+        "behaviors": {},
+        "effects": {},
+        "themes": {}
     }
 }

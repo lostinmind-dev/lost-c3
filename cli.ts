@@ -1,12 +1,12 @@
 import type { AddonType } from "./lib/config.ts";
 
 import DenoJson from './deno.json' with { type: "json" };
-import { parseArgs } from "jsr:@std/cli@1.0.6";
-import { Colors, join, Logger } from './deps.ts';
+import { Colors, join, Logger, parseArgs } from './deps.ts';
 import { Paths } from './shared/paths.ts';
 
 import Build from './cli/main.ts';
 import Serve from './cli/serve-addon.ts';
+
 
 let rebuildTimeout: number | undefined;
 

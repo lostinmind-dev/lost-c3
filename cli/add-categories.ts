@@ -38,6 +38,7 @@ export async function addCategories(addon: Plugin | Behavior) {
                         category !== null &&
                         !category._inDevelopment
                     ) {
+                        // category._expressions.forEach(v => console.log(v._func()))
                         addon._categories.push(category);
                     }
 

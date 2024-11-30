@@ -1,5 +1,5 @@
 import { bold, italic } from '../misc/text-formatting.ts';
-import type { ExpressionParamOptions, Parameter, ParamOptions } from './parameter.ts';
+import type { ComboIdArray, ExpressionParamOptions, Parameter, ParamOptions } from './parameter.ts';
 
 export enum EntityType {
     Action = 'action',
@@ -21,7 +21,7 @@ export abstract class Entity<E extends EntityType> {
     readonly _name: string;
     _displayText: string;
     readonly _description: string;
-    readonly _params: Array<Parameter<E>>;
+    readonly _params: Parameter[];
     readonly _func: (this: any, ...args: any[]) => EntityFuncReturnType<E>;
     
     readonly _isDeprecated: boolean;
@@ -34,7 +34,7 @@ export abstract class Entity<E extends EntityType> {
         func: (this: any, ...args: any[]) => EntityFuncReturnType<E>,
         isDeprecated: boolean,
         displayText?: string,
-        params?: Array<Parameter<E>>
+        params?: Parameter[]
     ) {
         this._id = id;
         this._type = type;
@@ -97,15 +97,15 @@ export abstract class Entity<E extends EntityType> {
 }  
 
 /** Object represents base options for each entity type */
-export type EntityOptions<T extends EntityType> = {
+export type EntityOptions = {
     /**
-     * 
+     * *Optional*. Set to true to mark as deprecated.
      */
     readonly isDeprecated?: boolean;
     /**
      * *Optional*. Entity parameters.
      */
-    readonly params?: Array<Parameter<T>>;
+    readonly params?: Parameter[];
     /**
      * *Optional*. Default is **False**.
      * Set to true to highlight the ACE in the condition/action/expression picker dialogs. 
@@ -114,11 +114,11 @@ export type EntityOptions<T extends EntityType> = {
 }
 
 /** Map of Parameter options for evert entity type. */
-interface EntityParamOptionsMap {
-    [EntityType.Action]: ParamOptions;
-    [EntityType.Condition]: ParamOptions;
+interface EntityParamOptionsMap<A extends ComboIdArray> {
+    [EntityType.Action]: ParamOptions<A>;
+    [EntityType.Condition]: ParamOptions<A>;
     [EntityType.Expression]: ExpressionParamOptions;
 }
 
 /** Seperated parameter options for every entity type. */
-export type EntityParamOptions<T extends EntityType> = EntityParamOptionsMap[T];
+export type EntityParamOptions<T extends EntityType, A extends ComboIdArray> = EntityParamOptionsMap<A>[T];

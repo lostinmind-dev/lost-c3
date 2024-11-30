@@ -2,12 +2,15 @@ import { Category, Action, Condition, Expression, addParam, Param } from "../../
 import type { Instance } from "../Instance.ts";
 
 
-@Category('id1', 'name')
+type ComboItemsCollection = ['id1', 'id2', 'hello', 'test', 'test1'];
+
+@Category<CategoriesCollection>('main', 'name')
 export default class {
-    
+
     @Action('test', '', '', {
         params: [
-            addParam('1', '', { type: Param.String })
+            addParam('1', '', { type: Param.String, initialValue: '' }),
+            addParam<ComboItemsCollection>('2', '', { type: Param.Combo, items: [['hello', 'Test'], ['id2', 'Test 2']], initialValue: 'id1' })
         ],
         isAsync: true
     })
@@ -22,12 +25,16 @@ export default class {
     @Condition('myId', '', '', {
         isTrigger: true
     })
-    onCondition(this: Instance): boolean {
-        return false;
+    onCondition(this: number): boolean {
+        return true;
     }
 
-    @Expression('id1', '')
-    GetValue(): string | number {
+    @Expression('id1', '', {
+        params: [
+            addParam('', '', { type: Param.Animation })
+        ]
+    })
+    GetValue(this: string): string | number {
         return 2
     }
 }

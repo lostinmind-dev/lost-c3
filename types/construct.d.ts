@@ -2161,9 +2161,9 @@ declare global {
 		GetExportType(): PlatformInfoExportType;    // note re-uses type from IPlatformInfoObjectType
 	}
 
-	const RuntimeInterface: typeof IRuntimeInterface;
-	const DOMHandler: typeof IDOMHandler;
-	const DOMElementHandler: typeof IDOMElementHandler;
+	var RuntimeInterface: typeof IRuntimeInterface;
+	var DOMHandler: typeof IDOMHandler;
+	var DOMElementHandler: typeof IDOMElementHandler;
 
 	/** IAnimation.d.ts */
 	/** Represents an animation in an object type.
@@ -3118,7 +3118,7 @@ declare global {
 	 * @see {@link https://www.construct.net/en/make-games/manuals/construct-3/scripting/scripting-reference/addon-sdk-interfaces/isdkbehaviorbase | ISDKPluginBase documentation } */
 	class ISDKPluginBase_ extends IPlugin_ {
 		static Type: typeof ISDKObjectTypeBase;
-		static Instance: typeof ISDKInstanceBase;
+		static Instance: typeof ISDKInstanceBase | typeof ISDKWorldInstanceBase;
 		
 		static Acts: ActsType;
 		static Cnds: CndsType;
@@ -3153,7 +3153,7 @@ declare global {
 		_onRendererContextRestored(): void;
 	}
 
-	const ISDKWorldInstanceBase: typeof ISDKWorldInstanceBase_;
+	var ISDKWorldInstanceBase: typeof ISDKWorldInstanceBase_;
 
 	/** IStorage.d.ts */
 	/** Provides access to storage for the project.
@@ -3316,7 +3316,7 @@ declare global {
 	/** sdk.d.ts */
 	namespace SDK {
 		const Plugins: {
-			[key: string]: typeof ISDKPluginBase_;
+			[key: string]: typeof IPluginBase;
 		};
 		const Behaviors: {
 			[key: string]: typeof IBehaviorBase;

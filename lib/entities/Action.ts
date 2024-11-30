@@ -20,7 +20,7 @@ export class ActionEntity extends Entity<EntityType.Action> {
 }
 
 /** Object that represents options for Acton entity. */
-interface IActionOptions extends EntityOptions<EntityType.Action> {
+interface IActionOptions extends EntityOptions {
     /**
      * *Optional*. Default is **False**. Set to true to mark the action as asynchronous. 
      * @description Make the action method an async function, and the system Wait for previous actions to complete action will be able to wait for the action as well.
@@ -29,11 +29,11 @@ interface IActionOptions extends EntityOptions<EntityType.Action> {
 }
 
 
-export function Action<I>(id: string, name: string, displayText: string): any;
-export function Action<I>(id: string, name: string, displayText: string, opts: IActionOptions): any;
-export function Action<I>(id: string, name: string, displayText: string, description: string): any;
-export function Action<I>(id: string, name: string, displayText: string, description: string, opts: IActionOptions): any;
-export function Action<I>(
+export function Action(id: string, name: string, displayText: string): any;
+export function Action(id: string, name: string, displayText: string, opts: IActionOptions): any;
+export function Action(id: string, name: string, displayText: string, description: string): any;
+export function Action(id: string, name: string, displayText: string, description: string, opts: IActionOptions): any;
+export function Action(
     id: string,
     name: string,
     displayText: string,
@@ -42,7 +42,7 @@ export function Action<I>(
 ): any {
     return function (
         value: (this: any, ...args: any[]) => void,
-        context: ClassMethodDecoratorContext<I, (this: any, ...args: any[]) => void>
+        context: ClassMethodDecoratorContext<any, (this: any, ...args: any[]) => void>
     ) {
         context.addInitializer(function (this: any) {
             let description = 'There is no any description yet...';

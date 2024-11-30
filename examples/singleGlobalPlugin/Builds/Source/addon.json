@@ -11,9 +11,9 @@
     "documentation": "https://myaddon.com/docs",
     "description": "My awesome addon was made with Lost",
     "editor-scripts": [
-        "plugin.js",
         "type.js",
-        "instance.js"
+        "instance.js",
+        "plugin.js"
     ],
     "file-list": [
         "c3runtime/modules/index.js",

@@ -1,10 +1,12 @@
 // deno-lint-ignore-file
 // deno-lint-ignore-file no-fallthrough no-case-declarations
+import { PluginConfig } from "../../lib/config.ts";
 import { Property } from '../../lib/entities/plugin-property.ts';
-import type { LostAddonData } from '../../shared/types.ts';
+import type { LostAddonPluginData } from '../../shared/types.ts';
 
-const _lostData: LostAddonData = {} as LostAddonData;
-const { config, icon } = _lostData;
+const _lostData: LostAddonPluginData = {} as LostAddonPluginData;
+const config = _lostData.config as PluginConfig;
+const { icon } = _lostData;
 
 const SDK = globalThis.SDK;
 
@@ -21,10 +23,57 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         this._info.SetIcon(icon.fileName, icon.iconType);
         this._info.SetIsDeprecated(config.deprecated || false);
         this._info.SetCanBeBundled(config.canBeBundled || true);
-        this._info.SetIsSingleGlobal(config.isSingleGlobal || false);
+        this._info.SetPluginType(config.pluginType);
+
+        if (config.pluginType === 'object') {
+            this._info.SetIsSingleGlobal(config.isSingleGlobal || false);
+        }
+
+        if (config.pluginType === 'world') {
+            this._info.SetHasImage(true);
+            this._info.SetIsResizable(config.isResizable || true);
+            this._info.SetIsRotatable(config.isRotatable || true);
+            this._info.SetIs3D(config.is3D || false);
+            this._info.SetIsTiled(config.isTiled || false);
+            this._info.SetHasAnimations(config.hasAnimations || false);
+
+            this._info.SetSupportsZElevation(config.supportsZElevation || true);
+            this._info.SetSupportsColor(config.supportsColor || true);
+            this._info.SetSupportsEffects(config.supportsEffects || true);
+            this._info.SetMustPreDraw(config.mustPreDraw || true);
+
+            if (config.commonACEs) {
+                const commonAces = new Set(config.commonACEs);
+
+                commonAces.forEach(value => {
+                    switch (value) {
+                        case "position":
+                            this._info.AddCommonPositionACEs();
+                            break;
+                        case "scene_graph":
+                            this._info.AddCommonSceneGraphACEs();
+                            break;
+                        case "size":
+                            this._info.AddCommonSizeACEs();
+                            break;
+                        case "angle":
+                            this._info.AddCommonAngleACEs();
+                            break;
+                        case "appereance":
+                            this._info.AddCommonAppearanceACEs();
+                            break;
+                        case "z_order":
+                            this._info.AddCommonZOrderACEs();
+                            break;
+                    }
+                })
+                
+            }
+        }
 
         SDK.Lang.PushContext(".properties");
 
+        this.addUserDomSideScripts();
         this.setupUserModules();
         this.addRemoteScripts();
         this.addUserFiles();
@@ -33,6 +82,18 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
 
         SDK.Lang.PopContext();
         SDK.Lang.PopContext();
+    }
+
+    private addUserDomSideScripts() {
+        if (_lostData.userDomSideScripts.length > 0) {
+            const list: string[] = [];
+
+            _lostData.userDomSideScripts.forEach(file => {
+                list.push(`c3runtime/domSide/${file.relativePath}`);
+            })
+
+            this._info.SetDOMSideScripts(list)
+        }
     }
 
     private setupUserModules() {

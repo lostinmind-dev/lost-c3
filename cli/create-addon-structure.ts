@@ -24,6 +24,7 @@ export default async function createAddonStructure(addon: Plugin | Behavior) {
         addon._type === 'plugin' ||
         addon._type === 'behavior'
     ) {
+        await copyUserDomSideScripts();
         await copyUserFiles();
         await copyUserScripts();
         await copyUserModules();
@@ -36,6 +37,28 @@ export default async function createAddonStructure(addon: Plugin | Behavior) {
             await Deno.copyFile(addon._icon.path, join(Paths.Build, addon._icon.fileName));
         } else {
             await Deno.writeTextFile(join(Paths.Build, addon._icon.relativePath), Icon())
+        }
+    }
+
+    async function copyUserDomSideScripts() {
+        if (
+            addon._type === 'plugin' &&
+            addon._userDomSideScripts.length > 0
+        ) {
+            await Deno.mkdir(join(Paths.Build, 'c3runtime/domSide'));
+
+            addon._userDomSideScripts.forEach(async file => {
+                const newFilePath = file.relativePath.replace('.ts', '.js');
+
+                const destinationPath = join(Paths.Build, 'c3runtime/domSide', newFilePath);
+                const normalizedPath = destinationPath.replace(/\\/g, '/');
+                const destinationDir = destinationPath.substring(0, normalizedPath.lastIndexOf('/'));
+
+                await Deno.mkdir(destinationDir, { recursive: true });
+
+                const fileContent = await transpileTs(file.path) as string || '';
+                await Deno.writeTextFile(join(Paths.Build, 'c3runtime/domSide', newFilePath), fileContent);
+            })
         }
     }
 

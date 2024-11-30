@@ -5,13 +5,23 @@ declare interface IAddonBaseMetadata {
     readonly timestamp: number;
 }
 
-declare type AddonFileType = 'icon' | 'file' | 'script' | 'module';
+declare type AddonFileType =
+    | 'icon'
+    | 'file'
+    | 'script'
+    | 'module'
+    | 'dom-side-script'
+;
 
 declare type AddonFileBase = {
     readonly type: AddonFileType;
     readonly fileName: string;
     readonly path: string;
     readonly relativePath: string;
+}
+
+declare interface AddonDomSideScriptFile extends AddonFileBase {
+    readonly type: 'dom-side-script';
 }
 
 declare type AddonUserFile = AddonFileCopyToOutput | AddonFileExternalCss;
