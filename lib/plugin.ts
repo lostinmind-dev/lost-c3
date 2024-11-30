@@ -8,7 +8,7 @@ import { getRelativePath } from "../shared/misc.ts";
 import { MIME } from "../shared/mime.ts";
 import type { CategoryClassType } from "./entities/category.ts";
 
-export class Plugin extends Addon {
+export class Plugin extends Addon<'plugin'> {
     readonly _userFiles: AddonUserFile[] = [];
     readonly _filesToOutput: string[] = [];
 
@@ -117,13 +117,11 @@ export class Plugin extends Addon {
                         relativePath: getRelativePath(Paths.Main, '', entry.name, true),
                         iconType: 'image/svg+xml'
                     }
-                } else if (!isPng && !isSvg) {
-                    this._icon = null;
                 }
             }
         }
 
-        if (!this._icon) {
+        if (this._icon.path === '-') {
             Logger.Warning(`Addon icon was not detected, will be used default [SVG] icon`);
         } else {
             Logger.Info(`Loaded [${this._icon.iconType}] addon icon`, `Filename: ${this._icon.fileName}`);

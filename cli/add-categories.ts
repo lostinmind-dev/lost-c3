@@ -3,6 +3,7 @@ import { Paths } from "../shared/paths.ts";
 
 import type { CategoryClassType } from "../lib/entities/category.ts";
 import type { Plugin } from "../lib/plugin.ts";
+import type { Behavior } from "../lib/behavior.ts";
 
 interface CategoryModule {
     default: new () => CategoryClassType;
@@ -20,7 +21,7 @@ async function getCategory(path: string) {
     return (_prototype) ? _prototype : null;
 }
 
-export async function addCategories(plugin: Plugin) {
+export async function addCategories(addon: Plugin | Behavior) {
     async function readDir(path: string) {
         for await (const entry of Deno.readDir(path)) {
             if (entry.isDirectory) {
@@ -37,7 +38,7 @@ export async function addCategories(plugin: Plugin) {
                         category !== null &&
                         !category._inDevelopment
                     ) {
-                        plugin._categories.push(category);
+                        addon._categories.push(category);
                     }
 
                 } catch (error) {
@@ -50,5 +51,5 @@ export async function addCategories(plugin: Plugin) {
 
     await readDir(Paths.Categories);
 
-    return plugin._categories.length;
+    return addon._categories.length;
 }

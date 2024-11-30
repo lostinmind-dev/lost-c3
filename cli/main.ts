@@ -1,18 +1,18 @@
+import type { Addon } from "../lib/addon.ts";
+import type { Plugin } from "../lib/plugin.ts";
+import type { AddonType } from "../lib/config.ts";
+import type{ Behavior } from "../lib/behavior.ts";
 
 import './global.ts';
-import DenoJson from '../deno.json' with { type: "json" };
 import { Colors, join, Logger } from "../deps.ts";
 import Zip from "./zip-addon.ts";
 
-
 import { Paths } from "../shared/paths.ts";
-import type { Addon } from "../lib/addon.ts";
-import type { Plugin } from "../lib/plugin.ts";
 import createAddonStructure from "./create-addon-structure.ts";
 import createC3RuntimeFiles from "./create-c3runtime-files.ts";
 import createAddonJsonFiles from "./create-addon-json-files.ts";
 import createMainAddonFiles from "./create-main-addon-files.ts";
-import { dirname } from "jsr:@std/path@1.0.8/dirname";
+import checkAddonBaseExists from "./check-addon-base-exists.ts";
 
 const addonModulePath = import.meta.resolve(`file://${join(Paths.Main, 'addon.ts')}`);
 
@@ -22,35 +22,39 @@ export default async function build(watch?: true) {
         isBuildError = false;
         isBuilding = true;
         const startTime = performance.now();
+
         Logger.Clear();
         Logger.LogBetweenLines('🚀 Starting build process...');
-        const addon = (await import(`${addonModulePath}?t=${Date.now()}`)).default as Addon;
-        switch (addon._type) {
-            // deno-lint-ignore no-case-declarations
-            case 'plugin':
-                const plugin = addon as Plugin;
 
-                if (!isBuildError) await checkPluginBaseExist()
+        const _addon = (await import(`${addonModulePath}?t=${Date.now()}`)).default as Addon<AddonType>;
 
-                if (!isBuildError) await createAddonStructure(plugin);
+        await checkAddonBaseExists(_addon._type);
 
-                if (!isBuildError) await createC3RuntimeFiles(plugin, watch);
+        let addon: Plugin | Behavior;
 
-                if (!isBuildError) await createMainAddonFiles(plugin);
-
-                if (!isBuildError) await createAddonJsonFiles(plugin);
-
+        switch (_addon._type) {
+            case "plugin":
+                addon = _addon as Plugin;
                 break;
-            default:
+            case "behavior":
+                addon = _addon as Behavior;
                 break;
         }
+
+        if (!isBuildError) await createAddonStructure(addon);
+
+        if (!isBuildError) await createC3RuntimeFiles(addon, watch);
+
+        if (!isBuildError) await createMainAddonFiles(addon);
+
+        if (!isBuildError) await createAddonJsonFiles(addon);
 
         if (!isBuildError) {
             if (!watch) {
                 Logger.Process('Creating .c3addon file');
                 await Zip(addon._config);
             }
-    
+
             const elapsedTime = (performance.now()) - startTime;
             Logger.LogBetweenLines(
                 '✅', `Addon [${Colors.yellow(addon._config.addonId)}] has been ${Colors.green('successfully')} built`,
@@ -65,53 +69,7 @@ export default async function build(watch?: true) {
         } else {
             Deno.exit(1);
         }
-        
+
         isBuilding = false;
     }
-}
-
-async function checkPluginBaseExist() {
-    const path = join(Paths.LocalAddonBase, 'plugin.js');
-    try {
-        const dirStat = await Deno.stat(path);
-
-        if (dirStat) {
-            const fileContent = await Deno.readTextFile(join(Paths.LocalAddonBase, 'metadata.json'));
-            const metadata: IAddonBaseMetadata = JSON.parse(fileContent);
-
-            if (metadata.version !== DenoJson.version) {
-                await downloadPluginBase(path);
-            }
-        }
-    
-    } catch (_e) {
-        await downloadPluginBase(path);
-    }
-}
-
-async function downloadPluginBase(path: string) {
-    Logger.Log(`🌐 Downloading addon base ...`);
-
-    await Deno.mkdir(join(Paths.Main, '.addon_base'), { recursive: true });
-    
-    const url = join(Paths.AddonBase, 'plugin', 'plugin.js');
-
-    const response = await fetch(url);
-
-    if (!response.ok) {
-        Logger.Error('build', 'Error while getting "plugin.js" file', `Status: ${response.statusText}`);
-        Deno.exit(1);
-    }
-
-    const fileContent = await response.text();
-
-    const metadata: IAddonBaseMetadata = {
-        download_url: url,
-        addon_type: 'plugin',
-        version: DenoJson.version,
-        timestamp: Date.now()
-    }
-
-    await Deno.writeTextFile(join(Paths.LocalAddonBase, 'metadata.json'), JSON.stringify(metadata, null, 4));
-    await Deno.writeTextFile(path, fileContent);
 }

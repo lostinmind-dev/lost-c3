@@ -1,12 +1,13 @@
 // deno-lint-ignore-file no-case-declarations
 import type { Plugin } from "../lib/plugin.ts";
+import type { Behavior } from "../lib/behavior.ts";
 import { join } from "../deps.ts";
 import { Paths } from "../shared/paths.ts";
 
-import Icon, { getDefaultAddonIconFile } from './defaults/addon-icon.ts';
+import Icon from './defaults/addon-icon.ts';
 import { transpileTs } from "../shared/transpile-ts.ts";
 
-export default async function createAddonStructure(plugin: Plugin) {
+export default async function createAddonStructure(addon: Plugin | Behavior) {
     try {
         await Deno.remove(Paths.Build, { recursive : true });
     } catch (e) {
@@ -18,28 +19,31 @@ export default async function createAddonStructure(plugin: Plugin) {
     await Deno.mkdir(join(Paths.Build, 'lang'));
 
     await copyIcon();
-    await copyUserFiles();
-    await copyUserScripts();
-    await copyUserModules();
+
+    if (
+        addon._type === 'plugin' ||
+        addon._type === 'behavior'
+    ) {
+        await copyUserFiles();
+        await copyUserScripts();
+        await copyUserModules();
+    }
 
     async function copyIcon() {
         if (
-            plugin._icon && 
-            plugin._icon.path !== '-'
+            addon._icon.path !== '-'
         ) {
-            await Deno.copyFile(plugin._icon.path, join(Paths.Build, plugin._icon.fileName));
+            await Deno.copyFile(addon._icon.path, join(Paths.Build, addon._icon.fileName));
         } else {
-            /** Create default icon */
-            plugin._icon = getDefaultAddonIconFile();
-            await Deno.writeTextFile(join(Paths.Build, plugin._icon.fileName), Icon())
+            await Deno.writeTextFile(join(Paths.Build, addon._icon.relativePath), Icon())
         }
     }
 
     async function copyUserFiles() {
-        if (plugin._userFiles.length > 0) {
+        if (addon._userFiles.length > 0) {
             await Deno.mkdir(join(Paths.Build, 'files'));
 
-            plugin._userFiles.forEach(async file => {
+            addon._userFiles.forEach(async file => {
                 const destinationPath = join(Paths.Build, 'files', file.relativePath);
                 const normalizedPath = destinationPath.replace(/\\/g, '/');
                 const destinationDir = destinationPath.substring(0, normalizedPath.lastIndexOf('/'));
@@ -52,10 +56,10 @@ export default async function createAddonStructure(plugin: Plugin) {
     }
 
     async function copyUserScripts() {
-        if (plugin._userScripts.length > 0) {
+        if (addon._userScripts.length > 0) {
             await Deno.mkdir(join(Paths.Build, 'scripts'));
 
-            plugin._userScripts.forEach(async file => {
+            addon._userScripts.forEach(async file => {
                 let destinationPath: string;
                 let destinationDir: string;
                 let normalizedPath: string;
@@ -89,10 +93,10 @@ export default async function createAddonStructure(plugin: Plugin) {
     }
 
     async function copyUserModules() {
-        if (plugin._userModules.length > 0) {
+        if (addon._userModules.length > 0) {
             await Deno.mkdir(join(Paths.Build, 'c3runtime', 'modules'));
 
-            plugin._userModules.forEach(async file => {
+            addon._userModules.forEach(async file => {
                 let destinationPath: string;
                 let destinationDir: string;
                 let normalizedPath: string;

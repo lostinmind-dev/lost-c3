@@ -2,7 +2,7 @@
 
 import type { LostConfig } from "../../mod.ts";
 
-const config: LostConfig = {
+const config: LostConfig<'plugin'> = {
     type: 'plugin',
     // deprecated?: boolean;
     // minConstructVersion?: string;

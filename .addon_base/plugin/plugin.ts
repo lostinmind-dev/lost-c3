@@ -4,7 +4,7 @@ import { Property } from '../../lib/entities/plugin-property.ts';
 import type { LostAddonData } from '../../shared/types.ts';
 
 const _lostData: LostAddonData = {} as LostAddonData;
-const {config, icon} = _lostData;
+const { config, icon } = _lostData;
 
 const SDK = globalThis.SDK;
 
@@ -22,7 +22,7 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         this._info.SetIsDeprecated(config.deprecated || false);
         this._info.SetCanBeBundled(config.canBeBundled || true);
         this._info.SetIsSingleGlobal(config.isSingleGlobal || false);
-        
+
         SDK.Lang.PushContext(".properties");
 
         this.setupUserModules();
@@ -89,7 +89,7 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         const properties: SDK.PluginProperty[] = [];
 
         _lostData.pluginProperties.forEach(property => {
-            const {_id, _opts, _funcString} = property;
+            const { _id, _opts, _funcString } = property;
             switch (_opts.type) {
                 case Property.Integer:
                     if (_opts.min && _opts.max) {
@@ -157,8 +157,8 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                     properties.push(
                         new SDK.PluginProperty(
                             _opts.type, _id, {
-                                initialValue: _opts.initialValue || 0
-                            }
+                            initialValue: _opts.initialValue || 0
+                        }
                         )
                     )
                     break;
@@ -166,8 +166,8 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                     properties.push(
                         new SDK.PluginProperty(
                             _opts.type, _id, {
-                                initialValue: _opts.initialValue || ''
-                            }
+                            initialValue: _opts.initialValue || ''
+                        }
                         )
                     )
                     break;
@@ -175,8 +175,8 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                     properties.push(
                         new SDK.PluginProperty(
                             _opts.type, _id, {
-                                initialValue: _opts.initialValue || ''
-                            }
+                            initialValue: _opts.initialValue || ''
+                        }
                         )
                     )
                     break;
@@ -184,8 +184,8 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                     properties.push(
                         new SDK.PluginProperty(
                             _opts.type, _id, {
-                                initialValue: _opts.initialValue || false
-                            }
+                            initialValue: _opts.initialValue || false
+                        }
                         )
                     )
                     break;
@@ -193,8 +193,8 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                     properties.push(
                         new SDK.PluginProperty(
                             _opts.type, _id, {
-                                initialValue: _opts.initialValue || 'Arial'
-                            }
+                            initialValue: _opts.initialValue || 'Arial'
+                        }
                         )
                     )
                     break;
@@ -204,9 +204,9 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                     properties.push(
                         new SDK.PluginProperty(
                             _opts.type, _id, {
-                                items: items,
-                                initialValue: _initialValue
-                            }
+                            items: items,
+                            initialValue: _initialValue
+                        }
                         )
                     )
                     break;
@@ -214,8 +214,8 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                     properties.push(
                         new SDK.PluginProperty(
                             _opts.type, _id, {
-                                initialValue: _opts.initialValue || [0, 0, 0]
-                            }
+                            initialValue: _opts.initialValue || [0, 0, 0]
+                        }
                         )
                     )
                     break;
@@ -223,8 +223,8 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                     properties.push(
                         new SDK.PluginProperty(
                             _opts.type, _id, {
-                                allowedPluginIds: _opts.allowedPluginIds || []
-                            }
+                            allowedPluginIds: _opts.allowedPluginIds || []
+                        }
                         )
                     )
                     break;
@@ -250,11 +250,11 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                         properties.push(
                             new SDK.PluginProperty(
                                 _opts.type, _id, {
-                                    callbackType: _opts.callbackType,
-                                    linkCallback: (p) => {
-                                        func(p);
-                                    }
+                                callbackType: _opts.callbackType,
+                                linkCallback: (p) => {
+                                    func(p);
                                 }
+                            }
                             )
                         )
                     }
@@ -271,13 +271,13 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
 
             const arrowFunctionMatch = cleanedFuncString.match(/^\((.*)\)\s*=>\s*\{([\s\S]*)\}$/);
             const regularFunctionMatch = cleanedFuncString.match(/^function\s*\((.*)\)\s*\{([\s\S]*)\}$/);
-    
+
             if (arrowFunctionMatch) {
                 const args = arrowFunctionMatch[1].trim();
                 const body = arrowFunctionMatch[2].trim();
                 return new Function(args, body);
             }
-    
+
             if (regularFunctionMatch) {
                 const args = regularFunctionMatch[1].trim();
                 const body = regularFunctionMatch[2].trim();
@@ -292,4 +292,4 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
     }
 };
 PLUGIN_CLASS.Register(config.addonId, PLUGIN_CLASS);
-export {};
+export { };

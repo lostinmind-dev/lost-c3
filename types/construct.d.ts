@@ -2905,10 +2905,16 @@ declare global {
 	/** SDK base class for a behavior.
 	 * @see {@link https://www.construct.net/en/make-games/manuals/construct-3/scripting/scripting-reference/addon-sdk-interfaces/isdkbehaviorbase | ISDKBehaviorBase documentation } */
 	class ISDKBehaviorBase_ extends IBehavior_ {
-
+		static Type: typeof ISDKBehaviorTypeBase;
+		// static Instance: typeof ISDKBehaviorInstanceBase_;
+		static Instance: any;
+		
+		static Acts: ActsType;
+		static Cnds: CndsType;
+		static Exps: ExpsType;
 	}
 
-	const ISDKBehaviorBase: typeof ISDKBehaviorBase_;
+	var ISDKBehaviorBase: typeof ISDKBehaviorBase_;
 
 	/** ISDKBehaviorInstanceBase.d.ts */
 	/** SDK base class for a behavior instance.
@@ -2937,7 +2943,7 @@ declare global {
 		_loadFromJson(o: JSONValue): void;
 	}
 
-	const ISDKBehaviorInstanceBase: typeof ISDKBehaviorInstanceBase_;
+	var ISDKBehaviorInstanceBase: typeof ISDKBehaviorInstanceBase_;
 
 	/** ISDKBehaviorTypeBase.d.ts */
 	/** SDK base class for a behavior type.
@@ -2946,7 +2952,7 @@ declare global {
 		_onCreate(): void;
 	}
 
-	const ISDKBehaviorTypeBase: typeof ISDKBehaviorTypeBase_;
+	var ISDKBehaviorTypeBase: typeof ISDKBehaviorTypeBase_;
 
 	/** ISDKDOMInstanceBase.d.ts */
 	/** SDK base class for an instance that creates a HTML element.

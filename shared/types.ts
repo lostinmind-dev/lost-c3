@@ -1,10 +1,10 @@
 import type { Param } from '../lib/entities/parameter.ts';
-import type { LostConfig } from '../lib/config.ts';
+import type { AddonType, LostConfig } from '../lib/config.ts';
 import type { PluginProperty } from '../lib/entities/plugin-property.ts';
 
 export type LostAddonData = {
-    readonly icon: AddonIconFile | null;
-    readonly config: LostConfig;
+    readonly icon: AddonIconFile;
+    readonly config: LostConfig<AddonType>;
     readonly remoteScripts: string[];
     readonly userScripts: AddonScriptFile[];
     readonly userFiles: AddonUserFile[];
@@ -17,7 +17,7 @@ export type AddonJson = {
     "min-construct-version"?: string;
     "is-c3-addon": true;
     "sdk-version": 2;
-    "type": 'plugin' | 'behavior';
+    "type": AddonType;
     "name": string;
     "id": string;
     "version": string;
@@ -74,12 +74,39 @@ export interface AceExpression extends AceBase {
     "isVariadicParameters"?: boolean;
 }
 
-
+type LanguageJsonAddonType =
+    | 'plugins'
+    | 'behaviors'
+    | 'effects'
+    | 'themes'
+;
 
 export type LanguageJson = {
     "languageTag": 'en-US',
     "fileDescription": string;
     "text": {
+        "behaviors": {
+            [addonId: string]: {
+                "name": string;
+                "description": string;
+                "help-url": string;
+                "properties": {
+                    [propertyId: string]: LanguagePluginProperty;
+                },
+                "aceCategories": {
+                    [categoryId: string]: string;
+                },
+                "conditions": {
+                    [conditionId: string]: LanguageCondition;
+                },
+                "actions": {
+                    [actionId: string]: LanguageAction;
+                },
+                "expressions": {
+                    [expressionId: string]: LanguageExpression;
+                }
+            }
+        },
         "plugins": {
             [addonId: string]: {
                 "name": string;
@@ -101,9 +128,11 @@ export type LanguageJson = {
                     [expressionId: string]: LanguageExpression;
                 }
             }
-        }
+        },
+        "effects": {},
+        "themes": {}
     }
-}
+};
 
 export interface LanguageParam {
     "name": string;

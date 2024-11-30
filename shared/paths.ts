@@ -5,14 +5,27 @@ type BareBonesCollection = {
     readonly [key in AddonType]: string;
 }
 
+type AddonBaseCollection = {
+    readonly [key in AddonType]: string;
+}
+
 export abstract class Paths {
     static readonly Main = Deno.cwd();
     static readonly ConstructTypes = 'https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/types/construct.d.ts';
     static readonly BareBones: BareBonesCollection = {
-        plugin: 'https://github.com/lostinmind-dev/lostc3-plugin-bare-bones.git'
+        plugin: 'https://github.com/lostinmind-dev/lostc3-plugin-bare-bones.git',
+        behavior: 'https://github.com/lostinmind-dev/lostc3-behavior-bare-bones.git'
     };
-    static readonly AddonBase = 'https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/.addon_base';
-    static readonly LocalAddonBase = join(this.Main, '.addon_base');
+    static readonly AddonBaseFolderName = '.addon_base';
+
+    static readonly AddonBaseUrl: AddonBaseCollection = {
+        plugin: `https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/${this.AddonBaseFolderName}/plugin/plugin.js`,
+        behavior: `https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/${this.AddonBaseFolderName}/behavior/behavior.js`,
+    };
+    static readonly LocalAddonBase: AddonBaseCollection = {
+        plugin: join(this.Main, this.AddonBaseFolderName, 'plugin.js'),
+        behavior: join(this.Main, this.AddonBaseFolderName, 'behavior.js'),
+    };
     static readonly Build = join(this.Main, 'Builds', 'Source');
 
     /** Addon */

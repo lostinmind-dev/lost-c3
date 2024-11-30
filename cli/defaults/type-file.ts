@@ -1,11 +1,45 @@
+import type { AddonType } from "../../lib/config.ts";
+import { dedent } from "../../shared/misc.ts";
 import Lost from "./lost.ts";
 
-export default function getDefaultAddonTypeFile(addonId: string) {
-    const _default = `${Lost(addonId)}\nconst SDK = globalThis.SDK;\nconst PLUGIN_CLASS = SDK.Plugins[Lost.addonId];`
-    return `${_default}\nPLUGIN_CLASS.Type = class LostPluginType extends SDK.ITypeBase {
+export default function getDefaultAddonTypeFile(addonId: string, addonType: AddonType) {
+
+const Plugin = dedent`
+
+${Lost(addonId)}
+const SDK = globalThis.SDK;
+
+const PLUGIN_CLASS = SDK.Plugins[Lost.addonId];
+
+PLUGIN_CLASS.Type = class LostPluginType extends SDK.ITypeBase {
     constructor(sdkPlugin, iObjectType) {
         super(sdkPlugin, iObjectType);
     }
 };
-export {};`
+export {};
+`;
+
+const Behavior = dedent`
+
+${Lost(addonId)}
+const SDK = globalThis.SDK;
+
+const BEHAVIOR_CLASS = SDK.Behaviors[Lost.addonId];
+
+BEHAVIOR_CLASS.Type = class LostBehaviorType extends SDK.IBehaviorTypeBase {
+    constructor(sdkBehavior, iBehaviorType) {
+        super(sdkBehavior, iBehaviorType);
+    }
+};
+export {};
+`;
+
+switch (addonType) {
+    case 'plugin':
+        return Plugin;
+    case 'behavior':
+        return Behavior;
+        // break;
+}
+
 }

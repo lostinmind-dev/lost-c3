@@ -1,5 +1,6 @@
 import { join, Logger } from '../deps.ts';
 import type { Plugin } from "../lib/plugin.ts";
+import type { Behavior } from "../lib/behavior.ts";
 
 import Lost from './defaults/lost.ts';
 import ModuleFile from './defaults/module-file.ts';
@@ -15,14 +16,23 @@ type EntityCollection = {
     [key: string]: Function;
 }
 
-export default async function createC3RuntimeFiles(plugin: Plugin, watch?: true) {
+export default async function createC3RuntimeFiles(addon: Plugin | Behavior, watch?: true) {
 
-    await addCategories(plugin);
+    await addCategories(addon);
     checkCategories();
 
     await createModuleFile();
     await createInstanceFile();
-    await createPluginFile();
+
+    switch (addon._type) {
+        case "plugin":
+            await createPluginFile();
+            break;
+        case "behavior":
+            await createBehaviorFile();
+            break;
+    }
+
     await createTypeFile();
     await createActionsFile();
     await createConditionsFile();
@@ -30,7 +40,7 @@ export default async function createC3RuntimeFiles(plugin: Plugin, watch?: true)
 
     function checkCategories() {
         const isCategoryAlreadyExists = (id: string) => {
-            const categories = plugin._categories.filter(c => c._id === id);
+            const categories = addon._categories.filter(c => c._id === id);
             if (categories.length > 1) {
                 return true;
             } else {
@@ -38,13 +48,13 @@ export default async function createC3RuntimeFiles(plugin: Plugin, watch?: true)
             }
         }
 
-        plugin._categories.forEach(category => {
+        addon._categories.forEach(category => {
             if (category._id.length > 0) {
                 if (!isCategoryAlreadyExists(category._id)) {
 
                     category._actions.forEach(e => {
                         const isIdAlreadyExists = (id: string) => {
-                            const allEntities = plugin._categories.map(c => c._actions).flat().filter(e => e._id === id);
+                            const allEntities = addon._categories.map(c => c._actions).flat().filter(e => e._id === id);
 
                             if (allEntities.length > 1) {
                                 return true;
@@ -54,7 +64,7 @@ export default async function createC3RuntimeFiles(plugin: Plugin, watch?: true)
                         }
 
                         const isFunctionNameAlreadyExists = (funcName: string) => {
-                            const allEntities = plugin._categories.map(c => c._actions).flat().filter(e => e._func.name === funcName);
+                            const allEntities = addon._categories.map(c => c._actions).flat().filter(e => e._func.name === funcName);
 
                             if (allEntities.length > 1) {
                                 return true;
@@ -107,7 +117,7 @@ export default async function createC3RuntimeFiles(plugin: Plugin, watch?: true)
 
                     category._conditions.forEach(e => {
                         const isIdAlreadyExists = (id: string) => {
-                            const allEntities = plugin._categories.map(c => c._conditions).flat().filter(e => e._id === id);
+                            const allEntities = addon._categories.map(c => c._conditions).flat().filter(e => e._id === id);
 
                             if (allEntities.length > 1) {
                                 return true;
@@ -117,7 +127,7 @@ export default async function createC3RuntimeFiles(plugin: Plugin, watch?: true)
                         }
 
                         const isFunctionNameAlreadyExists = (funcName: string) => {
-                            const allEntities = plugin._categories.map(c => c._conditions).flat().filter(e => e._func.name === funcName);
+                            const allEntities = addon._categories.map(c => c._conditions).flat().filter(e => e._func.name === funcName);
 
                             if (allEntities.length > 1) {
                                 return true;
@@ -170,7 +180,7 @@ export default async function createC3RuntimeFiles(plugin: Plugin, watch?: true)
 
                     category._expressions.forEach(e => {
                         const isIdAlreadyExists = (id: string) => {
-                            const allEntities = plugin._categories.map(c => c._expressions).flat().filter(e => e._id === id);
+                            const allEntities = addon._categories.map(c => c._expressions).flat().filter(e => e._id === id);
 
                             if (allEntities.length > 1) {
                                 return true;
@@ -180,7 +190,7 @@ export default async function createC3RuntimeFiles(plugin: Plugin, watch?: true)
                         }
 
                         const isFunctionNameAlreadyExists = (funcName: string) => {
-                            const allEntities = plugin._categories.map(c => c._expressions).flat().filter(e => e._func.name === funcName);
+                            const allEntities = addon._categories.map(c => c._expressions).flat().filter(e => e._func.name === funcName);
 
                             if (allEntities.length > 1) {
                                 return true;
@@ -243,62 +253,69 @@ export default async function createC3RuntimeFiles(plugin: Plugin, watch?: true)
     }
 
     async function createModuleFile() {
-        if (plugin._userModules.length > 0) {
-            await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'main.js'), ModuleFile());
+        if (addon._userModules.length > 0) {
+            await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'main.js'), ModuleFile('plugin'));
         }
     }
 
     async function createInstanceFile() {
         const path = join(Paths.Main, 'Addon', 'Instance.ts');
         let fileContent = await transpileTs(path) as string;
-        fileContent = `${Lost(plugin._config.addonId)}\n` + fileContent
+        fileContent = `${Lost(addon._config.addonId)}\n` + fileContent
         await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'instance.js'), fileContent);
     }
 
     async function createPluginFile() {
         const path = join(Paths.Main, 'Addon', 'Plugin.ts');
         let fileContent = await transpileTs(path) as string;
-        fileContent = `${Lost(plugin._config.addonId)}\n` + fileContent
+        fileContent = `${Lost(addon._config.addonId)}\n` + fileContent
         await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'plugin.js'), fileContent);
+    }
+
+    async function createBehaviorFile() {
+        const path = join(Paths.Main, 'Addon', 'Behavior.ts');
+        let fileContent = await transpileTs(path) as string;
+        fileContent = `${Lost(addon._config.addonId)}\n` + fileContent
+        await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'behavior.js'), fileContent);
     }
 
     async function createTypeFile() {
         const path = join(Paths.Main, 'Addon', 'Type.ts');
         let fileContent = await transpileTs(path) as string;
-        fileContent = `${Lost(plugin._config.addonId)}\n` + fileContent
+        fileContent = `${Lost(addon._config.addonId)}\n` + fileContent
         await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'type.js'), fileContent);
     }
 
     async function createActionsFile() {
         const entities: EntityCollection = {};
-        plugin._categories.forEach(c => c._actions.forEach(enitity => {
+        addon._categories.forEach(c => c._actions.forEach(enitity => {
 
             entities[enitity._func.name] = enitity._func;
         }))
 
-        const fileContent = `${EntityFile(plugin._config.addonId, EntityType.Action)} ${serializeObjectWithFunctions(entities)}`;
+        const fileContent = `${EntityFile(addon._config.addonId, addon._type, EntityType.Action)} ${serializeObjectWithFunctions(entities)}`;
         await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'actions.js'), fileContent);
     }
 
     async function createConditionsFile() {
         const entities: EntityCollection = {};
-        plugin._categories.forEach(c => c._conditions.forEach(entity => {
+        addon._categories.forEach(c => c._conditions.forEach(entity => {
 
             entities[entity._func.name] = entity._func;
         }))
 
-        const fileContent = `${EntityFile(plugin._config.addonId, EntityType.Condition)} ${serializeObjectWithFunctions(entities)}`;
+        const fileContent = `${EntityFile(addon._config.addonId, addon._type, EntityType.Condition)} ${serializeObjectWithFunctions(entities)}`;
         await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'conditions.js'), fileContent);
     }
 
     async function createExpressionsFile() {
         const entities: EntityCollection = {};
-        plugin._categories.forEach(c => c._expressions.forEach(entity => {
+        addon._categories.forEach(c => c._expressions.forEach(entity => {
 
             entities[entity._func.name] = entity._func;
         }))
 
-        const fileContent = `${EntityFile(plugin._config.addonId, EntityType.Expression)} ${serializeObjectWithFunctions(entities)}`;
+        const fileContent = `${EntityFile(addon._config.addonId, addon._type, EntityType.Expression)} ${serializeObjectWithFunctions(entities)}`;
         await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'expressions.js'), fileContent);
     }
 

@@ -1,13 +1,19 @@
 import type { AddonType, LostConfig } from "./config.ts";
 
-export abstract class Addon {
-    readonly _type: AddonType;
-    readonly _config: LostConfig;
-    _icon: AddonIconFile | null;
+export abstract class Addon<T extends AddonType> {
+    readonly _type: T;
+    readonly _config: LostConfig<AddonType>;
+    _icon: AddonIconFile = {
+        type: 'icon',
+        fileName: 'icon.svg',
+        path: '-',
+        relativePath: 'icon.svg',
+        iconType: 'image/svg+xml'
+    };
 
-    constructor(type: AddonType, config: LostConfig) {
+    constructor(type: T, config: LostConfig<T>) {
         this._type = type;
         this._config = config;
-        this._icon = null;
+
     }
 }

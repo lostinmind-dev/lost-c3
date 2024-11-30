@@ -1,8 +1,14 @@
 export * from './types/lost.d.ts';
+
+/**
+ * Addons
+ */
+export { Plugin } from './lib/plugin.ts';
+export { Behavior } from './lib/behavior.ts'
+
 /**
  * Entities
  */
-export { Plugin } from './lib/plugin.ts';
 export { Category } from './lib/entities/category.ts';
 export { Action } from './lib/entities/action.ts';
 export { Condition } from './lib/entities/condition.ts';

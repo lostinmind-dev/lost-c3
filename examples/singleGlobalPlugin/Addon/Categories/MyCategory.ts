@@ -12,9 +12,10 @@ export default class {
         isAsync: true
     })
     doAction(): void {
-        /**
-         * 
-         */
+        console.log('hello')
+        console.log('hello')
+        console.log('hello')
+        console.log('hello')
         console.log('hello')
     }
 
