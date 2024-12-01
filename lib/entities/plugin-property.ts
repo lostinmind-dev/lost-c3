@@ -1,3 +1,5 @@
+import { ComboIdArray } from "./parameter.ts";
+
 /** Object that represents all types of plugin property. */
 export enum Property {
     Integer = 'integer',
@@ -18,14 +20,14 @@ export enum Property {
 /**
  * @class Represents plugin property info.
  */
-export class PluginProperty {
+export class PluginProperty<A extends ComboIdArray = ComboIdArray> {
     readonly _id: string;
     readonly _name: string;
     readonly _description: string;
-    readonly _opts: PropertyOptions;
+    readonly _opts: PropertyOptions<A>;
     readonly _funcString?: string;
     
-    constructor(id: string, name: string, description: string, opts: PropertyOptions) {
+    constructor(id: string, name: string, description: string, opts: PropertyOptions<A>) {
         this._id = id;
         this._name = name;
         this._description = description;
@@ -82,20 +84,20 @@ export class PluginProperty {
 }
 
 /** All available plugin property options  */
-export type PropertyOptions = 
-    IntegerProperty |
-    FloatProperty |
-    PercentProperty |
-    TextProperty |
-    LongTextProperty |
-    CheckProperty |
-    FontProperty |
-    ComboProperty |
-    ColorProperty |
-    ObjectProperty |
-    GroupProperty |
-    InfoProperty |
-    LinkProperty
+export type PropertyOptions<A extends ComboIdArray> = 
+    | IntegerProperty
+    | FloatProperty
+    | PercentProperty
+    | TextProperty
+    | LongTextProperty
+    | CheckProperty
+    | FontProperty
+    | ComboProperty<A>
+    | ColorProperty
+    | ObjectProperty
+    | GroupProperty
+    | InfoProperty
+    | LinkProperty
 ;
 
 /** Base properties for any plugin property. */
@@ -190,19 +192,19 @@ interface FontProperty extends PropertyOptionsBase {
 }
 
 /** Object represents 'combo' plugin property */
-interface ComboProperty extends PropertyOptionsBase {
+interface ComboProperty<A extends ComboIdArray> extends PropertyOptionsBase {
     type: Property.Combo;
     /**
      * Must be used to specify the available items.
      * @example [["item_one", "Item 1"], ["item_two", "Item 2"]]
      */
-    items: [string, string][];
+    items: [A[number], string][];
     /**
      * A dropdown list property.
      * @description The property is set to the zero-based index of the chosen item.
      * The Items field of the options object must be used to specify the available items.
      */
-    initialValue?: string;
+    initialValue?: A[number];
 }
 
 /** Object represents 'color' plugin property */

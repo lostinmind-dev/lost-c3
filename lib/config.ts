@@ -1,25 +1,22 @@
 /** All available types of Lost config. */
 export type LostConfig<T extends AddonType> =
     T extends 'plugin' ? PluginConfig :
-    T extends 'behavior' ? BehaviorConfig : never
-    ;
+    T extends 'behavior' ? BehaviorConfig :
+    T extends 'effect' ? EffectConfig : never
+;
 
 /** Type of addon. */
 export type AddonType =
     | 'plugin'
     | 'behavior'
-    ;
+    | 'effect'
+;
 
 
 /** Base properties for any Lost config. */
 type LostConfigBase = {
     /** Type of addon */
     readonly type: AddonType;
-    /**
-      * An object name that will applied after plugin was installed/added to project.
-      * @example 'MyPlugin'
-      */
-    readonly objectName: string;
     /**
      * The unique ID of the addon.
      * @description This is not displayed and is only used internally.
@@ -82,9 +79,14 @@ type PluginCategory =
     | 'platform-specific'
     | 'web'
     | 'other'
-    ;
+;
 
 interface PluginConfigBase extends LostConfigBase {
+    /**
+      * An object name that will applied after plugin was installed/added to project.
+      * @example 'MyPlugin'
+      */
+    readonly objectName: string;
     /**
      * Set the plugin type.
      * @description This can be "object" or "world".
@@ -206,14 +208,14 @@ type CommonACEsType =
     | 'angle'
     | 'appereance'
     | 'z_order'
-    ;
+;
 
 type BehaviorCategory =
     | 'attributes'
     | 'general'
     | 'movements'
     | 'other'
-    ;
+;
 
 
 /** Object represents config for Behavior addon type. */
@@ -222,6 +224,11 @@ export interface BehaviorConfig extends LostConfigBase {
      * Addon type
      */
     readonly type: 'behavior';
+    /**
+      * An object name that will applied after plugin was installed/added to project.
+      * @example 'MyPlugin'
+      */
+    readonly objectName: string;
     /**
      * *Optional*. Default is ***True***.
      * A boolean indicating whether the addon supports Construct's worker mode, where the entire runtime is hosted in a Web Worker instead of the main thread.
@@ -265,4 +272,87 @@ export interface BehaviorConfig extends LostConfigBase {
      * @example 'general'
      */
     readonly category: BehaviorCategory;
+}
+
+type EffectCategory =
+    | '3d'
+    | 'blend'
+    | 'color'
+    | 'distortion'
+    | 'mask'
+    | 'normal-mapping'
+    | 'tiling'
+    | 'other'
+;
+
+/** Object represents config for Effect addon type. */
+export interface EffectConfig extends LostConfigBase {
+    /**
+     * The category the effect should appear in.
+     * @example '3d'
+     */
+    readonly category: EffectCategory;
+    /**
+     * *Optional*. An object that indicating the supported renderers for this effect.
+     * @description By default (if omitted), will be used "webgl" as only supported renderer.
+     * @property webgl2 can be added to support a WebGL 2 variant of the effect - see the section on WebGL shaders for more details.
+     * @property webgpu can be added to support the WebGPU renderer with a shader written in WGSL - see the section on WebGPU shaders for more details.
+     */
+    readonly supportedRenderers?: {
+        readonly webgl2: boolean;
+        readonly webgpu: boolean;
+    };
+    /**
+     * Boolean indicating whether the effect blends with the background.
+     * @description Objects and layers can use effects that blend with the background, but layouts cannot.
+     */
+    readonly blendsBackground: boolean;
+    /**
+     * Boolean indicating whether the effect samples the depth buffer with the samplerDepth uniform.
+     * @description This is used for depth-based effects like fog.
+     */
+    readonly usesDepth: boolean;
+    /**
+     * Boolean indicating whether a background-blending effect has inconsistent sampling of the background and foreground.
+     * @description A normal blending shader like Multiply will sample the background and foreground 1:1, so each foreground pixel samples only the background pixel it is rendered to.
+     * This is consistent sampling so cross-sampling should be false.
+     * However an effect that distorts the background, like Glass or a masking Warp effect, can sample different background pixels to the foreground pixel being rendered, so should set cross-sampling to true.
+     * This must be specified so the effect compositor can ensure the correct result is rendered when this happens.
+     */
+    readonly crossSampling: boolean;
+    /**
+     * Boolean indicating whether the effect preserves opaque pixels, i.e. every input pixel with an alpha of 1 is also output with an alpha of 1.
+     * @description This is true for most color-altering effects, but not for most distorting effects, since in some cases a previously opaque pixel will be distorted in to a transparent area of the texture.
+     * This information is not currently used, but is important for front-to-back rendering algorithms.
+     */
+    readonly preservesOpaqueness: boolean;
+    /**
+     * Boolean indicating whether the effect is animated, i.e. changes over time using the seconds uniform.
+     * @description This is used to ensure Construct keeps redrawing the screen if an animated effect is visible.
+     */
+    readonly animated: boolean;
+    /**
+     * Boolean indicating whether to force the pre-draw step.
+     * @description Sometimes Construct tries to optimise effect rendering by directly rendering an object with the shader applied.
+     * Setting this flag forces Construct to first render the object to an intermediate surface, which is necessary for some kinds of effect.
+     */
+    readonly mustPreDraw: boolean;
+    /**
+     * *Optional*. Default is ***False***. Boolean indicating whether 3D objects can render directly with this effect.
+     * @description This defaults to false, causing all 3D objects with the effect to first perform a pre-draw step, and then processing the effect on a 2D surface.
+     * If set to true, then 3D objects with the effect are allowed to render directly to the display with the effect being processed for each triangle in the geometry.
+     * This is usually more efficient and can be more appropriate for processing 3D effects.
+     * Note however that the effect compositor may still decide to add a pre-draw step in some circumstances, so this setting is not a guarantee that it will always use direct rendering.
+     */
+    readonly supports3DDirectRendering?: boolean;
+    /**
+     * Amount to extend the rendered box horizontally and vertically.
+     * @description Normally the effect is clipped to the object's bounding box, but some effects like Warp need to be able to render a short distance outside of that for the correct result.
+     * This property lets you extend the rendered box by a number of pixels.
+     * This property uses "horizontal" and "vertical" sub-properties
+     */
+    readonly extendBox: {
+        readonly horizontal: number;
+        readonly vertical: number;
+    }
 }

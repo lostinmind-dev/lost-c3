@@ -14,14 +14,13 @@ class LostBehaviorInstance extends globalThis.ISDKBehaviorInstanceBase<IWorldIns
         super();
 
         const properties = this._getInitProperties() as PluginProperties;
-
     }
 
     _release() {
 		super._release();
 	}
 
-
+    
 	// _tick() {
 	// 	const dt = this.instance.dt;
 	// 	// ... code to run every tick for this behavior ...

@@ -6,13 +6,13 @@ const Addon = new Plugin(config);
 
 Addon
     .addPluginProperty('test', 'Test 1', { type: Property.Text })
-    .addPluginProperty('test2', 'test 2', {
+    .addPluginProperty<['id1', 'id2']>('test2', 'test 2', {
         type: Property.Combo,
         items: [
-            ['test', 'Test1'],
-            ['test2', 'Test2']
+            ['id1', 'Test1'],
+            ['id2', 'Test2']
         ],
-        initialValue: ''
+        initialValue: 'id1'
     })
 
 export default Addon;

@@ -7,6 +7,7 @@ import { Paths } from "../shared/paths.ts";
 import { getRelativePath } from "../shared/misc.ts";
 import { MIME } from "../shared/mime.ts";
 import type { CategoryClassType } from "./entities/category.ts";
+import type { ComboIdArray } from "./entities/parameter.ts";
 
 export class Plugin extends Addon<'plugin'> {
     readonly _userFiles: AddonUserFile[] = [];
@@ -363,7 +364,7 @@ export class Plugin extends Addon<'plugin'> {
      * @param name The name of the property.
      * @param opts 
      */
-    addPluginProperty(id: string, name: string, opts: PropertyOptions): this
+    addProperty<A extends ComboIdArray = ComboIdArray>(id: string, name: string, opts: PropertyOptions<A>): this
     /**
      * Creates plugin property.
      * @param id A string with a unique identifier for this property.
@@ -371,7 +372,7 @@ export class Plugin extends Addon<'plugin'> {
      * @param description *Optional*. The property description.
      * @param opts Plugin property options.
      */
-    addPluginProperty(id: string, name: string, description: string, opts: PropertyOptions): this
+    addProperty<A extends ComboIdArray = ComboIdArray>(id: string, name: string, description: string, opts: PropertyOptions<A>): this
     /**
      * Creates plugin property.
      * @param id A string with a unique identifier for this property.
@@ -379,10 +380,10 @@ export class Plugin extends Addon<'plugin'> {
      * @param descriptionOrOpts The property description **OR** Plugin property options.
      * @param opts Plugin property options.
      */
-    addPluginProperty(id: string, name: string, descriptionOrOpts: string | PropertyOptions, opts?: PropertyOptions) {
+    addProperty<A extends ComboIdArray = ComboIdArray>(id: string, name: string, descriptionOrOpts: string | PropertyOptions<A>, opts?: PropertyOptions<A>) {
         if (!this.isPluginPropertyAlreadyExist(id)) {
             let description: string = 'There is no any description yet...';
-            let options: PropertyOptions;
+            let options: PropertyOptions<A>;
             if (typeof descriptionOrOpts === 'string' && opts) {
                 description = descriptionOrOpts;
                 options = opts;
@@ -398,7 +399,7 @@ export class Plugin extends Addon<'plugin'> {
                 name.length > 0
             ) {
                 this._pluginProperties.push(
-                    new PluginProperty(id, name, description, options)
+                    new PluginProperty<A>(id, name, description, options)
                 );
             } else if (id.length === 0) {
                 Logger.Error('build', `Plugin property id can't be empty.`, 'Please specify your property Id.')
@@ -416,7 +417,7 @@ export class Plugin extends Addon<'plugin'> {
 
     /**
      * Creates a new group in the Properties Bar.
-     * @description That method using *addPluginProperty* with **Property**.**Group** type in opts object.
+     * @description That method using *addProperty* with **Property**.**Group** type in opts object.
      * @param id A string with a unique identifier for this property.
      * @param name The name of the group.
      */
@@ -426,7 +427,7 @@ export class Plugin extends Addon<'plugin'> {
                 id.length > 0 &&
                 name.length > 0
             ) {
-                this.addPluginProperty(id, name, { type: Property.Group });
+                this.addProperty(id, name, { type: Property.Group });
             }  else if (id.length === 0) {
                 Logger.Error('build', `Group id can't be empty.`, 'Please specify your group Id.')
                 Deno.exit(1);

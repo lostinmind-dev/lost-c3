@@ -13,7 +13,6 @@ class Instance extends globalThis.ISDKInstanceBase {
     constructor() {
         super();
         const properties = this._getInitProperties() as PluginProperties;
-
     }
 
     _release() {

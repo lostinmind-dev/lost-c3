@@ -6,6 +6,7 @@ import { Paths } from "../shared/paths.ts";
 import { getRelativePath } from "../shared/misc.ts";
 import { MIME } from "../shared/mime.ts";
 import type { CategoryClassType } from "./entities/category.ts";
+import type { ComboIdArray } from "./entities/parameter.ts";
 
 export class Behavior extends Addon<'behavior'> {
     readonly _userFiles: AddonUserFile[] = [];
@@ -316,7 +317,7 @@ export class Behavior extends Addon<'behavior'> {
      * @param name The name of the property.
      * @param opts 
      */
-    addPluginProperty(id: string, name: string, opts: PropertyOptions): this
+    addProperty<A extends ComboIdArray = ComboIdArray>(id: string, name: string, opts: PropertyOptions<A>): this
     /**
      * Creates plugin property.
      * @param id A string with a unique identifier for this property.
@@ -324,7 +325,7 @@ export class Behavior extends Addon<'behavior'> {
      * @param description *Optional*. The property description.
      * @param opts Plugin property options.
      */
-    addPluginProperty(id: string, name: string, description: string, opts: PropertyOptions): this
+    addProperty<A extends ComboIdArray = ComboIdArray>(id: string, name: string, description: string, opts: PropertyOptions<A>): this
     /**
      * Creates plugin property.
      * @param id A string with a unique identifier for this property.
@@ -332,10 +333,10 @@ export class Behavior extends Addon<'behavior'> {
      * @param descriptionOrOpts The property description **OR** Plugin property options.
      * @param opts Plugin property options.
      */
-    addPluginProperty(id: string, name: string, descriptionOrOpts: string | PropertyOptions, opts?: PropertyOptions) {
+    addProperty<A extends ComboIdArray = ComboIdArray>(id: string, name: string, descriptionOrOpts: string | PropertyOptions<A>, opts?: PropertyOptions<A>) {
         if (!this.isPluginPropertyAlreadyExist(id)) {
             let description: string = 'There is no any description yet...';
-            let options: PropertyOptions;
+            let options: PropertyOptions<A>;
             if (typeof descriptionOrOpts === 'string' && opts) {
                 description = descriptionOrOpts;
                 options = opts;
@@ -379,7 +380,7 @@ export class Behavior extends Addon<'behavior'> {
                 id.length > 0 &&
                 name.length > 0
             ) {
-                this.addPluginProperty(id, name, { type: Property.Group });
+                this.addProperty(id, name, { type: Property.Group });
             }  else if (id.length === 0) {
                 Logger.Error('build', `Group id can't be empty.`, 'Please specify your group Id.')
                 Deno.exit(1);
