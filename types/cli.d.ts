@@ -20,7 +20,7 @@ declare type AddonFileBase = {
     readonly relativePath: string;
 }
 
-declare interface AddonDomSideScriptFile extends AddonFileBase {
+declare interface AddonUserDomSideScriptFile extends AddonFileBase {
     readonly type: 'dom-side-script';
 }
 
@@ -37,57 +37,49 @@ declare interface AddonFileCopyToOutput extends AddonFileBase {
     readonly dependencyType: 'copy-to-output';
 }
 
-declare interface AddonScriptFile extends AddonFileBase {
+declare interface AddonUserScriptFile extends AddonFileBase {
     readonly type: 'script';
     readonly scriptType?: 'module';
     readonly dependencyType: 'external-dom-script' | 'external-runtime-script';
     readonly isTypescript: boolean;
 }
 
-declare interface AddonModuleFile extends AddonFileBase {
+declare interface AddonUserModuleFile extends AddonFileBase {
     readonly type: 'module',
     readonly isTypescript: boolean;
 }
 
 declare type MIMEFileType = 
-    | 'unknown'
-    | 'application/json'
-    | 'application/javascript'
-    | 'application/pdf'
-    | 'application/xml'
-    | 'application/zip'
-    | 'application/x-www-form-urlencoded'
-    | 'application/vnd.ms-excel'
-    | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    | 'application/vnd.ms-powerpoint'
-    | 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-    | 'application/msword'
-    | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    | 'audio/mpeg'
-    | 'audio/wav'
-    | 'audio/ogg'
-    | 'audio/webm'
-    | 'image/jpeg'
-    | 'image/png'
-    | 'image/gif'
-    | 'image/bmp'
-    | 'image/webp'
-    | 'image/svg+xml'
-    | 'text/plain'
     | 'text/html'
+    | 'application/javascript'
+    | 'application/json'
     | 'text/css'
-    | 'text/javascript'
+    | 'application/wasm'
+    | 'image/png'
+    | 'image/jpeg'
+    | 'image/webp'
+    | 'image/avif'
+    | 'video/webm'
+    | 'audio/mp4'
+    | 'audio/mpeg'
+    | 'audio/ogg'
+    | 'video/mp4'
+    | 'application/font-woff'
+    | 'font/woff2'
+    | 'text/plain'
     | 'text/csv'
     | 'text/xml'
-    | 'video/mp4'
-    | 'video/mpeg'
-    | 'video/ogg'
-    | 'video/webm'
-    | 'video/quicktime'
-    | 'application/wasm'
+    | 'image/svg+xml'
+    | 'application/zip'
+;
+
+declare type AddonIconMimeType = 
+    | 'image/png'
+    | 'image/svg+xml'
 ;
 
 declare interface AddonIconFile extends AddonFileBase {
+    readonly isDefault: boolean;
     readonly type: 'icon';
-    readonly iconType: 'image/png' | 'image/svg+xml' ;
+    readonly iconType: AddonIconMimeType;
 }

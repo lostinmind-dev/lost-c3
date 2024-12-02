@@ -1,9 +1,9 @@
-import type { BehaviorConfig } from "../../lib/config.ts";
+import type { LostConfig } from "../../lib/config.ts";
 import { Property } from '../../lib/entities/plugin-property.ts';
 import type { LostAddonBehaviorData } from '../../shared/types.ts';
 
 const _lostData: LostAddonBehaviorData = {} as LostAddonBehaviorData;
-const config = _lostData.config as BehaviorConfig;
+const config = _lostData.config as LostConfig<'behavior'>;
 const { icon } = _lostData;
 
 const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extends SDK.IBehaviorBase {

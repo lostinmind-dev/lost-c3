@@ -1,8 +1,9 @@
-import type { AddonType, LostConfig } from "../../lib/config.ts";
+// deno-lint-ignore-file no-fallthrough
+import type { AddonType, LostConfig, PluginConfig } from "../../lib/config.ts";
 import { dedent } from "../../shared/misc.ts";
 import Lost from "./lost.ts";
 
-export default function instanceFile(config: LostConfig<AddonType>) {
+export default function file(config: LostConfig<AddonType>) {
 
 const DrawingPlugin = dedent`
 ${Lost(config.addonId)}
@@ -110,18 +111,16 @@ BEHAVIOR_CLASS.Instance = class LostBehaviorInstance extends SDK.IBehaviorInstan
 };
 `;
 
-if (config.type === 'plugin') {
-    switch(config.pluginType) {
-        case "object":
-            return Plugin;
-        case "world":
-            return DrawingPlugin;
-
-    }
-} else if (config.type === 'behavior') {
-    return Behavior;
-} else {
-    return Plugin;
+switch (config.type) {
+	case "plugin":
+		switch ((config as PluginConfig).pluginType) {
+			case "object":
+				return Plugin;
+			case "world":
+				return DrawingPlugin;
+		}
+	case "behavior":
+		return Behavior;
 }
 
 }

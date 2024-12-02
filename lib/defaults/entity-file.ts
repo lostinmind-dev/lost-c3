@@ -22,7 +22,7 @@ const EntityPath: EntityPathType = {
     },
 }
 
-export default function entityFile(config: LostConfig<AddonType>, entityType: EntityType) {
+export default function file(config: LostConfig<AddonType>, entityType: EntityType) {
 
 const _default = dedent`
 ${Lost(config.addonId)}

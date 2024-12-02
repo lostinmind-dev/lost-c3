@@ -16,8 +16,8 @@
                         "name": "test 2",
                         "desc": "There is no any description yet...",
                         "items": {
-                            "test": "Test1",
-                            "test2": "Test2"
+                            "id1": "Test1",
+                            "id2": "Test2"
                         }
                     }
                 },

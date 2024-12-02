@@ -1,22 +1,22 @@
 /** All available types of Lost config. */
 export type LostConfig<T extends AddonType> =
-    T extends 'plugin' ? PluginConfig :
-    T extends 'behavior' ? BehaviorConfig :
-    T extends 'effect' ? EffectConfig : never
+    T extends 'plugin' ? PluginConfig<T> :
+    T extends 'behavior' ? BehaviorConfig<T> : never
+    // T extends 'effect' ? EffectConfig : never
 ;
 
 /** Type of addon. */
 export type AddonType =
     | 'plugin'
     | 'behavior'
-    | 'effect'
+    // | 'effect'
 ;
 
 
 /** Base properties for any Lost config. */
-type LostConfigBase = {
+type LostConfigBase<T extends AddonType> = {
     /** Type of addon */
-    readonly type: AddonType;
+    readonly type: T;
     /**
      * The unique ID of the addon.
      * @description This is not displayed and is only used internally.
@@ -81,7 +81,7 @@ type PluginCategory =
     | 'other'
 ;
 
-interface PluginConfigBase extends LostConfigBase {
+interface PluginConfigBase<T extends AddonType> extends LostConfigBase<T> {
     /**
       * An object name that will applied after plugin was installed/added to project.
       * @example 'MyPlugin'
@@ -134,11 +134,10 @@ interface PluginConfigBase extends LostConfigBase {
 }
 
 /** Object represents configs for Plugin addon type. */
-export type PluginConfig = ObjectPluginConfig | WorldPluginConfig;
+type PluginConfig<T extends AddonType> = ObjectPluginConfig<T> | WorldPluginConfig<T>;
 
 /** Object represents config for Object Plugin addon. */
-interface ObjectPluginConfig extends PluginConfigBase {
-    readonly type: 'plugin';
+interface ObjectPluginConfig<T extends AddonType> extends PluginConfigBase<T> {
     readonly pluginType: 'object';
     /**
      * *Optional*. Default is ***False***. Pass true to set the plugin to be a single-global type.
@@ -148,8 +147,7 @@ interface ObjectPluginConfig extends PluginConfigBase {
     readonly isSingleGlobal?: boolean;
 }
 
-interface WorldPluginConfig extends PluginConfigBase {
-    readonly type: 'plugin';
+interface WorldPluginConfig<T extends AddonType> extends PluginConfigBase<T> {
     readonly pluginType: 'world';
     /**
      * *Optional*. Default is ***True***. Pass true to enable resizing instances in the Layout View.
@@ -219,11 +217,7 @@ type BehaviorCategory =
 
 
 /** Object represents config for Behavior addon type. */
-export interface BehaviorConfig extends LostConfigBase {
-    /**
-     * Addon type
-     */
-    readonly type: 'behavior';
+interface BehaviorConfig<T extends AddonType> extends LostConfigBase<T> {
     /**
       * An object name that will applied after plugin was installed/added to project.
       * @example 'MyPlugin'
@@ -286,7 +280,7 @@ type EffectCategory =
 ;
 
 /** Object represents config for Effect addon type. */
-export interface EffectConfig extends LostConfigBase {
+export interface EffectConfig<T extends AddonType> extends LostConfigBase<T> {
     /**
      * The category the effect should appear in.
      * @example '3d'

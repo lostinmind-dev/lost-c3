@@ -6,6 +6,7 @@ import { Paths } from './shared/paths.ts';
 
 import Build from './cli/main.ts';
 import Serve from './cli/serve-addon.ts';
+import { dedent } from "./shared/misc.ts";
 
 
 let rebuildTimeout: number | undefined;
@@ -57,7 +58,10 @@ async function main() {
             printHelp();
             break;
         case 'version':
-            Logger.LogBetweenLines(Colors.bold(`Lost ➜  ${Colors.yellow(DenoJson.version)} by ${Colors.italic(Colors.magenta('lostinmind.'))}`))
+            Logger.LogBetweenLines(dedent`
+                👾 ${Colors.bold(`Lost ➜  ${Colors.yellow(DenoJson.version)} by ${Colors.italic(Colors.magenta('lostinmind.'))}`)}
+                🌐 ${Colors.bold('https://github.com/lostinmind-dev/lost-c3')}
+            `)
             break;
         case 'create':
             if (!flags.plugin) {

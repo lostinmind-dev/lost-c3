@@ -1,7 +1,7 @@
-import type { AddonType } from "../../lib/config.ts";
+import type { AddonType, LostConfig } from "../../lib/config.ts";
 import { dedent } from "../../shared/misc.ts";
 
-export default function moduleFile(addonType: AddonType) {
+export default function file(config: LostConfig<AddonType>) {
 
 const Plugin = dedent`
 import './plugin.js';
@@ -21,12 +21,11 @@ import './actions.js';
 import './expressions.js';
 `
 
-switch (addonType) {
+switch (config.type) {
     case 'plugin':
         return Plugin;
     case 'behavior':
         return Behavior;
-        // break;
 }
 
 }

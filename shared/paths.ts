@@ -29,9 +29,9 @@ export abstract class Paths {
     static readonly Build = join(this.Main, 'Builds', 'Source');
 
     /** Addon */
-    static readonly Categories = join(this.Main, 'Addon', 'Categories');
-    static readonly Files = join(this.Main, 'Addon', 'Files');
-    static readonly Scripts = join(this.Main, 'Addon', 'Scripts');
-    static readonly Modules = join(this.Main, 'Addon', 'Modules');
-    static readonly DomSideScripts = join(this.Main, 'Addon', 'DomSide');
+    static readonly UserCategories = join(this.Main, 'Addon', 'Categories');
+    static readonly UserFiles = join(this.Main, 'Addon', 'Files');
+    static readonly UserScripts = join(this.Main, 'Addon', 'Scripts');
+    static readonly UserModules = join(this.Main, 'Addon', 'Modules');
+    static readonly UserDomSideScripts = join(this.Main, 'Addon', 'DomSide');
 }
