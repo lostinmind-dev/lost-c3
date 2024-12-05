@@ -117,6 +117,7 @@ export abstract class Addon<T extends AddonType = AddonType, I extends EditorIns
             await Deno.mkdir(join(Paths.Main, 'Addon', 'Types'), { recursive: true });
 
             await Deno.writeTextFile(join(Paths.Main, 'Addon', 'Types', 'properties.d.ts'), fileContent);
+            Logger.Success(`Created plugin properties types at path: ${join('Addon', 'Types', 'properties.d.ts')}`)
         }
     }
 

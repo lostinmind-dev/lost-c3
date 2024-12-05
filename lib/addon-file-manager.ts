@@ -208,7 +208,6 @@ ${assign}
 
                 switch (config.type) {
                     case "plugin":
-                        console.log(script)
                         className = findClassesInheritingFrom(script, 'globalThis.ISDKObjectTypeBase');
                         assign = `globalThis.C3.Plugins["${config.addonId}"].Type = ${className};`;
                         break;
