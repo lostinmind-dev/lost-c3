@@ -1,4 +1,3 @@
-const Lost = {"addonId":"LostPluginId"};
 import { GPUResourceManager } from './modules/index.js';
 const C3 = globalThis.C3;
 const a = new GPUResourceManager();
@@ -13,3 +12,5 @@ class LostBehaviorInstance extends globalThis.ISDKBehaviorInstanceBase {
     }
 }
 C3.Behaviors[Lost.addonId].Instance = LostBehaviorInstance;
+
+globalThis.C3.Behaviors["LostPluginId"].Instance = LostBehaviorInstance;

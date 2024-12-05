@@ -8,7 +8,7 @@
                 "description": "My awesome addon was made with Lost",
                 "help-url": "https://myaddon.com/help/en",
                 "properties": {
-                    "test": {
+                    "test1": {
                         "name": "Test 1",
                         "desc": "There is no any description yet..."
                     },
@@ -19,6 +19,10 @@
                             "id1": "Test1",
                             "id2": "Test2"
                         }
+                    },
+                    "test": {
+                        "name": "Hello",
+                        "desc": "There is no any description yet..."
                     }
                 },
                 "aceCategories": {

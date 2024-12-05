@@ -1,5 +1,19 @@
 import type { CategoryClassType } from "../lib/entities/category.ts";
 
+export function findClassesInheritingFrom(fileContent: string, parentClass: string) {
+    // Динамическое регулярное выражение для поиска классов
+    const classRegex = new RegExp(`class\\s+(\\w+)\\s+extends\\s+${parentClass.replace('.', '\\.')}\\s*{`, 'g');
+
+    const matches = [];
+    let match;
+
+    while ((match = classRegex.exec(fileContent)) !== null) {
+        matches.push(match[1]); // Имя класса находится в первой группе
+    }
+
+    return matches[0];
+}
+
 export function getRelativePath(path: string, basePath: string, fileName: string, replaceTsToJs?: true) {
     const relativePathIndex = path.indexOf(basePath);
     const relativePath = path.substring(relativePathIndex + basePath.length + 1);

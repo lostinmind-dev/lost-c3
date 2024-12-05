@@ -1,8 +1,9 @@
+// deno-lint-ignore-file no-case-declarations
 import type { LostConfig } from "../../lib/config.ts";
 import { Property } from '../../lib/entities/plugin-property.ts';
-import type { LostAddonBehaviorData } from '../../shared/types.ts';
+import type { LostAddonData } from '../../shared/types.ts';
 
-const _lostData: LostAddonBehaviorData = {} as LostAddonBehaviorData;
+const _lostData: LostAddonData = {} as LostAddonData;
 const config = _lostData.config as LostConfig<'behavior'>;
 const { icon } = _lostData;
 
@@ -210,22 +211,10 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
 					)
 					break;
 				case Property.Color:
-					properties.push(
-						new SDK.PluginProperty(
-							_opts.type, _id, {
-							initialValue: _opts.initialValue || [0, 0, 0]
-						}
-						)
-					)
+					// ignore, because link property is not available with behavior addon type
 					break;
 				case Property.Object:
-					properties.push(
-						new SDK.PluginProperty(
-							_opts.type, _id, {
-							allowedPluginIds: _opts.allowedPluginIds || []
-						}
-						)
-					)
+					// ignore, because link property is not available with behavior addon type
 					break;
 				case Property.Group:
 					properties.push(
@@ -233,30 +222,21 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
 					)
 					break;
 				case Property.Info:
-					properties.push(
-						new SDK.PluginProperty(
-							_opts.type, _id, {
-							infoCallback: (inst) => {
-								return _opts.info;
-							}
-						})
-					)
-					break;
-				case Property.Link:
-					const func = this.deserializeFunction(_funcString || '');
+					const infoFunc = this.deserializeFunction(_funcString || '');
 
-					if (func) {
+					if (infoFunc) {
 						properties.push(
 							new SDK.PluginProperty(
 								_opts.type, _id, {
-								callbackType: _opts.callbackType,
-								linkCallback: (p) => {
-									func(p);
+								infoCallback: (i) => {
+									return infoFunc(i);
 								}
-							}
-							)
+							})
 						)
 					}
+					break;
+				case Property.Link:
+					// ignore, because link property is not available with behavior addon type
 					break;
 			}
 		})

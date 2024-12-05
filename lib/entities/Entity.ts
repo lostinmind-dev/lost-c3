@@ -1,5 +1,5 @@
 import { bold, italic } from '../misc/text-formatting.ts';
-import type { ComboIdArray, ExpressionParamOptions, Parameter, ParamOptions } from './parameter.ts';
+import type { ExpressionParamOptions, Parameter, ParamOptions } from './parameter.ts';
 
 export enum EntityType {
     Action = 'action',
@@ -114,11 +114,11 @@ export type EntityOptions = {
 }
 
 /** Map of Parameter options for evert entity type. */
-interface EntityParamOptionsMap<A extends ComboIdArray> {
-    [EntityType.Action]: ParamOptions<A>;
-    [EntityType.Condition]: ParamOptions<A>;
+interface EntityParamOptionsMap {
+    [EntityType.Action]: ParamOptions;
+    [EntityType.Condition]: ParamOptions;
     [EntityType.Expression]: ExpressionParamOptions;
 }
 
 /** Seperated parameter options for every entity type. */
-export type EntityParamOptions<T extends EntityType, A extends ComboIdArray> = EntityParamOptionsMap<A>[T];
+export type EntityParamOptions<T extends EntityType> = EntityParamOptionsMap[T];

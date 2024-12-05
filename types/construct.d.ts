@@ -731,6 +731,8 @@ declare global {
 	}
 /** IInstanceBase.d.ts */ namespace SDK {
 		class IInstanceBase {
+			static Instance: typeof IInstanceBase;
+			static Type: typeof ITypeBase;
 
 			constructor(sdkType: SDK.ITypeBase, iInstance: SDK.IObjectInstance);
 

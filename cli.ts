@@ -14,6 +14,7 @@ let rebuildTimeout: number | undefined;
 async function BuildAndWatch() {
     const watcher = Deno.watchFs([
         join(Paths.Main, 'Addon'),
+        join(Paths.Main, 'Editor'),
         join(Paths.Main, 'addon.ts'),
         join(Paths.Main, 'lost.config.ts')
     ]);

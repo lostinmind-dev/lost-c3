@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-case-declarations
 import './global.ts';
 import type { Addon } from "../lib/addon.ts";
 

@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-case-declarations
 import type { AddonType, LostConfig } from "./config.ts";
 import type { CategoryClassType } from "./entities/category.ts";
-import type { PluginProperty } from "./entities/plugin-property.ts";
+import type { EditorInstanceType, PluginProperty } from "./entities/plugin-property.ts";
 import type {
     AcesJson, AddonJson, AceAction, AceCondition, AceExpression, AceParam,
     LanguageJson, LanguagePluginProperty, LanguageAction, LanguageParam, LanguageCondition, LanguageExpression
@@ -9,23 +9,16 @@ import type {
 
 import { Colors, join, Logger } from "../deps.ts";
 import { MIME } from "../shared/mime.ts";
-import { dedent, getCategory, getRelativePath, isDirectoryExists, serializeObjectWithFunctions } from "../shared/misc.ts";
+import { dedent, getCategory, getRelativePath, isDirectoryExists } from "../shared/misc.ts";
 import { Paths } from "../shared/paths.ts";
 import { transpileTs } from "../shared/transpile-ts.ts";
-import { EntityType } from "./entities/entity.ts";
 import { Property } from './entities/plugin-property.ts';
 import { Param } from "./entities/parameter.ts";
 
 import Icon from "./defaults/addon-icon.ts";
-import Lost from './defaults/lost.ts';
-import EntityFile from './defaults/entity-file.ts';
-import ModuleFile from './defaults/module-file.ts';
-import BehaviorFile from "./defaults/behavior-file.ts";
-import PluginFile from "./defaults/plugin-file.ts";
-import InstanceFile from './defaults/instance-file.ts';
-import TypeFile from './defaults/type-file.ts';
+import { AddonFileManager, EditorScript, RuntimeScript } from "./addon-file-manager.ts";
 
-export abstract class Addon<T extends AddonType = AddonType> {
+export abstract class Addon<T extends AddonType = AddonType, I extends EditorInstanceType = EditorInstanceType, E extends SDK.ITypeBase = SDK.ITypeBase> {
     protected readonly type: AddonType;
     protected readonly config: LostConfig<T>;
 
@@ -33,7 +26,7 @@ export abstract class Addon<T extends AddonType = AddonType> {
     protected readonly userScripts: AddonUserScriptFile[] = [];
     protected readonly userModules: AddonUserModuleFile[] = [];
     protected readonly userDomSideScripts: AddonUserDomSideScriptFile[] = [];
-    protected readonly pluginProperties: PluginProperty[] = [];
+    protected readonly pluginProperties: PluginProperty<T, I, E>[] = [];
     protected readonly categories: CategoryClassType[] = [];
     protected readonly remoteScripts: string[] = [];
     protected readonly filesToOutput: string[] = [];
@@ -493,7 +486,7 @@ export abstract class Addon<T extends AddonType = AddonType> {
 
         if (!isBuildError) await this.#createC3RuntimeFiles();
 
-        if (!isBuildError) await this.#createMainAddonFiles();
+        if (!isBuildError) await this.#createC3EditorFiles();
 
         if (!isBuildError) await this.#createAddonJsonFiles();
 
@@ -840,139 +833,66 @@ export abstract class Addon<T extends AddonType = AddonType> {
     }
 
     async #createC3RuntimeFiles() {
-        const createInstanceFile = async () => {
-            const path = join(Paths.Main, 'Addon', 'Instance.ts');
-            let fileContent = await transpileTs(path) as string;
-            fileContent = `${Lost(this.config.addonId)}\n` + fileContent
-            await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'instance.js'), fileContent);
-        }
-
-        const createPluginFile = async () => {
-            const path = join(Paths.Main, 'Addon', 'Plugin.ts');
-            let fileContent = await transpileTs(path) as string;
-            fileContent = `${Lost(this.config.addonId)}\n` + fileContent
-            await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'plugin.js'), fileContent);
-        }
-
-        const createBehaviorFile = async () => {
-            const path = join(Paths.Main, 'Addon', 'Behavior.ts');
-            let fileContent = await transpileTs(path) as string;
-            fileContent = `${Lost(this.config.addonId)}\n` + fileContent
-            await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'behavior.js'), fileContent);
-        }
-
-        const createTypeFile = async ()  => {
-            const path = join(Paths.Main, 'Addon', 'Type.ts');
-            let fileContent = await transpileTs(path) as string;
-            fileContent = `${Lost(this.config.addonId)}\n` + fileContent
-            await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'type.js'), fileContent);
-        }
-
-        const createEntityFile = async (entityType: EntityType) => {
-            let fileName: string;
-            const entities: { [key: string]: Function } = {};
-
-            switch (entityType) {
-                case EntityType.Action:
-                    fileName = 'actions.js';
-                    this.categories.forEach(category => category._actions.forEach(enitity => {
-                        entities[enitity._func.name] = enitity._func;
-                    }))
-                    break;
-                case EntityType.Condition:
-                    fileName = 'conditions.js';
-                    this.categories.forEach(category => category._conditions.forEach(enitity => {
-
-                        entities[enitity._func.name] = enitity._func;
-                    }))
-                    break;
-                case EntityType.Expression:
-                    fileName = 'expressions.js';
-                    this.categories.forEach(category => category._expressions.forEach(enitity => {
-
-                        entities[enitity._func.name] = enitity._func;
-                    }))
-                    break;
-            }
-
-            const fileContent = `${EntityFile(this.config, entityType)} ${serializeObjectWithFunctions(entities)}`;
-            await Deno.writeTextFile(join(Paths.Build, 'c3runtime', fileName), fileContent);
-        }
-
-        const createModuleFile = async () => {
-            await Deno.writeTextFile(join(Paths.Build, 'c3runtime', 'main.js'), ModuleFile(this.config));
-        }
-
-        switch (this.type) {
-            case 'plugin':
-                await createPluginFile();
-                break;
-            case 'behavior':
-                await createBehaviorFile();
-                break;
-        }
-
-        await createInstanceFile();
-        await createTypeFile();
-        await createEntityFile(EntityType.Action);
-        await createEntityFile(EntityType.Condition);
-        await createEntityFile(EntityType.Expression);
-        await createModuleFile();
-    }
-
-    async #createMainAddonFiles() {
-        const createPluginFile = async () => {
-            const fileContent = await PluginFile({
-                icon: this.icon,
-                config: this.config,
-                remoteScripts: this.remoteScripts,
-                userFiles: this.userFiles,
-                userScripts: this.userScripts,
-                userDomSideScripts: this.userDomSideScripts,
-                userModules: this.userModules,
-                pluginProperties: this.pluginProperties
-            });
-            await Deno.writeTextFile(join(Paths.Build, 'plugin.js'), fileContent);
-        }
-
-        const createBehaviorFile = async ()  => {
-            const fileContent = await BehaviorFile({
-                icon: this.icon,
-                config: this.config,
-                remoteScripts: this.remoteScripts,
-                userFiles: this.userFiles,
-                userScripts: this.userScripts,
-                userModules: this.userModules,
-                pluginProperties: this.pluginProperties
-            });
-            await Deno.writeTextFile(join(Paths.Build, 'behavior.js'), fileContent);
-        }
-
-        const createTypeFile = async () => {
-            const fileContent = TypeFile(this.config);
-            await Deno.writeTextFile(join(Paths.Build, 'type.js'), fileContent);
-        }
-
-        const createInstanceFile = async () => {
-            const fileContent = InstanceFile(this.config);
-            await Deno.writeTextFile(join(Paths.Build, 'instance.js'), fileContent);
-        }
-
         if (
             this.type === 'plugin' ||
             this.type === 'behavior'
         ) {
+
             switch (this.type) {
-                case "plugin":
-                    await createPluginFile();
+                case 'plugin':
+                    await AddonFileManager.createRuntimeScript(RuntimeScript.Plugin, this.config);
                     break;
-                case "behavior":
-                    await createBehaviorFile();
+                case 'behavior':
+                    await AddonFileManager.createRuntimeScript(RuntimeScript.Behavior, this.config);
                     break;
             }
 
-            await createTypeFile();
-            await createInstanceFile();
+            await AddonFileManager.createRuntimeScript(RuntimeScript.Instance, this.config);
+            await AddonFileManager.createRuntimeScript(RuntimeScript.Type, this.config);
+
+            await AddonFileManager.createRuntimeScript(RuntimeScript.Actions, this.config, this.categories);
+            await AddonFileManager.createRuntimeScript(RuntimeScript.Conditions, this.config, this.categories);
+            await AddonFileManager.createRuntimeScript(RuntimeScript.Expressions, this.config, this.categories);
+
+            await AddonFileManager.createRuntimeScript(RuntimeScript.Module, this.config);
+        }
+    }
+
+    async #createC3EditorFiles() {
+        if (
+            this.type === 'plugin' ||
+            this.type === 'behavior'
+        ) {
+
+            await AddonFileManager.createEditorScript(EditorScript.Type, this.config);
+            await AddonFileManager.createEditorScript(EditorScript.Instance, this.config);
+
+            switch (this.type) {
+                case "plugin":
+                    await AddonFileManager.createEditorScript(EditorScript.Plugin, this.config, {
+                        icon: this.icon,
+                        config: this.config,
+                        remoteScripts: this.remoteScripts,
+                        userFiles: this.userFiles,
+                        userScripts: this.userScripts,
+                        userDomSideScripts: this.userDomSideScripts,
+                        userModules: this.userModules,
+                        pluginProperties: this.pluginProperties
+                    });
+                    break;
+                case "behavior":
+                    await AddonFileManager.createEditorScript(EditorScript.Behavior, this.config, {
+                        icon: this.icon,
+                        config: this.config,
+                        remoteScripts: this.remoteScripts,
+                        userFiles: this.userFiles,
+                        userScripts: this.userScripts,
+                        userDomSideScripts: this.userDomSideScripts,
+                        userModules: this.userModules,
+                        pluginProperties: this.pluginProperties
+                    });
+                    break;
+            }
         }
     }
 

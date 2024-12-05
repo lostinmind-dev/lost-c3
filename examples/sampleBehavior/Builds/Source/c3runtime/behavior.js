@@ -1,7 +1,8 @@
-const Lost = {"addonId":"LostPluginId"};
-const C3 = globalThis.C3;
-C3.Behaviors[Lost.addonId] = class LostBehavior extends globalThis.ISDKBehaviorBase {
+class LostBehavior extends globalThis.ISDKBehaviorBase {
     constructor() {
         super();
     }
-};
+}
+;
+
+globalThis.C3.Behaviors["LostPluginId"] = LostBehavior;

@@ -1,5 +1,16 @@
-export default function getDefaultLost(addonId: string) {
+type DefaultLost = {
+    varName: string;
+    value: string;
+}
+
+export function getDefaultLost(addonId: string): DefaultLost {
     const Lost: ILost = { addonId };
 
-    return `const Lost = ${JSON.stringify(Lost)};`
+    const varName = 'Lost';
+    return {
+        varName,
+        value: `const ${varName} = ${JSON.stringify({
+            addonId
+        })};`
+    }
 }

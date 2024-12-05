@@ -13,21 +13,21 @@ export default class {
     })
     doAction(): void {
         console.log('hello')
-        console.log('hello')
-        console.log('hello')
-        console.log('hello')
-        console.log('hello')
+        // console.log('hello')
+        // console.log('hello')
+        // console.log('hello')
+        // console.log('hello')
     }
 
-    @Condition('myId', '', '', {
-        isTrigger: true
-    })
-    onCondition(this: Instance): boolean {
-        return false;
-    }
+    // @Condition('myId', '', '', {
+    //     isTrigger: true
+    // })
+    // onCondition(this: Instance): boolean {
+    //     return false;
+    // }
 
-    @Expression('id1', '')
-    MyExpression(): string | number {
-        return 1337;
-    }
+    // @Expression('id1', '')
+    // MyExpression(): string | number {
+    //     return 1337;
+    // }
 }

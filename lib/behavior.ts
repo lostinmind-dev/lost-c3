@@ -1,11 +1,13 @@
 import type { LostConfig } from "./config.ts";
 
-import type { ComboIdArray } from "./entities/parameter.ts";
-import { PluginProperty, Property, type PropertyOptions } from "./entities/plugin-property.ts";
+import { PluginProperty, Property, type AddonPropertyOptions } from "./entities/plugin-property.ts";
 import { Addon } from "./addon.ts";
 import { Colors, Logger } from "../deps.ts";
 
-export class Behavior extends Addon<'behavior'> {
+export class Behavior<
+    I extends SDK.IBehaviorInstanceBase, /** Editor instance OR base instance */
+    EditorType extends SDK.ITypeBase
+    > extends Addon<'behavior', I, EditorType> {
     constructor(config: LostConfig<'behavior'>) {
         super('behavior', config);
     }
@@ -15,7 +17,11 @@ export class Behavior extends Addon<'behavior'> {
      * @param name The name of the property.
      * @param opts 
      */
-    addProperty<A extends ComboIdArray = ComboIdArray>(id: string, name: string, opts: PropertyOptions<A>): this
+    addProperty(
+        id: string,
+        name: string,
+        opts: AddonPropertyOptions<'behavior', I, EditorType>
+    ): this
     /**
      * Creates plugin property.
      * @param id A string with a unique identifier for this property.
@@ -23,7 +29,12 @@ export class Behavior extends Addon<'behavior'> {
      * @param description *Optional*. The property description.
      * @param opts Plugin property options.
      */
-    addProperty<A extends ComboIdArray = ComboIdArray>(id: string, name: string, description: string, opts: PropertyOptions<A>): this
+    addProperty(
+        id: string,
+        name: string,
+        description: string,
+        opts: AddonPropertyOptions<'behavior', I, EditorType>
+    ): this
     /**
      * Creates plugin property.
      * @param id A string with a unique identifier for this property.
@@ -31,10 +42,15 @@ export class Behavior extends Addon<'behavior'> {
      * @param descriptionOrOpts The property description **OR** Plugin property options.
      * @param opts Plugin property options.
      */
-    addProperty<A extends ComboIdArray = ComboIdArray>(id: string, name: string, descriptionOrOpts: string | PropertyOptions<A>, opts?: PropertyOptions<A>) {
+    addProperty(
+        id: string,
+        name: string,
+        descriptionOrOpts: string | AddonPropertyOptions<'behavior', I, EditorType>,
+        opts?: AddonPropertyOptions<'behavior', I, EditorType>
+    ) {
         if (!this.#isPluginPropertyExists(id)) {
             let description: string = 'There is no any description yet...';
-            let options: PropertyOptions<A>;
+            let options: AddonPropertyOptions<'behavior', I, EditorType>;
             if (typeof descriptionOrOpts === 'string' && opts) {
                 description = descriptionOrOpts;
                 options = opts;
@@ -50,7 +66,7 @@ export class Behavior extends Addon<'behavior'> {
                 name.length > 0
             ) {
                 this.pluginProperties.push(
-                    new PluginProperty(id, name, description, options)
+                    new PluginProperty<'behavior', I, EditorType>(id, name, description, options)
                 );
             } else if (id.length === 0) {
                 Logger.Error('build', `Plugin property id can't be empty.`, 'Please specify your property Id.')
