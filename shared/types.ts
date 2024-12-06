@@ -1,20 +1,8 @@
 import type { Param } from '../lib/entities/parameter.ts';
-import type { AddonType, LostConfig } from '../lib/config.ts';
-import type { PluginProperty } from '../lib/entities/plugin-property.ts';
+import type { AddonType } from '../lib/config.ts';
 
 export type EntityCollection = {
     [key: string]: Function;
-}
-
-export type LostAddonData = {
-    readonly icon: AddonIconFile;
-    readonly config: LostConfig<AddonType>;
-    readonly remoteScripts: string[];
-    readonly userScripts: AddonUserScriptFile[];
-    readonly userDomSideScripts: AddonUserDomSideScriptFile[];
-    readonly userFiles: AddonUserFile[];
-    readonly userModules: AddonUserModuleFile[];
-    readonly pluginProperties: PluginProperty[];
 }
 
 export type AddonJson = {
@@ -79,13 +67,6 @@ export interface AceExpression extends AceBase {
     "isVariadicParameters"?: boolean;
 }
 
-type LanguageJsonAddonType =
-    | 'plugins'
-    | 'behaviors'
-    | 'effects'
-    | 'themes'
-;
-
 export type LanguageJson = {
     "languageTag": 'en-US',
     "fileDescription": string;
@@ -133,9 +114,7 @@ export type LanguageJson = {
                     [expressionId: string]: LanguageExpression;
                 }
             }
-        },
-        "effects": {},
-        "themes": {}
+        }
     }
 };
 

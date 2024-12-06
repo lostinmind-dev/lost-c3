@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-case-declarations
 import type { LostConfig } from "../../lib/config.ts";
 import { Property } from '../../lib/entities/plugin-property.ts';
-import type { LostAddonData } from '../../shared/types.ts';
+import type { LostAddonData } from '../../lib/lost-addon-data.ts';
 
 const _lostData: LostAddonData = {} as LostAddonData;
 const config = _lostData.config as LostConfig<'behavior'>;
@@ -17,7 +17,7 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
 		this._info.SetCategory(config.category);
 		this._info.SetAuthor(config.author);
 		this._info.SetHelpUrl(globalThis.lang(".help-url"));
-		this._info.SetIcon(icon.fileName, icon.iconType);
+		this._info.SetIcon(icon.path, icon.iconType);
 		this._info.SetIsDeprecated(config.deprecated || false);
 		this._info.SetCanBeBundled(config.canBeBundled || true);
 		this._info.SetIsOnlyOneAllowed(true);
@@ -36,11 +36,13 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
 	}
 
 	private setupUserModules() {
-		if (_lostData.userModules.length > 0) {
-			this._info.SetRuntimeModuleMainScript('c3runtime/main.js');
+		this._info.SetRuntimeModuleMainScript('c3runtime/main.js');
 
-			_lostData.userModules.forEach(file => {
-				this._info.AddC3RuntimeScript(`c3runtime/modules/${file.relativePath}`);
+		const modules = _lostData.files.filter(file => file.type === 'module');
+		if (modules.length > 0) {
+
+			modules.forEach(file => {
+				this._info.AddC3RuntimeScript(`c3runtime/modules/${file.path}`);
 			})
 		}
 	}
@@ -52,37 +54,37 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
 	}
 
 	private addUserFiles() {
-		_lostData.userFiles.forEach(file => {
-			if (file.dependencyType === 'copy-to-output') {
-				this._info.AddFileDependency({
-					filename: `files/${file.relativePath}`,
-					type: file.dependencyType,
-					fileType: file.mimeType
-				})
-			} else {
-				this._info.AddFileDependency({
-					filename: `files/${file.relativePath}`,
-					type: file.dependencyType
-				})
-			}
-		})
+		const files = _lostData.files.filter(file => file.type === 'file');
+
+		if (files.length > 0) {
+			files.forEach(file => {
+				if (file.dependencyType === 'copy-to-output') {
+					this._info.AddFileDependency({
+						filename: `files/${file.path}`,
+						type: file.dependencyType,
+						fileType: file.mimeType
+					})
+				} else {
+					this._info.AddFileDependency({
+						filename: `files/${file.path}`,
+						type: file.dependencyType || 'copy-to-output'
+					})
+				}
+			})
+		}
 	}
 
 	private addUserScripts() {
-		_lostData.userScripts.forEach(file => {
-			if (file.scriptType) {
+		const files = _lostData.files.filter(file => file.type === 'script');
+
+		if (files.length > 0) {
+			files.forEach(file => {
 				this._info.AddFileDependency({
-					filename: `scripts/${file.relativePath}`,
-					type: file.dependencyType,
-					scriptType: file.scriptType
+					filename: `scripts/${file.path}`,
+					type: file.dependencyType || 'external-dom-script'
 				})
-			} else {
-				this._info.AddFileDependency({
-					filename: `scripts/${file.relativePath}`,
-					type: file.dependencyType
-				})
-			}
-		})
+			})
+		}
 	}
 
 	private setupPluginProperties() {

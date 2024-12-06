@@ -34,7 +34,7 @@ export default defineAddon(
         // })
         .addProperty('test', 'Hello', {
             type: Property.Link,
-            callbackType: 'once-for-type' ,
+            callbackType: 'once-for-type',
             callback: (a) => {
 
             }

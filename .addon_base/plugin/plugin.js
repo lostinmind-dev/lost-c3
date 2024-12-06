@@ -11,7 +11,7 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         this._info.SetCategory(config.category);
         this._info.SetAuthor(config.author);
         this._info.SetHelpUrl(globalThis.lang(".help-url"));
-        this._info.SetIcon(icon.fileName, icon.iconType);
+        this._info.SetIcon(icon.path, icon.iconType);
         this._info.SetIsDeprecated(config.deprecated || false);
         this._info.SetCanBeBundled(config.canBeBundled || true);
         this._info.SetPluginType(config.pluginType);
@@ -66,19 +66,21 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         SDK.Lang.PopContext();
     }
     addUserDomSideScripts() {
-        if (_lostData.userDomSideScripts.length > 0) {
+        const domSideScripts = _lostData.files.filter(file => file.type === 'dom-side-script');
+        if (domSideScripts.length > 0) {
             const list = [];
-            _lostData.userDomSideScripts.forEach(file => {
-                list.push(`c3runtime/domSide/${file.relativePath}`);
+            domSideScripts.forEach(file => {
+                list.push(`c3runtime/domSide/${file.path}`);
             });
             this._info.SetDOMSideScripts(list);
         }
     }
     setupUserModules() {
-        if (_lostData.userModules.length > 0) {
-            this._info.SetRuntimeModuleMainScript('c3runtime/main.js');
-            _lostData.userModules.forEach(file => {
-                this._info.AddC3RuntimeScript(`c3runtime/modules/${file.relativePath}`);
+        this._info.SetRuntimeModuleMainScript('c3runtime/main.js');
+        const modules = _lostData.files.filter(file => file.type === 'module');
+        if (modules.length > 0) {
+            modules.forEach(file => {
+                this._info.AddC3RuntimeScript(`c3runtime/modules/${file.path}`);
             });
         }
     }
@@ -88,38 +90,35 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         });
     }
     addUserFiles() {
-        _lostData.userFiles.forEach(file => {
-            if (file.dependencyType === 'copy-to-output') {
-                this._info.AddFileDependency({
-                    filename: `files/${file.relativePath}`,
-                    type: file.dependencyType,
-                    fileType: file.mimeType
-                });
-            }
-            else {
-                this._info.AddFileDependency({
-                    filename: `files/${file.relativePath}`,
-                    type: file.dependencyType
-                });
-            }
-        });
+        const files = _lostData.files.filter(file => file.type === 'file');
+        if (files.length > 0) {
+            files.forEach(file => {
+                if (file.dependencyType === 'copy-to-output') {
+                    this._info.AddFileDependency({
+                        filename: `files/${file.path}`,
+                        type: file.dependencyType,
+                        fileType: file.mimeType
+                    });
+                }
+                else {
+                    this._info.AddFileDependency({
+                        filename: `files/${file.path}`,
+                        type: file.dependencyType || 'copy-to-output'
+                    });
+                }
+            });
+        }
     }
     addUserScripts() {
-        _lostData.userScripts.forEach(file => {
-            if (file.scriptType) {
+        const files = _lostData.files.filter(file => file.type === 'script');
+        if (files.length > 0) {
+            files.forEach(file => {
                 this._info.AddFileDependency({
-                    filename: `scripts/${file.relativePath}`,
-                    type: file.dependencyType,
-                    scriptType: file.scriptType
+                    filename: `scripts/${file.path}`,
+                    type: file.dependencyType || 'external-dom-script'
                 });
-            }
-            else {
-                this._info.AddFileDependency({
-                    filename: `scripts/${file.relativePath}`,
-                    type: file.dependencyType
-                });
-            }
-        });
+            });
+        }
     }
     setupPluginProperties() {
         const properties = [];
@@ -225,11 +224,14 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                     properties.push(new SDK.PluginProperty(_opts.type, _id));
                     break;
                 case "info":
-                    properties.push(new SDK.PluginProperty(_opts.type, _id, {
-                        infoCallback: () => {
-                            return _opts.info;
-                        }
-                    }));
+                    const infoFunc = this.deserializeFunction(_funcString || '');
+                    if (infoFunc) {
+                        properties.push(new SDK.PluginProperty(_opts.type, _id, {
+                            infoCallback: (i) => {
+                                return infoFunc(i);
+                            }
+                        }));
+                    }
                     break;
                 case "link":
                     const func = this.deserializeFunction(_funcString || '');
