@@ -1,3 +1,5 @@
+import type { AddonType } from "../config.ts";
+
 /** Object that represents all types of plugin property. */
 export enum Property {
     Integer = 'integer',
@@ -15,22 +17,40 @@ export enum Property {
     Link = 'link'
 }
 
+export type EditorInstanceType = 
+    | SDK.IInstanceBase
+    | SDK.IWorldInstanceBase
+    | SDK.IBehaviorInstanceBase
+;
+
+export type EditorType =
+    | SDK.ITypeBase
+    | SDK.IBehaviorTypeBase
+
 /**
  * @class Represents plugin property info.
  */
-export class PluginProperty {
+export class PluginProperty<A, I, T extends SDK.ITypeBase = SDK.ITypeBase> {
     readonly _id: string;
     readonly _name: string;
     readonly _description: string;
-    readonly _opts: PropertyOptions;
+    readonly _opts: AddonPropertyOptions<A, I, T>;
     readonly _funcString?: string;
     
-    constructor(id: string, name: string, description: string, opts: PropertyOptions) {
+    constructor(
+        id: string,
+        name: string,
+        description: string,
+        opts: AddonPropertyOptions<A, I, T>
+    ) {
         this._id = id;
         this._name = name;
         this._description = description;
 
-        if (opts.type === Property.Link) {
+        if (
+            opts.type === Property.Info ||
+            opts.type === Property.Link
+        ) {
             this._funcString = opts.callback.toString();
         }
 
@@ -81,22 +101,46 @@ export class PluginProperty {
 
 }
 
-/** All available plugin property options  */
-export type PropertyOptions = 
-    IntegerProperty |
-    FloatProperty |
-    PercentProperty |
-    TextProperty |
-    LongTextProperty |
-    CheckProperty |
-    FontProperty |
-    ComboProperty |
-    ColorProperty |
-    ObjectProperty |
-    GroupProperty |
-    InfoProperty |
-    LinkProperty
+export type AddonPropertyOptions<A, I, T extends SDK.ITypeBase = SDK.ITypeBase> =
+    A extends 'plugin' ? PluginPropertyOptions<I, T> :
+    A extends 'behavior' ? BehaviorPropertyOptionsWrapped<I> : never;
+
+type BaseAddonPropertyOptions<I extends EditorInstanceType> =
+    | IntegerProperty
+    | FloatProperty
+    | PercentProperty
+    | TextProperty
+    | LongTextProperty
+    | CheckProperty
+    | FontProperty
+    | ComboProperty
+    | GroupProperty
+    | InfoProperty<I>
 ;
+
+type ObjectPluginPropertyOptions<I extends SDK.IInstanceBase, T extends SDK.ITypeBase> =
+    | ColorProperty
+    | ObjectProperty
+    | BaseAddonPropertyOptions<I>
+    | LinkPropertyOnceForType<T>
+;
+
+type WorldPluginPropertyOptions<I extends SDK.IWorldInstanceBase, T extends SDK.ITypeBase> =
+    | ColorProperty
+    | ObjectProperty
+    | BaseAddonPropertyOptions<I>
+    | LinkPropertyForEachInstance<I>
+    | LinkPropertyOnceForType<T>
+;
+
+type PluginPropertyOptions<I, T extends SDK.ITypeBase> =
+    I extends SDK.IWorldInstanceBase ? WorldPluginPropertyOptions<I, T> :
+    I extends SDK.IInstanceBase ? ObjectPluginPropertyOptions<I, T> : never;
+
+type BehaviorPropertyOptionsWrapped<I> =
+    I extends SDK.IBehaviorInstanceBase ? BehaviorPropertyOptions<I> : never;
+
+type BehaviorPropertyOptions<I extends SDK.IBehaviorInstanceBase> = BaseAddonPropertyOptions<I>;
 
 /** Base properties for any plugin property. */
 type PropertyOptionsBase = {
@@ -237,19 +281,17 @@ interface GroupProperty extends PropertyOptionsBase {
 }
 
 /** Object represents 'info' plugin property */
-interface InfoProperty extends PropertyOptionsBase {
+interface InfoProperty<I extends EditorInstanceType> extends PropertyOptionsBase {
     type: Property.Info;
     /**
      * Creates a read-only string that cannot be edited.
      */
-    info: string;
+    callback: (inst: I) => string;
 }
 
-/** Object represents 'link' plugin property */
-type LinkProperty = LinkPropertyForEachInstance | LinkPropertyOnceForType
 
 /** Object represents 'link' plugin property with 'for-each-instance' callback type */
-interface LinkPropertyForEachInstance extends PropertyOptionsBase {
+interface LinkPropertyForEachInstance<I extends SDK.IWorldInstanceBase> extends PropertyOptionsBase {
     type: Property.Link;
     /**
      * Specifies how the link callback function is used.
@@ -259,11 +301,11 @@ interface LinkPropertyForEachInstance extends PropertyOptionsBase {
      * This is useful for per-instance modifications, such as a link to make all instances their original size. 
      */
     callbackType: 'for-each-instance';
-    callback: (inst: SDK.IWorldInstanceBase) => void;
+    callback: (inst: I) => void;
 }
 
 /** Object represents 'link' plugin property with 'once-for-type' callback type */
-interface LinkPropertyOnceForType extends PropertyOptionsBase {
+interface LinkPropertyOnceForType<T extends SDK.ITypeBase> extends PropertyOptionsBase {
     type: Property.Link;
     /**
      * Specifies how the link callback function is used.
@@ -272,5 +314,5 @@ interface LinkPropertyOnceForType extends PropertyOptionsBase {
      * This is useful for per-type modifications, such as a link to edit the object image.
      */
     callbackType: 'once-for-type';
-    callback: (type: SDK.ITypeBase) => void;
+    callback: (type: T) => void;
 }

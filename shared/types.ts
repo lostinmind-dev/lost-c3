@@ -1,15 +1,8 @@
 import type { Param } from '../lib/entities/parameter.ts';
-import type { LostConfig } from '../lib/config.ts';
-import type { PluginProperty } from '../lib/entities/plugin-property.ts';
+import type { AddonType } from '../lib/config.ts';
 
-export type LostAddonData = {
-    readonly icon: AddonIconFile | null;
-    readonly config: LostConfig;
-    readonly remoteScripts: string[];
-    readonly userScripts: AddonScriptFile[];
-    readonly userFiles: AddonUserFile[];
-    readonly userModules: AddonModuleFile[];
-    readonly pluginProperties: PluginProperty[];
+export type EntityCollection = {
+    [key: string]: Function;
 }
 
 export type AddonJson = {
@@ -17,7 +10,7 @@ export type AddonJson = {
     "min-construct-version"?: string;
     "is-c3-addon": true;
     "sdk-version": 2;
-    "type": 'plugin' | 'behavior';
+    "type": AddonType;
     "name": string;
     "id": string;
     "version": string;
@@ -74,12 +67,32 @@ export interface AceExpression extends AceBase {
     "isVariadicParameters"?: boolean;
 }
 
-
-
 export type LanguageJson = {
     "languageTag": 'en-US',
     "fileDescription": string;
     "text": {
+        "behaviors": {
+            [addonId: string]: {
+                "name": string;
+                "description": string;
+                "help-url": string;
+                "properties": {
+                    [propertyId: string]: LanguagePluginProperty;
+                },
+                "aceCategories": {
+                    [categoryId: string]: string;
+                },
+                "conditions": {
+                    [conditionId: string]: LanguageCondition;
+                },
+                "actions": {
+                    [actionId: string]: LanguageAction;
+                },
+                "expressions": {
+                    [expressionId: string]: LanguageExpression;
+                }
+            }
+        },
         "plugins": {
             [addonId: string]: {
                 "name": string;
@@ -103,7 +116,7 @@ export type LanguageJson = {
             }
         }
     }
-}
+};
 
 export interface LanguageParam {
     "name": string;

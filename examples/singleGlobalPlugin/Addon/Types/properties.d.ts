@@ -1,1 +1,1 @@
-declare type PluginProperties = [string]
+declare type PluginProperties = [string, number]

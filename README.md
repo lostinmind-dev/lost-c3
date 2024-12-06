@@ -3,7 +3,7 @@
 <div align="center">
   <h3>
     Lost for easy making Construct 3 Addons. <br />
-    v3.0.1
+    v3.0.3
   </h3>
 </div>
 
@@ -18,9 +18,9 @@ lostinmind.
 - **[💪 Advantages](#-advantages)**
 - **[🚀 Quickstart](#-quickstart)**
 - **[🔌 Creating ***`Plugin`*** addon](#-creating-plugin-addon)**
-<!-- - **[🎛️ Creating ***`Behavior`*** addon](#️-creating-behavior-addon)**
-- **[🎨 Creating ***`Theme`*** addon](#-creating-theme-addon)**
-- **[✨ Creating ***`Effect`*** addon](#-creating-effect-addon)** -->
+- **[🎛️ Creating ***`Behavior`*** addon](#️-creating-behavior-addon)**
+<!-- - **[🎨 Creating ***`Theme`*** addon](#-creating-theme-addon)** -->
+<!-- - **[✨ Creating ***`Effect`*** addon](#-creating-effect-addon)** --> -->
 - **[🏗️ Building addon](#️-building-addon)**
 - **[🧪 Testing addon](#-testing-addons-in-developer-mode)**
 
@@ -62,6 +62,10 @@ lost create
 - **Create a bare-bones project for addon by using one of the following commands:**
 ```bash
 lost create --plugin    # Creates a bare-bones project for 'plugin' addon
+```
+
+```bash
+lost create --behavior    # Creates a bare-bones project for 'plugin' addon
 ```
 
 <!-- ```bash

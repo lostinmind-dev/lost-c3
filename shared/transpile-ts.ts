@@ -7,7 +7,8 @@ export async function transpileTs(filePath: string): Promise<string | null> {
             target: 8,
             module: 7,
             preserveConstEnums: false,
-            isolatedModules: false
+            isolatedModules: false,
+            strict: true
         }
     });
     const sourceFile = project.addSourceFileAtPath(filePath);

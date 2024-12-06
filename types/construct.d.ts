@@ -731,6 +731,8 @@ declare global {
 	}
 /** IInstanceBase.d.ts */ namespace SDK {
 		class IInstanceBase {
+			static Instance: typeof IInstanceBase;
+			static Type: typeof ITypeBase;
 
 			constructor(sdkType: SDK.ITypeBase, iInstance: SDK.IObjectInstance);
 
@@ -2161,9 +2163,9 @@ declare global {
 		GetExportType(): PlatformInfoExportType;    // note re-uses type from IPlatformInfoObjectType
 	}
 
-	const RuntimeInterface: typeof IRuntimeInterface;
-	const DOMHandler: typeof IDOMHandler;
-	const DOMElementHandler: typeof IDOMElementHandler;
+	var RuntimeInterface: typeof IRuntimeInterface;
+	var DOMHandler: typeof IDOMHandler;
+	var DOMElementHandler: typeof IDOMElementHandler;
 
 	/** IAnimation.d.ts */
 	/** Represents an animation in an object type.
@@ -2905,10 +2907,16 @@ declare global {
 	/** SDK base class for a behavior.
 	 * @see {@link https://www.construct.net/en/make-games/manuals/construct-3/scripting/scripting-reference/addon-sdk-interfaces/isdkbehaviorbase | ISDKBehaviorBase documentation } */
 	class ISDKBehaviorBase_ extends IBehavior_ {
-
+		static Type: typeof ISDKBehaviorTypeBase;
+		// static Instance: typeof ISDKBehaviorInstanceBase_;
+		static Instance: any;
+		
+		static Acts: ActsType;
+		static Cnds: CndsType;
+		static Exps: ExpsType;
 	}
 
-	const ISDKBehaviorBase: typeof ISDKBehaviorBase_;
+	var ISDKBehaviorBase: typeof ISDKBehaviorBase_;
 
 	/** ISDKBehaviorInstanceBase.d.ts */
 	/** SDK base class for a behavior instance.
@@ -2937,7 +2945,7 @@ declare global {
 		_loadFromJson(o: JSONValue): void;
 	}
 
-	const ISDKBehaviorInstanceBase: typeof ISDKBehaviorInstanceBase_;
+	var ISDKBehaviorInstanceBase: typeof ISDKBehaviorInstanceBase_;
 
 	/** ISDKBehaviorTypeBase.d.ts */
 	/** SDK base class for a behavior type.
@@ -2946,7 +2954,7 @@ declare global {
 		_onCreate(): void;
 	}
 
-	const ISDKBehaviorTypeBase: typeof ISDKBehaviorTypeBase_;
+	var ISDKBehaviorTypeBase: typeof ISDKBehaviorTypeBase_;
 
 	/** ISDKDOMInstanceBase.d.ts */
 	/** SDK base class for an instance that creates a HTML element.
@@ -3112,7 +3120,7 @@ declare global {
 	 * @see {@link https://www.construct.net/en/make-games/manuals/construct-3/scripting/scripting-reference/addon-sdk-interfaces/isdkbehaviorbase | ISDKPluginBase documentation } */
 	class ISDKPluginBase_ extends IPlugin_ {
 		static Type: typeof ISDKObjectTypeBase;
-		static Instance: typeof ISDKInstanceBase;
+		static Instance: typeof ISDKInstanceBase | typeof ISDKWorldInstanceBase;
 		
 		static Acts: ActsType;
 		static Cnds: CndsType;
@@ -3147,7 +3155,7 @@ declare global {
 		_onRendererContextRestored(): void;
 	}
 
-	const ISDKWorldInstanceBase: typeof ISDKWorldInstanceBase_;
+	var ISDKWorldInstanceBase: typeof ISDKWorldInstanceBase_;
 
 	/** IStorage.d.ts */
 	/** Provides access to storage for the project.
@@ -3310,7 +3318,7 @@ declare global {
 	/** sdk.d.ts */
 	namespace SDK {
 		const Plugins: {
-			[key: string]: typeof ISDKPluginBase_;
+			[key: string]: typeof IPluginBase;
 		};
 		const Behaviors: {
 			[key: string]: typeof IBehaviorBase;

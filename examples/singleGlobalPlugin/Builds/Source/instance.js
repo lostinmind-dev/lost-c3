@@ -1,9 +1,18 @@
-const Lost = {"addonId":"LostPluginId"};
-const SDK = globalThis.SDK;
-const PLUGIN_CLASS = SDK.Plugins[Lost.addonId];
-PLUGIN_CLASS.Instance = class LostInstance extends SDK.IInstanceBase {
+class LostEditorInstance extends SDK.IInstanceBase {
     constructor(sdkType, inst) {
         super(sdkType, inst);
     }
-};
+    Release() {
+    }
+    OnCreate() {
+    }
+    OnPropertyChanged() {
+    }
+    LoadC2Property() {
+        return false; // not handled
+    }
+}
+;
 export {};
+
+globalThis.SDK.Plugins["LostPluginId"].Instance = LostEditorInstance;

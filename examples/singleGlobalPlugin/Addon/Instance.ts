@@ -1,19 +1,12 @@
-import { GPUResourceManager } from "./Modules/index.ts";
-
 const C3 = globalThis.C3;
 
-const a = new GPUResourceManager();
-
-console.log(a)
-
-class LostInstance extends globalThis.ISDKInstanceBase {
+class Instance extends globalThis.ISDKInstanceBase {
 
     readonly Conditions = C3.Plugins[Lost.addonId].Cnds;
 
     constructor() {
         super();
         const properties = this._getInitProperties() as PluginProperties;
-
     }
 
     _release() {
@@ -21,5 +14,4 @@ class LostInstance extends globalThis.ISDKInstanceBase {
 	}
 }
 
-C3.Plugins[Lost.addonId].Instance = LostInstance;
-export type { LostInstance as Instance };
+export type { Instance };

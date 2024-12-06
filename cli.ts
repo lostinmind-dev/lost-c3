@@ -1,16 +1,20 @@
+import type { AddonType } from "./lib/config.ts";
+
 import DenoJson from './deno.json' with { type: "json" };
-import { parseArgs } from "jsr:@std/cli@1.0.6";
-import { Colors, join, Logger } from './deps.ts';
+import { Colors, join, Logger, parseArgs } from './deps.ts';
+import { Paths } from './shared/paths.ts';
+
 import Build from './cli/main.ts';
 import Serve from './cli/serve-addon.ts';
-import { Paths } from './shared/paths.ts';
-import type { AddonType } from "./lib/config.ts";
+import { dedent } from "./shared/misc.ts";
+
 
 let rebuildTimeout: number | undefined;
 
 async function BuildAndWatch() {
     const watcher = Deno.watchFs([
         join(Paths.Main, 'Addon'),
+        join(Paths.Main, 'Editor'),
         join(Paths.Main, 'addon.ts'),
         join(Paths.Main, 'lost.config.ts')
     ]);
@@ -43,8 +47,8 @@ async function BuildAndWatch() {
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
-        boolean: ['plugin', 'watch'],
-        alias: { p: 'plugin', w: 'watch' },
+        boolean: ['plugin', 'behavior', 'watch'],
+        alias: { p: 'plugin', b: 'behavior', w: 'watch', },
         "--": true,
     });
 
@@ -55,7 +59,10 @@ async function main() {
             printHelp();
             break;
         case 'version':
-            Logger.LogBetweenLines(Colors.bold(`Lost ➜  ${Colors.yellow(DenoJson.version)} by ${Colors.italic(Colors.magenta('lostinmind.'))}`))
+            Logger.LogBetweenLines(dedent`
+                👾 ${Colors.bold(`Lost ➜  ${Colors.yellow(DenoJson.version)} by ${Colors.italic(Colors.magenta('lostinmind.'))}`)}
+                🌐 ${Colors.bold('https://github.com/lostinmind-dev/lost-c3')}
+            `)
             break;
         case 'create':
             if (!flags.plugin) {
@@ -63,7 +70,13 @@ async function main() {
                 printCreate();
                 break;
             } else {
-                await createBareBones('plugin');
+                if (flags.plugin) {
+                    await createBareBones('plugin');
+                }
+
+                if (flags.behavior) {
+                    await createBareBones('behavior');
+                }
             }
             break;
         case 'build':
@@ -74,7 +87,7 @@ async function main() {
             }
             break;
         case 'serve':
-            await Serve(65432);
+            Serve(65432);
             break;
         case 'types':
             await installTypes();
@@ -120,10 +133,10 @@ async function cloneRepo(url: string) {
         stderr: "piped"
     })
 
-    const { code, stdout, stderr } = await command.output();
+    const { code } = await command.output();
 
     if (code === 0) {
-        Logger.Success(Colors.bold(`${Colors.green('Successfully')} created bare-bones for ${Colors.magenta(`"${''}"`)} addon type!`));
+        Logger.Success(Colors.bold(`${Colors.green('Successfully')} created bare-bones!`));
     } else {
         Logger.Error('cli', 'Error occured while creating bare-bones.', `Error code: ${code}`);
     }
@@ -142,12 +155,12 @@ function printHelp() {
     Logger.Log(`  ${Colors.yellow('build')}`);
     Logger.Log('   ⚙️', Colors.gray('  --watch, -w'), Colors.italic('   Runs build command with auto-reload.'));
     Logger.Log(`  ${Colors.yellow('serve')}`);
-    Logger.Log(`  ${Colors.yellow('types')}`);
+    Logger.Log(`  ${Colors.yellow('types')}`, Colors.italic('   Creates "properties.d.ts" of your plugin properties.'));
 }
 
 function printCreate() {
     Logger.Log('   ⚙️', Colors.gray('  --plugin, -p'), Colors.italic('   Creates a bare-bones for "plugin" addon type.'));
-    // Logger.Log('   ⚙️', Colors.gray('  --behavior, -b'), Colors.italic('   Creates a bare-bones for "behavior" addon type.'));
+    Logger.Log('   ⚙️', Colors.gray('  --behavior, -b'), Colors.italic('   Creates a bare-bones for "behavior" addon type.'));
     // Logger.Log('   ⚙️', Colors.gray('  --theme, -t'), Colors.italic('   Creates a bare-bones for "theme" addon type.'));
     // Logger.Log('   ⚙️', Colors.gray('  --effect, -e'), Colors.italic('   Creates a bare-bones for "effect" addon type.'));
 }

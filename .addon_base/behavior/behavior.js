@@ -10,7 +10,7 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
         this._info.SetCategory(config.category);
         this._info.SetAuthor(config.author);
         this._info.SetHelpUrl(globalThis.lang(".help-url"));
-        this._info.SetIcon(icon.fileName, icon.iconType);
+        this._info.SetIcon(icon.path, icon.iconType);
         this._info.SetIsDeprecated(config.deprecated || false);
         this._info.SetCanBeBundled(config.canBeBundled || true);
         this._info.SetIsOnlyOneAllowed(true);
@@ -24,10 +24,11 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
         SDK.Lang.PopContext();
     }
     setupUserModules() {
-        if (_lostData.userModules.length > 0) {
-            this._info.SetRuntimeModuleMainScript('c3runtime/main.js');
-            _lostData.userModules.forEach(file => {
-                this._info.AddC3RuntimeScript(`c3runtime/modules/${file.relativePath}`);
+        this._info.SetRuntimeModuleMainScript('c3runtime/main.js');
+        const modules = _lostData.files.filter(file => file.type === 'module');
+        if (modules.length > 0) {
+            modules.forEach(file => {
+                this._info.AddC3RuntimeScript(`c3runtime/modules/${file.path}`);
             });
         }
     }
@@ -37,38 +38,35 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
         });
     }
     addUserFiles() {
-        _lostData.userFiles.forEach(file => {
-            if (file.dependencyType === 'copy-to-output') {
-                this._info.AddFileDependency({
-                    filename: `files/${file.relativePath}`,
-                    type: file.dependencyType,
-                    fileType: file.mimeType
-                });
-            }
-            else {
-                this._info.AddFileDependency({
-                    filename: `files/${file.relativePath}`,
-                    type: file.dependencyType
-                });
-            }
-        });
+        const files = _lostData.files.filter(file => file.type === 'file');
+        if (files.length > 0) {
+            files.forEach(file => {
+                if (file.dependencyType === 'copy-to-output') {
+                    this._info.AddFileDependency({
+                        filename: `files/${file.path}`,
+                        type: file.dependencyType,
+                        fileType: file.mimeType
+                    });
+                }
+                else {
+                    this._info.AddFileDependency({
+                        filename: `files/${file.path}`,
+                        type: file.dependencyType || 'copy-to-output'
+                    });
+                }
+            });
+        }
     }
     addUserScripts() {
-        _lostData.userScripts.forEach(file => {
-            if (file.scriptType) {
+        const files = _lostData.files.filter(file => file.type === 'script');
+        if (files.length > 0) {
+            files.forEach(file => {
                 this._info.AddFileDependency({
-                    filename: `scripts/${file.relativePath}`,
-                    type: file.dependencyType,
-                    scriptType: file.scriptType
+                    filename: `scripts/${file.path}`,
+                    type: file.dependencyType || 'external-dom-script'
                 });
-            }
-            else {
-                this._info.AddFileDependency({
-                    filename: `scripts/${file.relativePath}`,
-                    type: file.dependencyType
-                });
-            }
-        });
+            });
+        }
     }
     setupPluginProperties() {
         const properties = [];
@@ -161,35 +159,26 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
                     }));
                     break;
                 case "color":
-                    properties.push(new SDK.PluginProperty(_opts.type, _id, {
-                        initialValue: _opts.initialValue || [0, 0, 0]
-                    }));
+                    // ignore, because link property is not available with behavior addon type
                     break;
                 case "object":
-                    properties.push(new SDK.PluginProperty(_opts.type, _id, {
-                        allowedPluginIds: _opts.allowedPluginIds || []
-                    }));
+                    // ignore, because link property is not available with behavior addon type
                     break;
                 case "group":
                     properties.push(new SDK.PluginProperty(_opts.type, _id));
                     break;
                 case "info":
-                    properties.push(new SDK.PluginProperty(_opts.type, _id, {
-                        infoCallback: () => {
-                            return _opts.info;
-                        }
-                    }));
-                    break;
-                case "link":
-                    const func = this.deserializeFunction(_funcString || '');
-                    if (func) {
+                    const infoFunc = this.deserializeFunction(_funcString || '');
+                    if (infoFunc) {
                         properties.push(new SDK.PluginProperty(_opts.type, _id, {
-                            callbackType: _opts.callbackType,
-                            linkCallback: (p) => {
-                                func(p);
+                            infoCallback: (i) => {
+                                return infoFunc(i);
                             }
                         }));
                     }
+                    break;
+                case "link":
+                    // ignore, because link property is not available with behavior addon type
                     break;
             }
         });

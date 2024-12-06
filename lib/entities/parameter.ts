@@ -1,10 +1,11 @@
 import { Md5 } from "../../deps.ts";
 import type { EntityParamOptions, EntityType } from './entity.ts';
 
+
 /**
  * @class represents ACE's parameter info.
  */
-export class Parameter<E extends EntityType> {
+export class Parameter<E extends EntityType = EntityType> {
     readonly _id: string;
     readonly _name: string;
     readonly _description: string;
@@ -27,7 +28,14 @@ export class Parameter<E extends EntityType> {
                 opts.autocompleteId = hash;
             }
         }
-        
+        if (opts.type === Param.Combo) {
+            if (opts.initialValue) {
+                const items = opts.items.map(i => i[0]);
+                if (!items.includes(opts.initialValue)) {
+                    opts.initialValue = items[0]
+                }
+            }
+        }
         this._opts = opts;
     }
 }
@@ -55,23 +63,23 @@ export enum Param {
 
 /** All available ACE's parameter options  */
 export type ParamOptions = 
-    NumberParam |
-    StringParam |
-    AnyParam |
-    BooleanParam |
-    ComboParam |
-    CmpParam |
-    ObjectParam |
-    ObjectNameParam |
-    LayerParam |
-    LayoutParam |
-    KeybParam |
-    InstanceVarParam |
-    InstanceVarBoolParam |
-    EventVarParam |
-    EventVarBoolParam |
-    AnimationParam |
-    ObjInstanceVarParam
+    | NumberParam
+    | StringParam
+    | AnyParam
+    | BooleanParam
+    | ComboParam
+    | CmpParam
+    | ObjectParam
+    | ObjectNameParam
+    | LayerParam
+    | LayoutParam
+    | KeybParam
+    | InstanceVarParam
+    | InstanceVarBoolParam
+    | EventVarParam
+    | EventVarBoolParam
+    | AnimationParam
+    | ObjInstanceVarParam
 ;
 
 /** All available expression parameter options  */
@@ -253,7 +261,7 @@ interface ObjInstanceVarParam extends ParamOptionsBase {
  * @param name The name that appears in the action/condition/expression parameters dialog.
  * @param opts Parameter options.
  */
-export function addParam<E extends EntityType>(id: string, name: string, opts: EntityParamOptions<E>): Parameter<E>;
+export function addParam(id: string, name: string, opts: EntityParamOptions<EntityType>): Parameter;
 /**
  * Adds parameter to action/condition/expression entity.
  * @param id The unique identifier for the parameter.
@@ -261,7 +269,7 @@ export function addParam<E extends EntityType>(id: string, name: string, opts: E
  * @param description Optional. The parameter description.
  * @param opts Parameter options.
  */
-export function addParam<E extends EntityType>(id: string, name: string, description: string, opts: EntityParamOptions<E>): Parameter<E>;
+export function addParam(id: string, name: string, description: string, opts: EntityParamOptions<EntityType>): Parameter;
 /**
  * Adds parameter to action/condition/expression entity.
  * @param id The unique identifier for the parameter.
@@ -269,14 +277,14 @@ export function addParam<E extends EntityType>(id: string, name: string, descrip
  * @param descriptionOrOpts The parameter description OR parameter options.
  * @param opts Parameter options.
  */
-export function addParam<E extends EntityType>(
+export function addParam(
     id: string,
     name: string,
-    descriptionOrOpts: string | EntityParamOptions<E>,
-    opts?: EntityParamOptions<E>
-): Parameter<E> {
+    descriptionOrOpts: string | EntityParamOptions<EntityType>,
+    opts?: EntityParamOptions<EntityType>
+): Parameter {
     let description: string = 'There is no any description yet...';
-    let options: EntityParamOptions<E>;
+    let options: EntityParamOptions<EntityType>;
 
     if (typeof descriptionOrOpts === 'string' && opts) {
         // Если переданы описание и опции
@@ -291,5 +299,5 @@ export function addParam<E extends EntityType>(
         );
     }
 
-    return new Parameter<E>(id, name, description, options);
+    return new Parameter(id, name, description, options);
 }
