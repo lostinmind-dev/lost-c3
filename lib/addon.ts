@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-case-declarations
 import type { AddonType, LostConfig } from "./config.ts";
 import type { CategoryClassType } from "./entities/category.ts";
-import type { EditorInstanceType, PluginProperty } from "./entities/plugin-property.ts";
+import type { PluginProperty } from "./entities/plugin-property.ts";
 import type {
     AcesJson, AddonJson, AceAction, AceCondition, AceExpression, AceParam,
     LanguageJson, LanguagePluginProperty, LanguageAction, LanguageParam, LanguageCondition, LanguageExpression
@@ -18,15 +18,15 @@ import { Param } from "./entities/parameter.ts";
 import Icon from "./defaults/addon-icon.ts";
 import { AddonFileManager, EditorScript, RuntimeScript } from "./addon-file-manager.ts";
 
-export abstract class Addon<T extends AddonType = AddonType, I extends EditorInstanceType = EditorInstanceType, E extends SDK.ITypeBase = SDK.ITypeBase> {
+export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SDK.ITypeBase> {
     protected readonly type: AddonType;
-    protected readonly config: LostConfig<T>;
+    protected readonly config: LostConfig<A>;
 
     protected readonly userFiles: AddonUserFile[] = [];
     protected readonly userScripts: AddonUserScriptFile[] = [];
     protected readonly userModules: AddonUserModuleFile[] = [];
     protected readonly userDomSideScripts: AddonUserDomSideScriptFile[] = [];
-    protected readonly pluginProperties: PluginProperty<T, I, E>[] = [];
+    protected readonly pluginProperties: PluginProperty<A, I, T>[] = [];
     protected readonly categories: CategoryClassType[] = [];
     protected readonly remoteScripts: string[] = [];
     protected readonly filesToOutput: string[] = [];
@@ -42,7 +42,7 @@ export abstract class Addon<T extends AddonType = AddonType, I extends EditorIns
         relativePath: 'icon.svg'
     };
 
-    constructor(type: T, config: LostConfig<T>) {
+    constructor(type: A, config: LostConfig<A>) {
         this.type = type;
         this.config = config;
         this.#load();
@@ -415,7 +415,7 @@ export abstract class Addon<T extends AddonType = AddonType, I extends EditorIns
 
     #addUserScript(file: AddonUserScriptFile) {
         this.userScripts.push(file);
-
+        console.log(file)
         if (file.isTypescript) {
             Logger.Loading(
                 `Founded script at path: ${Colors.blue(`${Colors.bold(join('Addon', 'Scripts', file.relativePath))}`)}`

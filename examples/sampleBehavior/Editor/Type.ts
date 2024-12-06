@@ -1,7 +1,7 @@
-class LostEditorType extends SDK.ITypeBase {
+class LostEditorType extends SDK.IBehaviorTypeBase {
 	test = 1;
-	constructor(sdkPlugin: SDK.IPluginBase, iObjectType: SDK.IObjectType) {
-		super(sdkPlugin, iObjectType);
+	constructor(sdkBehavior: SDK.IBehaviorBase, iBehaviorType: SDK.IBehaviorType) {
+		super(sdkBehavior, iBehaviorType);
 	}
 };
 

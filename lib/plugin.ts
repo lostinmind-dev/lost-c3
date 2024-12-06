@@ -9,8 +9,8 @@ import { Colors, Logger } from "../deps.ts";
 
 export class Plugin<
     I extends SDK.IInstanceBase | SDK.IWorldInstanceBase, /** Editor instance OR base instance */
-    EditorType extends SDK.ITypeBase
-    > extends Addon<'plugin', I, EditorType> {
+    T extends SDK.ITypeBase
+    > extends Addon<'plugin', I, T> {
 
     constructor(config: LostConfig<'plugin'>) {
         super('plugin', config);
@@ -25,7 +25,7 @@ export class Plugin<
     addProperty(
         id: string,
         name: string,
-        opts: AddonPropertyOptions<'plugin', I, EditorType>
+        opts: AddonPropertyOptions<'plugin', I, T>
     ): this
     /**
      * Creates plugin property.
@@ -38,7 +38,7 @@ export class Plugin<
         id: string,
         name: string,
         description: string,
-        opts: AddonPropertyOptions<'plugin', I, EditorType>
+        opts: AddonPropertyOptions<'plugin', I, T>
     ): this
     /**
      * Creates plugin property.
@@ -50,12 +50,12 @@ export class Plugin<
     addProperty(
         id: string,
         name: string,
-        descriptionOrOpts: string | AddonPropertyOptions<'plugin', I, EditorType>,
-        opts?: AddonPropertyOptions<'plugin', I, EditorType>
+        descriptionOrOpts: string | AddonPropertyOptions<'plugin', I, T>,
+        opts?: AddonPropertyOptions<'plugin', I, T>
     ) {
         if (!this.#isPluginPropertyExists(id)) {
             let description: string = 'There is no any description yet...';
-            let options: AddonPropertyOptions<'plugin', I, EditorType>;
+            let options: AddonPropertyOptions<'plugin', I, T>;
             if (typeof descriptionOrOpts === 'string' && opts) {
                 description = descriptionOrOpts;
                 options = opts;
@@ -71,7 +71,7 @@ export class Plugin<
                 name.length > 0
             ) {
                 this.pluginProperties.push(
-                    new PluginProperty<'plugin', I, EditorType>(id, name, description, options)
+                    new PluginProperty<'plugin', I, T>(id, name, description, options)
                 );
             } else if (id.length === 0) {
                 Logger.Error('build', `Plugin property id can't be empty.`, 'Please specify your property Id.')

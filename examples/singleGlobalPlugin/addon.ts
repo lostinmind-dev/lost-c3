@@ -9,6 +9,7 @@ import config from './lost.config.ts';
 
 export default defineAddon(
     new Plugin<EditorInstance, EditorType>(config)
+        .setRuntimeScripts('index.ts')
         .addProperty('test1', 'Test 1', { type: Property.Text })
         .addProperty('test2', 'test 2', {
             type: Property.Combo,
@@ -18,7 +19,7 @@ export default defineAddon(
             ],
             initialValue: 'id1'
         })
-        .addProperty('', '', {
+        .addProperty('12', 'sdf', {
             type: Property.Info,
             callback: (i) => {
                 return 'string'

@@ -8,6 +8,10 @@
                 "description": "My awesome addon was made with Lost",
                 "help-url": "https://myaddon.com/help/en",
                 "properties": {
+                    "12": {
+                        "name": "sdf",
+                        "desc": "There is no any description yet..."
+                    },
                     "test1": {
                         "name": "Test 1",
                         "desc": "There is no any description yet..."

@@ -6,6 +6,6 @@ export function defineConfig<T extends AddonType>(config: LostConfig<T>) {
     return config;
 }
 
-export function defineAddon<T extends Addon<any, any, any>>(addon: T) {
+export function defineAddon<T extends Addon<AddonType>>(addon: T) {
     return addon;
 }

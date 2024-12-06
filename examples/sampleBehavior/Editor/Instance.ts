@@ -1,7 +1,7 @@
-class LostEditorInstance extends SDK.IWorldInstanceBase {
+class LostEditorInstance extends SDK.IBehaviorInstanceBase {
 	test = 2;
-	constructor(sdkType: SDK.ITypeBase, inst: SDK.IWorldInstance) {
-		super(sdkType, inst);
+	constructor(sdkBehType: SDK.IBehaviorTypeBase, behInst: SDK.IBehaviorInstance) {
+		super(sdkBehType, behInst);
 	}
 	
 	Release() {
@@ -21,4 +21,4 @@ class LostEditorInstance extends SDK.IWorldInstanceBase {
 	}
 };
 
-export { LostEditorInstance as EditorWorldInstance };
+export { LostEditorInstance as EditorInstance };

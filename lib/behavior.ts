@@ -4,10 +4,7 @@ import { PluginProperty, Property, type AddonPropertyOptions } from "./entities/
 import { Addon } from "./addon.ts";
 import { Colors, Logger } from "../deps.ts";
 
-export class Behavior<
-    I extends SDK.IBehaviorInstanceBase, /** Editor instance OR base instance */
-    EditorType extends SDK.ITypeBase
-    > extends Addon<'behavior', I, EditorType> {
+export class Behavior<I extends SDK.IBehaviorInstanceBase> extends Addon<'behavior', I,> {
     constructor(config: LostConfig<'behavior'>) {
         super('behavior', config);
     }
@@ -20,7 +17,7 @@ export class Behavior<
     addProperty(
         id: string,
         name: string,
-        opts: AddonPropertyOptions<'behavior', I, EditorType>
+        opts: AddonPropertyOptions<'behavior', I, T>
     ): this
     /**
      * Creates plugin property.
@@ -33,7 +30,7 @@ export class Behavior<
         id: string,
         name: string,
         description: string,
-        opts: AddonPropertyOptions<'behavior', I, EditorType>
+        opts: AddonPropertyOptions<'behavior', I, T>
     ): this
     /**
      * Creates plugin property.
@@ -45,12 +42,12 @@ export class Behavior<
     addProperty(
         id: string,
         name: string,
-        descriptionOrOpts: string | AddonPropertyOptions<'behavior', I, EditorType>,
-        opts?: AddonPropertyOptions<'behavior', I, EditorType>
+        descriptionOrOpts: string | AddonPropertyOptions<'behavior', I, T>,
+        opts?: AddonPropertyOptions<'behavior', I, T>
     ) {
         if (!this.#isPluginPropertyExists(id)) {
             let description: string = 'There is no any description yet...';
-            let options: AddonPropertyOptions<'behavior', I, EditorType>;
+            let options: AddonPropertyOptions<'behavior', I, T>;
             if (typeof descriptionOrOpts === 'string' && opts) {
                 description = descriptionOrOpts;
                 options = opts;
@@ -66,7 +63,7 @@ export class Behavior<
                 name.length > 0
             ) {
                 this.pluginProperties.push(
-                    new PluginProperty<'behavior', I, EditorType>(id, name, description, options)
+                    new PluginProperty<'behavior', I, T>(id, name, description, options)
                 );
             } else if (id.length === 0) {
                 Logger.Error('build', `Plugin property id can't be empty.`, 'Please specify your property Id.')

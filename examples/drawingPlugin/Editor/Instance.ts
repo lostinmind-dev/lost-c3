@@ -21,4 +21,4 @@ class LostEditorInstance extends SDK.IWorldInstanceBase {
 	}
 };
 
-export { LostEditorInstance as EditorWorldInstance };
+export { LostEditorInstance as EditorInstance };
