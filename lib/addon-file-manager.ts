@@ -50,7 +50,7 @@ export abstract class AddonFileManager {
                     await readDir(join(path, entry.name));
                 } else if (entry.isFile) {
                     //
-                    const filePath = getRelativePath(path, Paths.Build, entry.name).replace(/\\/g, '/');
+                    const filePath = getRelativePath(path, directoryPath, entry.name).replace(/\\/g, '/');
                     files.push(filePath);
                 }
             }
@@ -373,7 +373,7 @@ ${assign}
                         "type.js",
                         "instance.js"
                     ],
-                    "file-list": await this.#getDirectoryFiles(Paths.Main)
+                    "file-list": await this.#getDirectoryFiles(Paths.Build)
                 }
 
                 switch (config.type) {

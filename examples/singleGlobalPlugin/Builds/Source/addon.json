@@ -16,19 +16,6 @@
         "plugin.js"
     ],
     "file-list": [
-        "metadata.json",
-        "plugin.js",
-        "ies/MyCategory.ts",
-        "ther/info.txt",
-        "styles.css",
-        "Instance.ts",
-        "index.ts",
-        "Plugin.ts",
-        "index.ts",
-        "Type.ts",
-        "properties.d.ts",
-        "addon.ts",
-        "LostPluginId_1.0.0.0.c3addon",
         "aces.json",
         "c3runtime/actions.js",
         "c3runtime/conditions.js",
@@ -45,10 +32,6 @@
         "lang/en-US.json",
         "plugin.js",
         "scripts/index.js",
-        "type.js",
-        "Instance.ts",
-        "Type.ts",
-        "lost.config.ts",
-        "types.d.ts"
+        "type.js"
     ]
 }
