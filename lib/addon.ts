@@ -121,7 +121,7 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SD
             this.type === 'plugin' ||
             this.type === 'behavior'
         ) {
-            let iconFounded = false;
+            let iconFound = false;
             for await (const entry of Deno.readDir(Paths.Main)) {
                 if (
                     entry.isFile &&
@@ -138,11 +138,11 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SD
                         iconType
                     }
 
-                    iconFounded = true;
+                    iconFound = true;
                 }
             }
 
-            if (!iconFounded) {
+            if (!iconFound) {
                 Logger.Warning(
                     `Addon icon was not detected, will be used default [SVG] icon`
                 );
@@ -187,7 +187,7 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SD
                                     } else {
                                         Logger.Warning(
                                             dedent`
-                                            Founded 'copy-to-output' file (${entry.name}) with unknown MIME type.
+                                            Found 'copy-to-output' file (${entry.name}) with unknown MIME type.
                                             File will not be included in final addon build'
                                             ${'https://www.construct.net/en/make-games/manuals/construct-3/tips-and-guides/mime-types'}`
                                         );
@@ -397,12 +397,12 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SD
         switch (file.dependencyType) {
             case "copy-to-output":
                 Logger.Loading(
-                    `Founded file at path: ${Colors.bold(Colors.green(`${join('Addon', 'Files', file.relativePath)}`))}, will be included in project build`
+                    `Found file at path: ${Colors.bold(Colors.green(`${join('Addon', 'Files', file.relativePath)}`))}, will be included in project build`
                 );
                 break;
             case "external-css":
                 Logger.Loading(
-                    `Founded CSS file at path: ${Colors.bold(Colors.dim(`${join('Addon', 'Files', file.relativePath)}`))}`
+                    `Found CSS file at path: ${Colors.bold(Colors.dim(`${join('Addon', 'Files', file.relativePath)}`))}`
                 );
                 break;
         }
@@ -414,11 +414,11 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SD
         if (file.isTypescript) {
             if (file.dependencyType === 'external-runtime-script')
             Logger.Loading(
-                `Founded script at path: ${Colors.blue(`${Colors.bold(join('Addon', 'Scripts', file.relativePath))}`)} (${file.dependencyType})`
+                `Found script at path: ${Colors.blue(`${Colors.bold(join('Addon', 'Scripts', file.relativePath))}`)} (${file.dependencyType})`
             );
         } else {
             Logger.Loading(
-                `Founded script at path: ${Colors.yellow(`${Colors.bold(join('Addon', 'Scripts', file.relativePath))}`)} (${file.dependencyType})`
+                `Found script at path: ${Colors.yellow(`${Colors.bold(join('Addon', 'Scripts', file.relativePath))}`)} (${file.dependencyType})`
             );
         }
     }
@@ -428,11 +428,11 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SD
 
         if (file.isTypescript) {
             Logger.Loading(
-                `Founded module at path: ${Colors.blue(`${Colors.bold(join('Addon', 'Modules', file.relativePath))}`)}`
+                `Found module at path: ${Colors.blue(`${Colors.bold(join('Addon', 'Modules', file.relativePath))}`)}`
             );
         } else {
             Logger.Loading(
-                `Founded module at path: ${Colors.yellow(`${Colors.bold(join('Addon', 'Modules', file.relativePath))}`)}`
+                `Found module at path: ${Colors.yellow(`${Colors.bold(join('Addon', 'Modules', file.relativePath))}`)}`
             );
         }
     }
@@ -441,7 +441,7 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SD
         this.userDomSideScripts.push(file);
 
         Logger.Loading(
-            `Founded DOM side script at path: ${Colors.dim(`${Colors.bold(join('Addon', 'DomSide', file.relativePath))}`)}`
+            `Found DOM side script at path: ${Colors.dim(`${Colors.bold(join('Addon', 'DomSide', file.relativePath))}`)}`
         );
     }
 
