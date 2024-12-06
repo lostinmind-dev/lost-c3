@@ -4,4 +4,4 @@ class LostEditorType extends SDK.ITypeBase {
 	}
 };
 
-export { LostEditorType as EditorType };
+export type { LostEditorType as EditorType };

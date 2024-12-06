@@ -13,6 +13,6 @@ class LostEditorInstance extends SDK.IInstanceBase {
     }
 }
 ;
-export { LostEditorInstance as EditorInstance };
+export {};
 
 globalThis.SDK.Plugins["LostPluginId"].Instance = LostEditorInstance;

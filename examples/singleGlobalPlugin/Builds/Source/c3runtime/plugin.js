@@ -4,5 +4,6 @@ class LostPlugin extends globalThis.ISDKPluginBase {
     }
 }
 ;
+export {};
 
 globalThis.C3.Plugins["LostPluginId"] = LostPlugin;

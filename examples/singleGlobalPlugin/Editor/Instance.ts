@@ -20,4 +20,4 @@ class LostEditorInstance extends SDK.IInstanceBase {
 	}
 };
 
-export { LostEditorInstance as EditorInstance };
+export type { LostEditorInstance as EditorInstance };

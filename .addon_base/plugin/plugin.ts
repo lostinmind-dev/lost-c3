@@ -153,183 +153,184 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
     private setupPluginProperties() {
         const properties: SDK.PluginProperty[] = [];
 
-        _lostData.pluginProperties.forEach(property => {
-            const { _id, _opts, _funcString } = property;
-            switch (_opts.type) {
-                case Property.Integer:
-                    if (_opts.min && _opts.max) {
-                        properties.push(
-                            new SDK.PluginProperty(_opts.type, _id, {
-                                initialValue: _opts.initialValue || 0,
-                                minValue: _opts.min,
-                                maxValue: _opts.max
-                            })
-                        )
-                    } else if (_opts.min) {
-                        properties.push(
-                            new SDK.PluginProperty(_opts.type, _id, {
-                                initialValue: _opts.initialValue || 0,
-                                minValue: _opts.min,
-                            })
-                        )
-                    } else if (_opts.max) {
-                        properties.push(
-                            new SDK.PluginProperty(_opts.type, _id, {
-                                initialValue: _opts.initialValue || 0,
-                                maxValue: _opts.max
-                            })
-                        )
-                    } else {
-                        properties.push(
-                            new SDK.PluginProperty(_opts.type, _id, {
-                                initialValue: _opts.initialValue || 0
-                            })
-                        )
-                    }
-                    break;
-                case Property.Float:
-                    if (_opts.min && _opts.max) {
-                        properties.push(
-                            new SDK.PluginProperty(_opts.type, _id, {
-                                initialValue: _opts.initialValue || 0,
-                                minValue: _opts.min,
-                                maxValue: _opts.max
-                            })
-                        )
-                    } else if (_opts.min) {
-                        properties.push(
-                            new SDK.PluginProperty(_opts.type, _id, {
-                                initialValue: _opts.initialValue || 0,
-                                minValue: _opts.min,
-                            })
-                        )
-                    } else if (_opts.max) {
-                        properties.push(
-                            new SDK.PluginProperty(_opts.type, _id, {
-                                initialValue: _opts.initialValue || 0,
-                                maxValue: _opts.max
-                            })
-                        )
-                    } else {
-                        properties.push(
-                            new SDK.PluginProperty(_opts.type, _id, {
-                                initialValue: _opts.initialValue || 0
-                            })
-                        )
-                    }
-                    break;
-                case Property.Percent:
-                    properties.push(
-                        new SDK.PluginProperty(
-                            _opts.type, _id, {
-                            initialValue: _opts.initialValue || 0
+        if (_lostData.pluginProperties.length > 0) {
+            _lostData.pluginProperties.forEach(property => {
+                const { _id, _opts, _funcString } = property;
+                switch (_opts.type) {
+                    case Property.Integer:
+                        if (_opts.min && _opts.max) {
+                            properties.push(
+                                new SDK.PluginProperty(_opts.type, _id, {
+                                    initialValue: _opts.initialValue || 0,
+                                    minValue: _opts.min,
+                                    maxValue: _opts.max
+                                })
+                            )
+                        } else if (_opts.min) {
+                            properties.push(
+                                new SDK.PluginProperty(_opts.type, _id, {
+                                    initialValue: _opts.initialValue || 0,
+                                    minValue: _opts.min,
+                                })
+                            )
+                        } else if (_opts.max) {
+                            properties.push(
+                                new SDK.PluginProperty(_opts.type, _id, {
+                                    initialValue: _opts.initialValue || 0,
+                                    maxValue: _opts.max
+                                })
+                            )
+                        } else {
+                            properties.push(
+                                new SDK.PluginProperty(_opts.type, _id, {
+                                    initialValue: _opts.initialValue || 0
+                                })
+                            )
                         }
-                        )
-                    )
-                    break;
-                case Property.Text:
-                    properties.push(
-                        new SDK.PluginProperty(
-                            _opts.type, _id, {
-                            initialValue: _opts.initialValue || ''
+                        break;
+                    case Property.Float:
+                        if (_opts.min && _opts.max) {
+                            properties.push(
+                                new SDK.PluginProperty(_opts.type, _id, {
+                                    initialValue: _opts.initialValue || 0,
+                                    minValue: _opts.min,
+                                    maxValue: _opts.max
+                                })
+                            )
+                        } else if (_opts.min) {
+                            properties.push(
+                                new SDK.PluginProperty(_opts.type, _id, {
+                                    initialValue: _opts.initialValue || 0,
+                                    minValue: _opts.min,
+                                })
+                            )
+                        } else if (_opts.max) {
+                            properties.push(
+                                new SDK.PluginProperty(_opts.type, _id, {
+                                    initialValue: _opts.initialValue || 0,
+                                    maxValue: _opts.max
+                                })
+                            )
+                        } else {
+                            properties.push(
+                                new SDK.PluginProperty(_opts.type, _id, {
+                                    initialValue: _opts.initialValue || 0
+                                })
+                            )
                         }
-                        )
-                    )
-                    break;
-                case Property.LongText:
-                    properties.push(
-                        new SDK.PluginProperty(
-                            _opts.type, _id, {
-                            initialValue: _opts.initialValue || ''
-                        }
-                        )
-                    )
-                    break;
-                case Property.Checkbox:
-                    properties.push(
-                        new SDK.PluginProperty(
-                            _opts.type, _id, {
-                            initialValue: _opts.initialValue || false
-                        }
-                        )
-                    )
-                    break;
-                case Property.Font:
-                    properties.push(
-                        new SDK.PluginProperty(
-                            _opts.type, _id, {
-                            initialValue: _opts.initialValue || 'Arial'
-                        }
-                        )
-                    )
-                    break;
-                case Property.Combo:
-                    const items = _opts.items.map(item => item[0]);
-                    const _initialValue = (_opts.initialValue) ? _opts.initialValue : items[0];
-                    properties.push(
-                        new SDK.PluginProperty(
-                            _opts.type, _id, {
-                            items: items,
-                            initialValue: _initialValue
-                        }
-                        )
-                    )
-                    break;
-                case Property.Color:
-                    properties.push(
-                        new SDK.PluginProperty(
-                            _opts.type, _id, {
-                            initialValue: _opts.initialValue || [0, 0, 0]
-                        }
-                        )
-                    )
-                    break;
-                case Property.Object:
-                    properties.push(
-                        new SDK.PluginProperty(
-                            _opts.type, _id, {
-                            allowedPluginIds: _opts.allowedPluginIds || []
-                        }
-                        )
-                    )
-                    break;
-                case Property.Group:
-                    properties.push(
-                        new SDK.PluginProperty(_opts.type, _id)
-                    )
-                    break;
-                case Property.Info:
-                    const infoFunc = this.deserializeFunction(_funcString || '');
-
-                    if (infoFunc) {
+                        break;
+                    case Property.Percent:
                         properties.push(
                             new SDK.PluginProperty(
                                 _opts.type, _id, {
-                                infoCallback: (i) => {
-                                    return infoFunc(i);
-                                }
-                            })
-                        )
-                    }
-                    break;
-                case Property.Link:
-                    const func = this.deserializeFunction(_funcString || '');
-
-                    if (func) {
-                        properties.push(
-                            new SDK.PluginProperty(
-                                _opts.type, _id, {
-                                callbackType: _opts.callbackType,
-                                linkCallback: (p) => {
-                                    func(p);
-                                }
+                                initialValue: _opts.initialValue || 0
                             }
                             )
                         )
-                    }
-                    break;
-            }
-        })
+                        break;
+                    case Property.Text:
+                        properties.push(
+                            new SDK.PluginProperty(
+                                _opts.type, _id, {
+                                initialValue: _opts.initialValue || ''
+                            }
+                            )
+                        )
+                        break;
+                    case Property.LongText:
+                        properties.push(
+                            new SDK.PluginProperty(
+                                _opts.type, _id, {
+                                initialValue: _opts.initialValue || ''
+                            }
+                            )
+                        )
+                        break;
+                    case Property.Checkbox:
+                        properties.push(
+                            new SDK.PluginProperty(
+                                _opts.type, _id, {
+                                initialValue: _opts.initialValue || false
+                            }
+                            )
+                        )
+                        break;
+                    case Property.Font:
+                        properties.push(
+                            new SDK.PluginProperty(
+                                _opts.type, _id, {
+                                initialValue: _opts.initialValue || 'Arial'
+                            }
+                            )
+                        )
+                        break;
+                    case Property.Combo:
+                        const items = _opts.items.map(item => item[0]);
+                        properties.push(
+                            new SDK.PluginProperty(
+                                _opts.type, _id, {
+                                items: items,
+                                initialValue: _opts.initialValue || items[0]
+                            }
+                            )
+                        )
+                        break;
+                    case Property.Color:
+                        properties.push(
+                            new SDK.PluginProperty(
+                                _opts.type, _id, {
+                                initialValue: _opts.initialValue || [0, 0, 0]
+                            }
+                            )
+                        )
+                        break;
+                    case Property.Object:
+                        properties.push(
+                            new SDK.PluginProperty(
+                                _opts.type, _id, {
+                                allowedPluginIds: _opts.allowedPluginIds || []
+                            }
+                            )
+                        )
+                        break;
+                    case Property.Group:
+                        properties.push(
+                            new SDK.PluginProperty(_opts.type, _id)
+                        )
+                        break;
+                    case Property.Info:
+                        const infoFunc = this.deserializeFunction(_funcString || '');
+    
+                        if (infoFunc) {
+                            properties.push(
+                                new SDK.PluginProperty(
+                                    _opts.type, _id, {
+                                    infoCallback: (i) => {
+                                        return infoFunc(i);
+                                    }
+                                })
+                            )
+                        }
+                        break;
+                    case Property.Link:
+                        const func = this.deserializeFunction(_funcString || '');
+    
+                        if (func) {
+                            properties.push(
+                                new SDK.PluginProperty(
+                                    _opts.type, _id, {
+                                    callbackType: _opts.callbackType,
+                                    linkCallback: (p) => {
+                                        func(p);
+                                    }
+                                }
+                                )
+                            )
+                        }
+                        break;
+                }
+            })
+        }
 
         this._info.SetProperties(properties);
     }

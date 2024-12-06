@@ -3,3 +3,5 @@ class LostPlugin extends globalThis.ISDKPluginBase {
 		super();
 	}
 };
+
+export type { LostPlugin };

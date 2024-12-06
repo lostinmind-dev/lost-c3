@@ -39,7 +39,8 @@ export class LostAddonData {
             this.files.push({
                 type: 'file',
                 path: file.relativePath,
-                dependencyType: file.dependencyType
+                dependencyType: file.dependencyType,
+                mimeType: (file as AddonFileCopyToOutput).mimeType
             })
         }
 

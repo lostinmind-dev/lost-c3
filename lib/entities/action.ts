@@ -16,6 +16,7 @@ export class ActionEntity extends Entity<EntityType.Action> {
     ) {
         super(EntityType.Action, id, name, description, func, opts?.isDeprecated || false, displayText, opts?.params);
         this._opts = opts;
+
     }
 }
 

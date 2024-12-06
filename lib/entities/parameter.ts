@@ -28,7 +28,14 @@ export class Parameter<E extends EntityType = EntityType> {
                 opts.autocompleteId = hash;
             }
         }
-        
+        if (opts.type === Param.Combo) {
+            if (opts.initialValue) {
+                const items = opts.items.map(i => i[0]);
+                if (!items.includes(opts.initialValue)) {
+                    opts.initialValue = items[0]
+                }
+            }
+        }
         this._opts = opts;
     }
 }

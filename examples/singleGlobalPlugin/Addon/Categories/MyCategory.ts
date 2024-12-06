@@ -10,7 +10,7 @@ export default class {
     @Action('test', '', '', {
         params: [
             addParam('1', '', { type: Param.String, initialValue: '' }),
-            addParam<ComboItemsCollection>('2', '', { type: Param.Combo, items: [['hello', 'Test'], ['id2', 'Test 2']], initialValue: 'id1' })
+            addParam('2', '', { type: Param.Combo, items: [['hello', 'Test'], ['id2', 'Test 2']] })
         ],
         isAsync: true
     })

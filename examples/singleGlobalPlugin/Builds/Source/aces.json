@@ -21,7 +21,7 @@
                             "hello",
                             "id2"
                         ],
-                        "initialValue": "id1"
+                        "initialValue": "hello"
                     }
                 ]
             }
