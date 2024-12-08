@@ -5,4 +5,5 @@ class LostEditorType extends SDK.ITypeBase {
 	}
 };
 
-export { LostEditorType as EditorType };
+/** Important to save export type for Typescript compiler */
+export type { LostEditorType as EditorType };

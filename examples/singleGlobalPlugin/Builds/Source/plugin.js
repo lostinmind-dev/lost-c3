@@ -77,7 +77,6 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         }
     }
     setupUserModules() {
-        this._info.SetRuntimeModuleMainScript('c3runtime/main.js');
         const modules = _lostData.files.filter(file => file.type === 'module');
         if (modules.length > 0) {
             modules.forEach(file => {

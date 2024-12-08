@@ -1,3 +1,4 @@
+const Lost = {"addonId":"LostPluginId"};
 class LostEditorType extends SDK.ITypeBase {
     constructor(sdkPlugin, iObjectType) {
         super(sdkPlugin, iObjectType);

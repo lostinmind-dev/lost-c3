@@ -1,3 +1,4 @@
+const Lost = {"addonId":"LostPluginId"};
 class LostType extends globalThis.ISDKObjectTypeBase {
     constructor() {
         super();
