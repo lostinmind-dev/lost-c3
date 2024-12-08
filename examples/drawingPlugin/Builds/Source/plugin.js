@@ -1,3 +1,13 @@
+const _lostMethods = {
+    test: (inst)=>{
+  inst.OnMakeOriginalSize();
+},
+test1: (type)=>{
+  // type.GetObjectType().EditImage();
+  window.open('https://lostinmind.net');
+}
+};
+const _lostData = {"hasDefaultImage":true,"icon":{"path":"icon.svg","iconType":"image/svg+xml"},"config":{"type":"plugin","pluginType":"world","objectName":"LostPlugin","addonId":"LostPluginId","category":"general","addonName":"Lost plugin for Construct 3","addonDescription":"My awesome addon was made with Lost","version":"1.0.0.0","author":"lostinmind.","docsUrl":"https://myaddon.com/docs","helpUrl":{"EN":"https://myaddon.com/help/en"},"websiteUrl":"https://myaddon.com","commonACEs":[]},"remoteScripts":[],"files":[],"pluginProperties":[{"_id":"test","_name":"Make 1:1","_description":"There is no any description yet...","_opts":{"type":"link","callbackType":"for-each-instance","linkText":"Make 1:1"}},{"_id":"test1","_name":"Edit image","_description":"There is no any description yet...","_opts":{"type":"link","callbackType":"once-for-type","linkText":"Edit image"}}]};
 
 const config = _lostData.config;
 const { icon } = _lostData;

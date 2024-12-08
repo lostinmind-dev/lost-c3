@@ -4,7 +4,7 @@ import type { CategoryClassType } from "./entities/category.ts";
 import type { PluginProperty } from "./entities/plugin-property.ts";
 import { Colors, join, Logger } from "../deps.ts";
 import { MIME } from "../shared/mime.ts";
-import { dedent, getCategory, getRelativePath, isDirectoryExists } from "../shared/misc.ts";
+import { dedent, getCategory, getRelativePath, isDirectoryExists, isFileExists } from "../shared/misc.ts";
 import { Paths } from "../shared/paths.ts";
 import { transpileTs } from "../shared/transpile-ts.ts";
 import { Property } from './entities/plugin-property.ts';
@@ -13,7 +13,7 @@ import Icon from "./defaults/addon-icon.ts";
 import { AddonFileManager, EditorScript, JsonFile, RuntimeScript } from "./addon-file-manager.ts";
 import { LostAddonData } from "./lost-addon-data.ts";
 
-export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SDK.ITypeBase> {
+export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
     protected readonly type: AddonType;
     protected readonly config: LostConfig<A>;
 
@@ -27,6 +27,7 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SD
     protected readonly filesToOutput: string[] = [];
     protected readonly runtimeScripts: string[] = [];
 
+    protected hasDefaultImage: boolean = false;
 
     protected icon: AddonIconFile = {
         type: 'icon',
@@ -44,15 +45,16 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SD
     }
 
     async #load() {
-        await this.#createTypes();
         await this.#loadAddonIcon();
         await this.#loadUserFiles();
         await this.#loadUserScripts();
         await this.#loadUserModules();
         await this.#loadUserDomSideScripts();
+        await this.#createTypes();
         await this.#loadCategories();
     }
 
+    /** Creates **properties.d.ts** declaration file for plugin properties types */
     async #createTypes() {
         if (
             (this.type === 'plugin' || this.type === 'behavior') &&
@@ -125,6 +127,7 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SD
             for await (const entry of Deno.readDir(Paths.Main)) {
                 if (
                     entry.isFile &&
+                    (entry.name !== 'default.png') &&
                     (entry.name.endsWith('.png') || entry.name.endsWith('.svg'))
                 ) {
                     const iconType: AddonIconMimeType = (entry.name.endsWith('.png')) ? 'image/png' : 'image/svg+xml';
@@ -595,6 +598,21 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SD
         }
     }
 
+    async #copyDefaultImageFile() {
+        const fileName = 'default.png';
+        const filePath = join(Paths.Main, fileName);
+
+        if (await isFileExists(filePath)) {
+            this.hasDefaultImage = true;
+            Logger.Loading(
+                `Found default image for drawing plugin`
+            );
+            await Deno.copyFile(
+                filePath, join(Paths.Build, fileName)
+            );
+        }
+    }
+
     async #createAddonStructure() {
         if (await isDirectoryExists(Paths.Build)) {
             await Deno.remove(Paths.Build, { recursive: true });
@@ -605,6 +623,12 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SD
         await Deno.mkdir(join(Paths.Build, 'lang'));
 
         await this.#createIcon();
+        if (
+            this.config.type === 'plugin' &&
+            this.config.pluginType === 'world'
+        ) {
+            await this.#copyDefaultImageFile();
+        }
         await this.#copyUserFilesTo('files');
         await this.#copyUserScriptsTo('scripts');
         await this.#copyUserModulesTo('modules');
@@ -842,7 +866,7 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SD
         await AddonFileManager.createRuntimeScript(RuntimeScript.Conditions, this.config, this.categories);
         await AddonFileManager.createRuntimeScript(RuntimeScript.Expressions, this.config, this.categories);
 
-        await AddonFileManager.createRuntimeScript(RuntimeScript.Module, this.config);
+        // await AddonFileManager.createRuntimeScript(RuntimeScript.Module, this.config);
     }
 
     async #createC3EditorFiles() {
@@ -850,6 +874,7 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase = SD
         await AddonFileManager.createEditorScript(EditorScript.Instance, this.config);
 
         const lostAddonData = new LostAddonData(
+            this.hasDefaultImage,
             { path: this.icon.relativePath, iconType: this.icon.iconType },
             this.config, this.pluginProperties, this.remoteScripts,
             this.userFiles, this.userScripts, this.userModules, this.userDomSideScripts

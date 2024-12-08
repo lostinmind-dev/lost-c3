@@ -35,7 +35,6 @@ export class PluginProperty<A, I, T extends SDK.ITypeBase = SDK.ITypeBase> {
     readonly _name: string;
     readonly _description: string;
     readonly _opts: AddonPropertyOptions<A, I, T>;
-    readonly _funcString?: string;
     
     constructor(
         id: string,
@@ -48,10 +47,11 @@ export class PluginProperty<A, I, T extends SDK.ITypeBase = SDK.ITypeBase> {
         this._description = description;
 
         if (
-            opts.type === Property.Info ||
             opts.type === Property.Link
         ) {
-            this._funcString = opts.callback.toString();
+            if (!opts.linkText) {
+                opts.linkText = name;
+            }
         }
 
         if (opts.type === Property.Color) {
@@ -71,32 +71,6 @@ export class PluginProperty<A, I, T extends SDK.ITypeBase = SDK.ITypeBase> {
             return [0, 0, 0];
         }
         return [colors[0] / 255, colors[1] / 255, colors[2] / 255];
-    }
-
-    protected deserializeFunction(funcString: string): Function | null {
-        try {
-            const cleanedFuncString = funcString.trim();
-    
-            const arrowFunctionMatch = cleanedFuncString.match(/^\((.*)\)\s*=>\s*\{([\s\S]*)\}$/);
-            const regularFunctionMatch = cleanedFuncString.match(/^function\s*\((.*)\)\s*\{([\s\S]*)\}$/);
-    
-            if (arrowFunctionMatch) {
-                const args = arrowFunctionMatch[1].trim();
-                const body = arrowFunctionMatch[2].trim();
-                return new Function(args, body);
-            }
-    
-            if (regularFunctionMatch) {
-                const args = regularFunctionMatch[1].trim();
-                const body = regularFunctionMatch[2].trim();
-                return new Function(args, body);
-            }
-
-            return null;
-        } catch (error) {
-            console.error("Failed to deserialize function:", error);
-            return null;
-        }
     }
 
 }
@@ -289,9 +263,15 @@ interface InfoProperty<I extends EditorInstanceType> extends PropertyOptionsBase
     callback: (inst: I) => string;
 }
 
+/** Object represents base for 'link' plugin property */
+interface LinkPropertyBase extends PropertyOptionsBase {
+    type: Property.Link;
+    /**  *Optional*. Sets the text of the clickable link. */
+    linkText?: string;
+}
 
 /** Object represents 'link' plugin property with 'for-each-instance' callback type */
-interface LinkPropertyForEachInstance<I extends SDK.IWorldInstanceBase> extends PropertyOptionsBase {
+interface LinkPropertyForEachInstance<I extends SDK.IWorldInstanceBase> extends LinkPropertyBase {
     type: Property.Link;
     /**
      * Specifies how the link callback function is used.
@@ -305,7 +285,7 @@ interface LinkPropertyForEachInstance<I extends SDK.IWorldInstanceBase> extends 
 }
 
 /** Object represents 'link' plugin property with 'once-for-type' callback type */
-interface LinkPropertyOnceForType<T extends SDK.ITypeBase> extends PropertyOptionsBase {
+interface LinkPropertyOnceForType<T extends SDK.ITypeBase> extends LinkPropertyBase {
     type: Property.Link;
     /**
      * Specifies how the link callback function is used.

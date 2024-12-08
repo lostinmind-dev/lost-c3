@@ -1,7 +1,7 @@
 /** All available types of Lost config. */
-export type LostConfig<T extends AddonType> =
-    T extends 'plugin' ? PluginConfig<T> :
-    T extends 'behavior' ? BehaviorConfig<T> : never
+export type LostConfig<A extends AddonType> =
+    A extends 'plugin' ? PluginConfig :
+    A extends 'behavior' ? BehaviorConfig : never
 ;
 
 /** Type of addon. */
@@ -10,11 +10,14 @@ export type AddonType =
     | 'behavior'
 ;
 
-
+export type AddonPluginType =
+    | 'object'
+    | 'world'
+;
 /** Base properties for any Lost config. */
-type LostConfigBase<T extends AddonType> = {
+type LostConfigBase<A> = {
     /** Type of addon */
-    readonly type: T;
+    readonly type: A;
     /**
      * The unique ID of the addon.
      * @description This is not displayed and is only used internally.
@@ -79,7 +82,7 @@ type PluginCategory =
     | 'other'
 ;
 
-interface PluginConfigBase<T extends AddonType> extends LostConfigBase<T> {
+interface PluginConfigBase<A, P> extends LostConfigBase<A> {
     /**
       * An object name that will applied after plugin was installed/added to project.
       * @example 'MyPlugin'
@@ -91,7 +94,7 @@ interface PluginConfigBase<T extends AddonType> extends LostConfigBase<T> {
      * The world typeh represents a plugin that appears in the Layout View, whereas the object type represents a hidden plugin, similar to the Audio plugin (a single-global type) or Dictionary.
      * World type plugins must derive from SDK.IWorldInstanceBase instead of SDK.IInstanceBase and implement a Draw() method.
      */
-    readonly pluginType: 'object' | 'world';
+    readonly pluginType: P;
     /**
         * The category for the plugin when displaying it in the Create New Object Type dialog.
         * @example 'general'
@@ -132,11 +135,13 @@ interface PluginConfigBase<T extends AddonType> extends LostConfigBase<T> {
 }
 
 /** Object represents configs for Plugin addon type. */
-type PluginConfig<T extends AddonType> = ObjectPluginConfig<T> | WorldPluginConfig<T>;
+type PluginConfig = 
+    | ObjectPluginConfig
+    | WorldPluginConfig
+;
 
 /** Object represents config for Object Plugin addon. */
-interface ObjectPluginConfig<T extends AddonType> extends PluginConfigBase<T> {
-    readonly pluginType: 'object';
+interface ObjectPluginConfig extends PluginConfigBase<'plugin', 'object'> {
     /**
      * *Optional*. Default is ***False***. Pass true to set the plugin to be a single-global type.
      * @description The plugin type must be "object". Single-global plugins can only be added once to a project, and they then have a single permanent global instance available throughout the project. 
@@ -145,8 +150,7 @@ interface ObjectPluginConfig<T extends AddonType> extends PluginConfigBase<T> {
     readonly isSingleGlobal?: boolean;
 }
 
-interface WorldPluginConfig<T extends AddonType> extends PluginConfigBase<T> {
-    readonly pluginType: 'world';
+interface WorldPluginConfig extends PluginConfigBase<'plugin', 'world'> {
     /**
      * *Optional*. Default is ***True***. Pass true to enable resizing instances in the Layout View.
      */
@@ -165,10 +169,6 @@ interface WorldPluginConfig<T extends AddonType> extends PluginConfigBase<T> {
      * @description This adjusts the texture wrapping mode when Construct creates a texture for its image.
      */
     readonly isTiled?: boolean;
-    /**
-     * *Optional*. Default is ***False***. Pass true to indicate that plugin has animations.
-     */
-    readonly hasAnimations?: boolean;
     /**
      * *Optional*. Default is ***True***. Pass true to allow using Z elevation with this plugin.
      * @description By default the renderer applies the Z elevation before calling the Draw() method on an instance, which in many cases is sufficient to handle rendering Z elevation correctly, but be sure to take in to account Z elevation in the drawing method if it does more complex rendering.
@@ -215,7 +215,7 @@ type BehaviorCategory =
 
 
 /** Object represents config for Behavior addon type. */
-interface BehaviorConfig<T extends AddonType> extends LostConfigBase<T> {
+interface BehaviorConfig extends LostConfigBase<'behavior'> {
     /**
       * An object name that will applied after plugin was installed/added to project.
       * @example 'MyPlugin'

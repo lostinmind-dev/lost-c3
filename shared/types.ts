@@ -199,4 +199,5 @@ export interface LanguagePluginProperty {
     "items"?: {
         [itemId: string]: string;
     };
+    "link-text"?: string;
 }

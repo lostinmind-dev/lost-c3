@@ -1,4 +1,4 @@
-const C3 = globalThis.C3;
+import { GPUResourceManager } from "./Modules/index.ts";
 
 class Instance extends globalThis.ISDKInstanceBase {
 
@@ -7,6 +7,7 @@ class Instance extends globalThis.ISDKInstanceBase {
     constructor() {
         super();
         const properties = this._getInitProperties() as PluginProperties;
+        console.log(GPUResourceManager)
     }
 
     _release() {
@@ -14,4 +15,5 @@ class Instance extends globalThis.ISDKInstanceBase {
 	}
 }
 
+/** Important to save export type for Typescript compiler */
 export type { Instance };

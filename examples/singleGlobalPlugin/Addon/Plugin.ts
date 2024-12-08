@@ -4,4 +4,5 @@ class LostPlugin extends globalThis.ISDKPluginBase {
 	}
 };
 
+/** Important to save export type for Typescript compiler */
 export type { LostPlugin };

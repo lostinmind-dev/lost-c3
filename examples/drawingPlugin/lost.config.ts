@@ -1,10 +1,10 @@
 
 
-import type { LostConfig } from "../../mod.ts";
+import { defineConfig } from "../../lib/index.ts";
 
-const config: LostConfig<'plugin'> = {
+export default defineConfig<'plugin'>({
     type: 'plugin',
-    pluginType: 'object',
+    pluginType: 'world',
     // deprecated?: boolean;
     // minConstructVersion?: string;
     // canBeBundled?: boolean;
@@ -20,7 +20,6 @@ const config: LostConfig<'plugin'> = {
     helpUrl: {
         EN: 'https://myaddon.com/help/en'
     },
-    websiteUrl: 'https://myaddon.com'
-}
-
-export default config;
+    websiteUrl: 'https://myaddon.com',
+    commonACEs: []
+})

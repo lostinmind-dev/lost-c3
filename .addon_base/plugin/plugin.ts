@@ -35,8 +35,9 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
             this._info.SetIsRotatable(config.isRotatable || true);
             this._info.SetIs3D(config.is3D || false);
             this._info.SetIsTiled(config.isTiled || false);
-            this._info.SetHasAnimations(config.hasAnimations || false);
-
+            if (_lostData.hasDefaultImage) {
+                this._info.SetDefaultImageURL('default.png');
+            };
             this._info.SetSupportsZElevation(config.supportsZElevation || true);
             this._info.SetSupportsColor(config.supportsColor || true);
             this._info.SetSupportsEffects(config.supportsEffects || true);
@@ -99,11 +100,8 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
     }
 
     private setupUserModules() {
-        this._info.SetRuntimeModuleMainScript('c3runtime/main.js');
-        
         const modules = _lostData.files.filter(file => file.type === 'module');
         if (modules.length > 0) {
-
             modules.forEach(file => {
                 this._info.AddC3RuntimeScript(`c3runtime/modules/${file.path}`);
             })
@@ -299,29 +297,29 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                         )
                         break;
                     case Property.Info:
-                        const infoFunc = this.deserializeFunction(_funcString || '');
+                        const infoFunc = _lostMethods[_id];
     
                         if (infoFunc) {
                             properties.push(
                                 new SDK.PluginProperty(
                                     _opts.type, _id, {
-                                    infoCallback: (i) => {
-                                        return infoFunc(i);
+                                    infoCallback: (inst) => {
+                                            return infoFunc(inst);
                                     }
                                 })
                             )
                         }
                         break;
                     case Property.Link:
-                        const func = this.deserializeFunction(_funcString || '');
+                        const linkFunc = _lostMethods[_id];
     
-                        if (func) {
+                        if (linkFunc) {
                             properties.push(
                                 new SDK.PluginProperty(
                                     _opts.type, _id, {
                                     callbackType: _opts.callbackType,
-                                    linkCallback: (p) => {
-                                        func(p);
+                                    linkCallback: (instOrType) => {
+                                        linkFunc(instOrType);
                                     }
                                 }
                                 )
@@ -333,32 +331,6 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         }
 
         this._info.SetProperties(properties);
-    }
-
-    protected deserializeFunction(funcString: string): Function | null {
-        try {
-            const cleanedFuncString = funcString.trim();
-
-            const arrowFunctionMatch = cleanedFuncString.match(/^\((.*)\)\s*=>\s*\{([\s\S]*)\}$/);
-            const regularFunctionMatch = cleanedFuncString.match(/^function\s*\((.*)\)\s*\{([\s\S]*)\}$/);
-
-            if (arrowFunctionMatch) {
-                const args = arrowFunctionMatch[1].trim();
-                const body = arrowFunctionMatch[2].trim();
-                return new Function(args, body);
-            }
-
-            if (regularFunctionMatch) {
-                const args = regularFunctionMatch[1].trim();
-                const body = regularFunctionMatch[2].trim();
-                return new Function(args, body);
-            }
-
-            return null;
-        } catch (error) {
-            // console.error("Failed to deserialize function:", error);
-            return null;
-        }
     }
 };
 PLUGIN_CLASS.Register(config.addonId, PLUGIN_CLASS);

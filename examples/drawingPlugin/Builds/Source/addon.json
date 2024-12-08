@@ -21,16 +21,13 @@
         "c3runtime/conditions.js",
         "c3runtime/expressions.js",
         "c3runtime/instance.js",
-        "c3runtime/modules/index.js",
         "c3runtime/plugin.js",
         "c3runtime/type.js",
-        "files/other/info.txt",
-        "files/styles.css",
+        "default.png",
         "icon.svg",
         "instance.js",
         "lang/en-US.json",
         "plugin.js",
-        "scripts/index.js",
         "type.js"
     ]
 }

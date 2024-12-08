@@ -1,0 +1,47 @@
+{
+    "id1": {
+        "actions": [
+            {
+                "id": "test",
+                "scriptName": "doAction",
+                "highlight": false,
+                "isDeprecated": false,
+                "isAsync": true,
+                "params": [
+                    {
+                        "id": "1",
+                        "type": "string",
+                        "initialValue": "",
+                        "autocompleteId": ""
+                    }
+                ]
+            }
+        ],
+        "conditions": [
+            {
+                "id": "myId",
+                "scriptName": "onCondition",
+                "highlight": false,
+                "isDeprecated": false,
+                "isTrigger": true,
+                "isFakeTrigger": false,
+                "isStatic": false,
+                "isLooping": false,
+                "isInvertible": true,
+                "isCompatibleWithTriggers": true,
+                "params": []
+            }
+        ],
+        "expressions": [
+            {
+                "id": "id1",
+                "expressionName": "GetValue",
+                "highlight": false,
+                "isDeprecated": false,
+                "returnType": "any",
+                "isVariadicParameters": false,
+                "params": []
+            }
+        ]
+    }
+}

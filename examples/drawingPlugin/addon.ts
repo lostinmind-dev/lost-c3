@@ -7,20 +7,19 @@ import config from './lost.config.ts';
 
 export default defineAddon(
     new Plugin<EditorInstance, EditorType>(config)
-
-        .addProperty('test', 'Test', {
+        .addProperty('test', 'Make 1:1', {
             type: Property.Link,
             callbackType: 'for-each-instance',
-            callback: (i) => {
-                i.
+            callback: (inst) => {
+                inst.OnMakeOriginalSize();
             }
         })
 
-        .addProperty('', '', {
+        .addProperty('test1', 'Edit image', {
             type: Property.Link,
             callbackType: 'once-for-type',
-            callback: (i) => {
-                
+            callback: (type) => {
+                type.GetObjectType().EditImage();
             }
         })
 )

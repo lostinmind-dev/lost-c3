@@ -9,5 +9,5 @@ class LostType extends globalThis.ISDKObjectTypeBase<Instance> {
 };
 
 
-/** Export should be here for compiler (to detect class) */
+/** Important to save export type for Typescript compiler */
 export type { LostType };

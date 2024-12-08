@@ -1,3 +1,8 @@
+declare const _lostMethods: LostMethodsColection;
+
+declare type LostMethodsColection = {
+    [key: string]: ((i: any) => void) | Function | undefined;
+}
 declare interface IAddonBaseMetadata {
     readonly download_url: string;
     readonly addon_type: string;

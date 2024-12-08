@@ -14,6 +14,7 @@ type AddonIconData = {
 }
 
 export class LostAddonData {
+    readonly hasDefaultImage: boolean;
     readonly icon: AddonIconData;
     readonly config: LostConfig<AddonType>;
     readonly remoteScripts: string[] = [];
@@ -21,6 +22,7 @@ export class LostAddonData {
     readonly pluginProperties: PluginProperty<any, any, any>[];
 
     constructor(
+        hasDefaultImage: boolean,
         icon: AddonIconData,
         config: LostConfig<AddonType>,
         pluginProperties: PluginProperty<any, any, any>[],
@@ -30,6 +32,7 @@ export class LostAddonData {
         userModules: AddonUserModuleFile[],
         userDomSideScripts: AddonUserDomSideScriptFile[]
     ) {
+        this.hasDefaultImage = hasDefaultImage;
         this.icon = icon;
         this.config = config;
         this.pluginProperties = pluginProperties;

@@ -1,7 +1,8 @@
-const C3 = globalThis.C3;
-
-C3.Plugins[Lost.addonId] = class LostPlugin extends globalThis.ISDKPluginBase {
+class LostDrawingPlugin extends globalThis.ISDKPluginBase {
 	constructor() {
 		super();
 	}
 };
+
+/** Important to save export type for Typescript compiler */
+export type { LostDrawingPlugin };

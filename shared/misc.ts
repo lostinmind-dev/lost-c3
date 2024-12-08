@@ -41,6 +41,23 @@ export function dedent(strings: TemplateStringsArray, ...values: any[]) {
     return lines.map(line => line.slice(minIndent)).join("\n").trim();
 }
 
+export async function isFileExists(path: string): Promise<boolean> {
+    try {
+        const dirStat = await Deno.stat(path);
+
+        if (
+            dirStat &&
+            dirStat.isFile
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (_e) {
+        return false;
+    }
+}
+
 export async function isDirectoryExists(path: string): Promise<boolean> {
     try {
         const dirStat = await Deno.stat(path);

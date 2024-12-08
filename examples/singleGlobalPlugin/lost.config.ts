@@ -10,7 +10,7 @@ export default defineConfig<'plugin'>({
     // canBeBundled?: boolean;
     isSingleGlobal: true,
     objectName: 'LostPlugin',
-
+    
     addonId: 'LostPluginId',
     category: 'general',
     addonName: 'Lost plugin for Construct 3',
@@ -21,5 +21,6 @@ export default defineConfig<'plugin'>({
     helpUrl: {
         EN: 'https://myaddon.com/help/en'
     },
-    websiteUrl: 'https://myaddon.com'
+    websiteUrl: 'https://myaddon.com',
+    
 })

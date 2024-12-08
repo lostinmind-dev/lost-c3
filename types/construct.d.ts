@@ -757,7 +757,8 @@ declare global {
 
 	namespace SDK {
 		class IPluginBase {
-
+			static Instance: typeof IInstanceBase;
+			static Type: typeof ITypeBase;
 			constructor(id: string);
 
 			_info: SDK.IPluginInfo;

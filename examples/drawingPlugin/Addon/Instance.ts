@@ -1,5 +1,3 @@
-const C3 = globalThis.C3;
-
 class LostDrawingInstance extends globalThis.ISDKWorldInstanceBase {
 
     readonly Conditions = C3.Plugins[Lost.addonId].Cnds;
@@ -44,5 +42,5 @@ class LostDrawingInstance extends globalThis.ISDKWorldInstanceBase {
     }
 }
 
-C3.Plugins[Lost.addonId].Instance = LostDrawingInstance;
+/** Important to save export type for Typescript compiler */
 export type { LostDrawingInstance as Instance };

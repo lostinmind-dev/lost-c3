@@ -20,4 +20,5 @@ class LostEditorInstance extends SDK.IInstanceBase {
 	}
 };
 
+/** Important to save export type for Typescript compiler */
 export type { LostEditorInstance as EditorInstance };

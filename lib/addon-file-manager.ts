@@ -10,6 +10,7 @@ import type {
     LanguageCondition, LanguageExpression, EntityCollection
 } from "../shared/types.ts";
 import type { AddonType, LostConfig } from "./config.ts";
+import { getDefaultLost } from "./defaults/lost.ts";
 import type { CategoryClassType } from "./entities/category.ts";
 import { Param } from "./entities/parameter.ts";
 import { Property, type PluginProperty } from "./entities/plugin-property.ts";
@@ -60,6 +61,7 @@ export abstract class AddonFileManager {
         return files;
     }
 
+    /** @deprecated */
     static #initModuleFile(addonType: AddonType) {
         const scripts: string[] = [];
 
@@ -204,6 +206,7 @@ C3.Behaviors["${config.addonId}"].Exps = ${serializeObjectWithFunctions(entities
                 }
 
 fileContent = dedent`
+${getDefaultLost(config).value}
 ${script}
 ${assign}
 `
@@ -217,6 +220,7 @@ ${assign}
                 assign = `globalThis.C3.Plugins["${config.addonId}"] = ${className};`;
 
 fileContent = dedent`
+${getDefaultLost(config).value}
 ${script}
 ${assign}
 `
@@ -230,6 +234,7 @@ ${assign}
                 assign = `globalThis.C3.Behaviors["${config.addonId}"] = ${className};`;
 
 fileContent = dedent`
+${getDefaultLost(config).value}
 ${script}
 ${assign}
 `
@@ -251,6 +256,7 @@ ${assign}
                 }
 
 fileContent = dedent`
+${getDefaultLost(config).value}
 ${script}
 ${assign}
 `
@@ -271,9 +277,32 @@ ${assign}
 
         switch (scriptType) {
             case EditorScript.Plugin:
+                /** Create methods .js file */
+                const methods: { [key: string]: Function } = {};
+
+                if (
+                    lostData &&
+                    lostData.pluginProperties.length > 0
+                ) {
+                    lostData.pluginProperties.forEach(p => {
+                        if (
+                            p._opts.type === Property.Info ||
+                            p._opts.type === Property.Link
+                        ) {
+                            methods[p._id] = p._opts.callback;
+                        }
+                    })
+                }
+
+                const methodsAsString = Object.entries(methods)
+                    .map(([key, value]) => dedent`  ${key}: ${value.toString()}`)
+                    .join(',\n');
                 fileContent = await Deno.readTextFile(Paths.LocalAddonBase[config.type]);
 
 fileContent = dedent`
+const _lostMethods = {
+    ${methodsAsString}
+};
 const _lostData = ${JSON.stringify(lostData)};
 ${fileContent}
 `
@@ -312,8 +341,11 @@ ${fileContent}
                 }
 
 fileContent = dedent`
+${getDefaultLost(config).value}
 ${script}
-${assign}
+setTimeout(() => {
+    ${assign}
+})
 `
                 break;
             case EditorScript.Type:
@@ -340,8 +372,11 @@ ${assign}
                 }
 
 fileContent = dedent`
+${getDefaultLost(config).value}
 ${script}
-${assign}
+setTimeout(() => {
+    ${assign}
+})
 `
                 break;
         }
@@ -612,6 +647,9 @@ ${assign}
                         LangPP['name'] = _name;
                         LangPP['desc'] = _description;
                         switch (_opts.type) {
+                            case Property.Link:
+                            LangPP['link-text'] = _opts.linkText;
+                            break;
                             case Property.Combo:
     
                                 LangPP['items'] = {};

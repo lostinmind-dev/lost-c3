@@ -1,8 +1,6 @@
 import type { Instance } from "./Instance.ts";
 
-const C3 = globalThis.C3;
-
-C3.Plugins[Lost.addonId].Type = class LostDrawingType extends globalThis.ISDKObjectTypeBase<Instance> {
+class LostDrawingType extends globalThis.ISDKObjectTypeBase<Instance> {
 	constructor() {
 		super();
 	}
@@ -21,3 +19,6 @@ C3.Plugins[Lost.addonId].Type = class LostDrawingType extends globalThis.ISDKObj
 		renderer.releaseTextureForImageInfo(this.getImageInfo());
 	}
 };
+
+/** Important to save export type for Typescript compiler */
+export type { LostDrawingType };
