@@ -275,11 +275,10 @@ ${assign}
         let className: string;
         let fileContent: string = '';
 
+        const methods: { [key: string]: Function } = {};
+        let methodsAsString: string
         switch (scriptType) {
             case EditorScript.Plugin:
-                /** Create methods .js file */
-                const methods: { [key: string]: Function } = {};
-
                 if (
                     lostData &&
                     lostData.pluginProperties.length > 0
@@ -294,7 +293,7 @@ ${assign}
                     })
                 }
 
-                const methodsAsString = Object.entries(methods)
+                methodsAsString = Object.entries(methods)
                     .map(([key, value]) => dedent`  ${key}: ${value.toString()}`)
                     .join(',\n');
                 fileContent = await Deno.readTextFile(Paths.LocalAddonBase[config.type]);
@@ -309,9 +308,29 @@ ${fileContent}
 
                 break;
             case EditorScript.Behavior:
+                if (
+                    lostData &&
+                    lostData.pluginProperties.length > 0
+                ) {
+                    lostData.pluginProperties.forEach(p => {
+                        if (
+                            p._opts.type === Property.Info ||
+                            p._opts.type === Property.Link
+                        ) {
+                            methods[p._id] = p._opts.callback;
+                        }
+                    })
+                }
+
+                methodsAsString = Object.entries(methods)
+                    .map(([key, value]) => dedent`  ${key}: ${value.toString()}`)
+                    .join(',\n');
                 fileContent = await Deno.readTextFile(Paths.LocalAddonBase[config.type]);
 
 fileContent = dedent`
+const _lostMethods = {
+    ${methodsAsString}
+};
 const _lostData = ${JSON.stringify(lostData)};
 ${fileContent}
 `

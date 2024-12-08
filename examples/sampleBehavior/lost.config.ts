@@ -1,8 +1,8 @@
 
 
-import type { LostConfig } from "../../mod.ts";
+import { defineConfig } from "../../mod.ts";
 
-const config: LostConfig<'behavior'> = {
+export default defineConfig<'behavior'>({
     type: 'behavior',
     // deprecated?: boolean;
     // minConstructVersion?: string;
@@ -21,6 +21,4 @@ const config: LostConfig<'behavior'> = {
         EN: 'https://myaddon.com/help/en'
     },
     websiteUrl: 'https://myaddon.com'
-}
-
-export default config;
+})

@@ -1,18 +1,9 @@
-import { GPUResourceManager } from "./Modules/index.ts";
-
-const C3 = globalThis.C3;
-
-const a = new GPUResourceManager();
-
-console.log(a)
-
 class LostBehaviorInstance extends globalThis.ISDKBehaviorInstanceBase<IWorldInstance> {
 
-    readonly Conditions = C3.Plugins[Lost.addonId].Cnds;
+    readonly Conditions = C3.Behaviors[Lost.addonId].Cnds;
 
     constructor() {
         super();
-
         const properties = this._getInitProperties() as PluginProperties;
     }
 
@@ -27,5 +18,4 @@ class LostBehaviorInstance extends globalThis.ISDKBehaviorInstanceBase<IWorldIns
 	// }
 }
 
-C3.Behaviors[Lost.addonId].Instance = LostBehaviorInstance;
 export type { LostBehaviorInstance as Instance };

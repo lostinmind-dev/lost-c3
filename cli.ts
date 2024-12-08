@@ -7,6 +7,7 @@ import { Paths } from './shared/paths.ts';
 import Build from './cli/main.ts';
 import Serve from './cli/serve-addon.ts';
 import { dedent } from "./shared/misc.ts";
+import { downloadAddonBase } from "./cli/check-addon-base-exists.ts";
 
 
 let rebuildTimeout: number | undefined;
@@ -47,8 +48,8 @@ async function BuildAndWatch() {
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
-        boolean: ['plugin', 'behavior', 'watch'],
-        alias: { p: 'plugin', b: 'behavior', w: 'watch', },
+        boolean: ['drawing-plugin', 'plugin', 'behavior', 'watch'],
+        alias: { dp: 'drawing-plugin', p: 'plugin', b: 'behavior', w: 'watch', },
         "--": true,
     });
 
@@ -76,6 +77,9 @@ async function main() {
 
                 if (flags.behavior) {
                     await createBareBones('behavior');
+                }
+                if (flags["drawing-plugin"]) {
+                    await createBareBones('drawing-plugin');
                 }
             }
             break;
@@ -121,9 +125,21 @@ async function installTypes() {
     }
 }
 
-async function createBareBones(addonType: AddonType) {
-    Logger.Process(`Creating bare-bones for ${Colors.magenta(`"${addonType}"`)} addon type`);
-    await cloneRepo(Paths.BareBones[addonType]);
+async function createBareBones(type: AddonBareBonesType) {
+    Logger.Process(`Creating bare-bones for ${Colors.magenta(`"${type}"`)} addon type`);
+    await cloneRepo(Paths.BareBones[type]);
+    await installTypes();
+    switch (type) {
+        case "plugin":
+            await downloadAddonBase('plugin');
+            break;
+        case "drawing-plugin":
+            await downloadAddonBase('plugin');
+            break;
+        case "behavior":
+            await downloadAddonBase('behavior');
+            break;
+    }
 }
 
 async function cloneRepo(url: string) {
@@ -159,8 +175,9 @@ function printHelp() {
 }
 
 function printCreate() {
-    Logger.Log('   ⚙️', Colors.gray('  --plugin, -p'), Colors.italic('   Creates a bare-bones for "plugin" addon type.'));
-    Logger.Log('   ⚙️', Colors.gray('  --behavior, -b'), Colors.italic('   Creates a bare-bones for "behavior" addon type.'));
+    Logger.Log('   ⚙️', Colors.gray('  --plugin, -p'), Colors.italic('   Creates a bare-bones for "Plugin" addon type.'));
+    Logger.Log('   ⚙️', Colors.gray('  --drawing-plugin, -dp'), Colors.italic('   Creates a bare-bones for "Drawing Plugin" addon type.'));
+    Logger.Log('   ⚙️', Colors.gray('  --behavior, -b'), Colors.italic('   Creates a bare-bones for "Behavior" addon type.'));
     // Logger.Log('   ⚙️', Colors.gray('  --theme, -t'), Colors.italic('   Creates a bare-bones for "theme" addon type.'));
     // Logger.Log('   ⚙️', Colors.gray('  --effect, -e'), Colors.italic('   Creates a bare-bones for "effect" addon type.'));
 }

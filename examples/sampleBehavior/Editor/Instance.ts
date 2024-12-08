@@ -1,5 +1,4 @@
 class LostEditorInstance extends SDK.IBehaviorInstanceBase {
-	test = 2;
 	constructor(sdkBehType: SDK.IBehaviorTypeBase, behInst: SDK.IBehaviorInstance) {
 		super(sdkBehType, behInst);
 	}
@@ -21,4 +20,4 @@ class LostEditorInstance extends SDK.IBehaviorInstanceBase {
 	}
 };
 
-export { LostEditorInstance as EditorInstance };
+export type { LostEditorInstance as EditorInstance };

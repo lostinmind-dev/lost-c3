@@ -153,7 +153,7 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
 
         if (_lostData.pluginProperties.length > 0) {
             _lostData.pluginProperties.forEach(property => {
-                const { _id, _opts, _funcString } = property;
+                const { _id, _opts } = property;
                 switch (_opts.type) {
                     case Property.Integer:
                         if (_opts.min && _opts.max) {

@@ -1,3 +1,7 @@
+const _lostMethods = {
+    
+};
+const _lostData = {"hasDefaultImage":false,"icon":{"path":"icon.svg","iconType":"image/svg+xml"},"config":{"type":"behavior","isOnlyOneAllowed":true,"objectName":"LostPlugin","addonId":"LostPluginId","category":"general","addonName":"Lost plugin for Construct 3","addonDescription":"My awesome addon was made with Lost","version":"1.0.0.0","author":"lostinmind.","docsUrl":"https://myaddon.com/docs","helpUrl":{"EN":"https://myaddon.com/help/en"},"websiteUrl":"https://myaddon.com"},"remoteScripts":[],"files":[{"type":"file","path":"other/info.txt","dependencyType":"copy-to-output","mimeType":"text/plain"},{"type":"file","path":"styles.css","dependencyType":"external-css"},{"type":"script","path":"index.js","dependencyType":"external-dom-script"},{"type":"module","path":"index.js"}],"pluginProperties":[{"_id":"test","_name":"Test 1","_description":"There is no any description yet...","_opts":{"type":"text"}},{"_id":"test334","_name":"rtwet","_description":"There is no any description yet...","_opts":{"type":"integer"}}]};
 
 const config = _lostData.config;
 const { icon } = _lostData;

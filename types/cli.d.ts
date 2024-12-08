@@ -1,3 +1,9 @@
+declare type AddonBareBonesType =
+    | 'plugin'
+    | 'drawing-plugin'
+    | 'behavior'
+;
+
 declare const _lostMethods: LostMethodsColection;
 
 declare type LostMethodsColection = {

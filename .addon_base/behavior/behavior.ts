@@ -36,11 +36,8 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
 	}
 
 	private setupUserModules() {
-		this._info.SetRuntimeModuleMainScript('c3runtime/main.js');
-
 		const modules = _lostData.files.filter(file => file.type === 'module');
 		if (modules.length > 0) {
-
 			modules.forEach(file => {
 				this._info.AddC3RuntimeScript(`c3runtime/modules/${file.path}`);
 			})
@@ -90,186 +87,161 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
 	private setupPluginProperties() {
 		const properties: SDK.PluginProperty[] = [];
 
-		_lostData.pluginProperties.forEach(property => {
-			const { _id, _opts, _funcString } = property;
-			switch (_opts.type) {
-				case Property.Integer:
-					if (_opts.min && _opts.max) {
-						properties.push(
-							new SDK.PluginProperty(_opts.type, _id, {
-								initialValue: _opts.initialValue || 0,
-								minValue: _opts.min,
-								maxValue: _opts.max
-							})
-						)
-					} else if (_opts.min) {
-						properties.push(
-							new SDK.PluginProperty(_opts.type, _id, {
-								initialValue: _opts.initialValue || 0,
-								minValue: _opts.min,
-							})
-						)
-					} else if (_opts.max) {
-						properties.push(
-							new SDK.PluginProperty(_opts.type, _id, {
-								initialValue: _opts.initialValue || 0,
-								maxValue: _opts.max
-							})
-						)
-					} else {
-						properties.push(
-							new SDK.PluginProperty(_opts.type, _id, {
-								initialValue: _opts.initialValue || 0
-							})
-						)
-					}
-					break;
-				case Property.Float:
-					if (_opts.min && _opts.max) {
-						properties.push(
-							new SDK.PluginProperty(_opts.type, _id, {
-								initialValue: _opts.initialValue || 0,
-								minValue: _opts.min,
-								maxValue: _opts.max
-							})
-						)
-					} else if (_opts.min) {
-						properties.push(
-							new SDK.PluginProperty(_opts.type, _id, {
-								initialValue: _opts.initialValue || 0,
-								minValue: _opts.min,
-							})
-						)
-					} else if (_opts.max) {
-						properties.push(
-							new SDK.PluginProperty(_opts.type, _id, {
-								initialValue: _opts.initialValue || 0,
-								maxValue: _opts.max
-							})
-						)
-					} else {
-						properties.push(
-							new SDK.PluginProperty(_opts.type, _id, {
-								initialValue: _opts.initialValue || 0
-							})
-						)
-					}
-					break;
-				case Property.Percent:
-					properties.push(
-						new SDK.PluginProperty(
-							_opts.type, _id, {
-							initialValue: _opts.initialValue || 0
+		if (_lostData.pluginProperties.length > 0) {
+			_lostData.pluginProperties.forEach(property => {
+				const { _id, _opts } = property;
+				switch (_opts.type) {
+					case Property.Integer:
+						if (_opts.min && _opts.max) {
+							properties.push(
+								new SDK.PluginProperty(_opts.type, _id, {
+									initialValue: _opts.initialValue || 0,
+									minValue: _opts.min,
+									maxValue: _opts.max
+								})
+							)
+						} else if (_opts.min) {
+							properties.push(
+								new SDK.PluginProperty(_opts.type, _id, {
+									initialValue: _opts.initialValue || 0,
+									minValue: _opts.min,
+								})
+							)
+						} else if (_opts.max) {
+							properties.push(
+								new SDK.PluginProperty(_opts.type, _id, {
+									initialValue: _opts.initialValue || 0,
+									maxValue: _opts.max
+								})
+							)
+						} else {
+							properties.push(
+								new SDK.PluginProperty(_opts.type, _id, {
+									initialValue: _opts.initialValue || 0
+								})
+							)
 						}
-						)
-					)
-					break;
-				case Property.Text:
-					properties.push(
-						new SDK.PluginProperty(
-							_opts.type, _id, {
-							initialValue: _opts.initialValue || ''
+						break;
+					case Property.Float:
+						if (_opts.min && _opts.max) {
+							properties.push(
+								new SDK.PluginProperty(_opts.type, _id, {
+									initialValue: _opts.initialValue || 0,
+									minValue: _opts.min,
+									maxValue: _opts.max
+								})
+							)
+						} else if (_opts.min) {
+							properties.push(
+								new SDK.PluginProperty(_opts.type, _id, {
+									initialValue: _opts.initialValue || 0,
+									minValue: _opts.min,
+								})
+							)
+						} else if (_opts.max) {
+							properties.push(
+								new SDK.PluginProperty(_opts.type, _id, {
+									initialValue: _opts.initialValue || 0,
+									maxValue: _opts.max
+								})
+							)
+						} else {
+							properties.push(
+								new SDK.PluginProperty(_opts.type, _id, {
+									initialValue: _opts.initialValue || 0
+								})
+							)
 						}
-						)
-					)
-					break;
-				case Property.LongText:
-					properties.push(
-						new SDK.PluginProperty(
-							_opts.type, _id, {
-							initialValue: _opts.initialValue || ''
-						}
-						)
-					)
-					break;
-				case Property.Checkbox:
-					properties.push(
-						new SDK.PluginProperty(
-							_opts.type, _id, {
-							initialValue: _opts.initialValue || false
-						}
-						)
-					)
-					break;
-				case Property.Font:
-					properties.push(
-						new SDK.PluginProperty(
-							_opts.type, _id, {
-							initialValue: _opts.initialValue || 'Arial'
-						}
-						)
-					)
-					break;
-				case Property.Combo:
-					const items = _opts.items.map(item => item[0]);
-					const _initialValue = (_opts.initialValue) ? _opts.initialValue : items[0];
-					properties.push(
-						new SDK.PluginProperty(
-							_opts.type, _id, {
-							items: items,
-							initialValue: _initialValue
-						}
-						)
-					)
-					break;
-				case Property.Color:
-					// ignore, because link property is not available with behavior addon type
-					break;
-				case Property.Object:
-					// ignore, because link property is not available with behavior addon type
-					break;
-				case Property.Group:
-					properties.push(
-						new SDK.PluginProperty(_opts.type, _id)
-					)
-					break;
-				case Property.Info:
-					const infoFunc = this.deserializeFunction(_funcString || '');
-
-					if (infoFunc) {
+						break;
+					case Property.Percent:
 						properties.push(
 							new SDK.PluginProperty(
 								_opts.type, _id, {
-								infoCallback: (i) => {
-									return infoFunc(i);
-								}
-							})
+								initialValue: _opts.initialValue || 0
+							}
+							)
 						)
-					}
-					break;
-				case Property.Link:
-					// ignore, because link property is not available with behavior addon type
-					break;
-			}
-		})
+						break;
+					case Property.Text:
+						properties.push(
+							new SDK.PluginProperty(
+								_opts.type, _id, {
+								initialValue: _opts.initialValue || ''
+							}
+							)
+						)
+						break;
+					case Property.LongText:
+						properties.push(
+							new SDK.PluginProperty(
+								_opts.type, _id, {
+								initialValue: _opts.initialValue || ''
+							}
+							)
+						)
+						break;
+					case Property.Checkbox:
+						properties.push(
+							new SDK.PluginProperty(
+								_opts.type, _id, {
+								initialValue: _opts.initialValue || false
+							}
+							)
+						)
+						break;
+					case Property.Font:
+						properties.push(
+							new SDK.PluginProperty(
+								_opts.type, _id, {
+								initialValue: _opts.initialValue || 'Arial'
+							}
+							)
+						)
+						break;
+					case Property.Combo:
+						const items = _opts.items.map(item => item[0]);
+						properties.push(
+							new SDK.PluginProperty(
+								_opts.type, _id, {
+								items: items,
+								initialValue: _opts.initialValue || items[0]
+							}
+							)
+						)
+						break;
+					case Property.Color:
+						// ignore, because property type is not available with behavior addon type
+						break;
+					case Property.Object:
+						// ignore, because property type is not available with behavior addon type
+						break;
+					case Property.Group:
+						properties.push(
+							new SDK.PluginProperty(_opts.type, _id)
+						)
+						break;
+					case Property.Info:
+						const infoFunc = _lostMethods[_id];
+
+						if (infoFunc) {
+							properties.push(
+								new SDK.PluginProperty(
+									_opts.type, _id, {
+									infoCallback: (inst) => {
+										return infoFunc(inst);
+									}
+								})
+							)
+						}
+						break;
+					case Property.Link:
+						// ignore, because link property type is not available with behavior addon type
+						break;
+				}
+			})
+		}
 
 		this._info.SetProperties(properties);
-	}
-
-	protected deserializeFunction(funcString: string): Function | null {
-		try {
-			const cleanedFuncString = funcString.trim();
-
-			const arrowFunctionMatch = cleanedFuncString.match(/^\((.*)\)\s*=>\s*\{([\s\S]*)\}$/);
-			const regularFunctionMatch = cleanedFuncString.match(/^function\s*\((.*)\)\s*\{([\s\S]*)\}$/);
-
-			if (arrowFunctionMatch) {
-				const args = arrowFunctionMatch[1].trim();
-				const body = arrowFunctionMatch[2].trim();
-				return new Function(args, body);
-			}
-
-			if (regularFunctionMatch) {
-				const args = regularFunctionMatch[1].trim();
-				const body = regularFunctionMatch[2].trim();
-				return new Function(args, body);
-			}
-
-			return null;
-		} catch (error) {
-			// console.error("Failed to deserialize function:", error);
-			return null;
-		}
 	}
 };
 

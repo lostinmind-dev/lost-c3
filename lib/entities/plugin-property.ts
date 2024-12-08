@@ -77,9 +77,9 @@ export class PluginProperty<A, I, T extends SDK.ITypeBase = SDK.ITypeBase> {
 
 export type AddonPropertyOptions<A, I, T extends SDK.ITypeBase = SDK.ITypeBase> =
     A extends 'plugin' ? PluginPropertyOptions<I, T> :
-    A extends 'behavior' ? BehaviorPropertyOptionsWrapped<I> : never;
+    A extends 'behavior' ? BehaviorPropertyOptions : never;
 
-type BaseAddonPropertyOptions<I extends EditorInstanceType> =
+type BaseAddonPropertyOptions =
     | IntegerProperty
     | FloatProperty
     | PercentProperty
@@ -89,20 +89,21 @@ type BaseAddonPropertyOptions<I extends EditorInstanceType> =
     | FontProperty
     | ComboProperty
     | GroupProperty
-    | InfoProperty<I>
 ;
 
 type ObjectPluginPropertyOptions<I extends SDK.IInstanceBase, T extends SDK.ITypeBase> =
     | ColorProperty
     | ObjectProperty
-    | BaseAddonPropertyOptions<I>
+    | InfoProperty<I>
+    | BaseAddonPropertyOptions
     | LinkPropertyOnceForType<T>
 ;
 
 type WorldPluginPropertyOptions<I extends SDK.IWorldInstanceBase, T extends SDK.ITypeBase> =
     | ColorProperty
     | ObjectProperty
-    | BaseAddonPropertyOptions<I>
+    | InfoProperty<I>
+    | BaseAddonPropertyOptions
     | LinkPropertyForEachInstance<I>
     | LinkPropertyOnceForType<T>
 ;
@@ -111,10 +112,7 @@ type PluginPropertyOptions<I, T extends SDK.ITypeBase> =
     I extends SDK.IWorldInstanceBase ? WorldPluginPropertyOptions<I, T> :
     I extends SDK.IInstanceBase ? ObjectPluginPropertyOptions<I, T> : never;
 
-type BehaviorPropertyOptionsWrapped<I> =
-    I extends SDK.IBehaviorInstanceBase ? BehaviorPropertyOptions<I> : never;
-
-type BehaviorPropertyOptions<I extends SDK.IBehaviorInstanceBase> = BaseAddonPropertyOptions<I>;
+type BehaviorPropertyOptions = BaseAddonPropertyOptions;
 
 /** Base properties for any plugin property. */
 type PropertyOptionsBase = {

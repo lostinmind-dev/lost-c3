@@ -3,3 +3,5 @@ class LostBehavior extends globalThis.ISDKBehaviorBase {
 		super();
 	}
 };
+
+export type { LostBehavior };

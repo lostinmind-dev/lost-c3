@@ -1,0 +1,36 @@
+{
+    "supports-worker-mode": true,
+    "is-c3-addon": true,
+    "sdk-version": 2,
+    "type": "behavior",
+    "name": "Lost plugin for Construct 3",
+    "id": "LostPluginId",
+    "version": "1.0.0.0",
+    "author": "lostinmind.",
+    "website": "https://myaddon.com",
+    "documentation": "https://myaddon.com/docs",
+    "description": "My awesome addon was made with Lost",
+    "editor-scripts": [
+        "type.js",
+        "instance.js",
+        "behavior.js"
+    ],
+    "file-list": [
+        "aces.json",
+        "behavior.js",
+        "c3runtime/actions.js",
+        "c3runtime/behavior.js",
+        "c3runtime/conditions.js",
+        "c3runtime/expressions.js",
+        "c3runtime/instance.js",
+        "c3runtime/modules/index.js",
+        "c3runtime/type.js",
+        "files/other/info.txt",
+        "files/styles.css",
+        "icon.svg",
+        "instance.js",
+        "lang/en-US.json",
+        "scripts/index.js",
+        "type.js"
+    ]
+}

@@ -1,6 +1,3 @@
-import type { Instance } from "./Instance.ts";
-
-
 class LostBehaviorType extends globalThis.ISDKBehaviorTypeBase {
 	constructor() {
 		super();
@@ -10,3 +7,5 @@ class LostBehaviorType extends globalThis.ISDKBehaviorTypeBase {
 		
 	}
 };
+
+export type { LostBehaviorType };
