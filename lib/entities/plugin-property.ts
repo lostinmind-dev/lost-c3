@@ -14,7 +14,8 @@ export enum Property {
     Object = 'object',
     Group = 'group',
     Info = 'info',
-    Link = 'link'
+    Link = 'link',
+    // ProjectFile = 'projectfile'
 }
 
 export type EditorInstanceType = 
@@ -100,6 +101,7 @@ type ObjectPluginPropertyOptions<I extends SDK.IInstanceBase, T extends SDK.ITyp
 ;
 
 type WorldPluginPropertyOptions<I extends SDK.IWorldInstanceBase, T extends SDK.ITypeBase> =
+    // | ProjectFileProperty /** Test */
     | ColorProperty
     | ObjectProperty
     | InfoProperty<I>
@@ -121,6 +123,11 @@ type PropertyOptionsBase = {
      */
     type: Property;
 }
+
+// interface ProjectFileProperty extends PropertyOptionsBase {
+//     type: Property.ProjectFile,
+//     filter: '.svg'
+// }
 
 /** Object represents 'integer' plugin property */
 interface IntegerProperty extends PropertyOptionsBase {
@@ -173,6 +180,10 @@ interface TextProperty extends PropertyOptionsBase {
      * *Optional*. A field the user can enter a string in to.
      */
     initialValue?: string;
+    /**
+     * *Optional*. Set to a globally unique ID and string constants with the same ID will offer autocomplete in the editor.
+     */
+    autocompleteId?: string;
 }
 
 /** Object represents 'longtext' plugin property */

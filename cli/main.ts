@@ -2,13 +2,12 @@
 import './global.ts';
 import type { Addon } from "../lib/addon.ts";
 
-import { Colors, join, Logger } from "../deps.ts";
+import { Colors, Logger } from "../deps.ts";
 
 import { Paths } from "../shared/paths.ts";
 import checkAddonBaseExists from "./check-addon-base-exists.ts";
 import Zip from "./zip-addon.ts";
-
-const addonModulePath = import.meta.resolve(`file://${join(Paths.Main, 'addon.ts')}`);
+import { Parameter } from "../lib/entities/parameter.ts";
 
 export default async function build(watch?: true) {
 
@@ -20,8 +19,9 @@ export default async function build(watch?: true) {
         Logger.Clear();
         Logger.LogBetweenLines('🚀 Starting build process...');
 
-        const addon = (await import(`${addonModulePath}?t=${Date.now()}`)).default as Addon;
+        const addon = (await import(`${Paths.AddonModulePath}?t=${Date.now()}`)).default as Addon<any, any, any>;
 
+        Parameter.addonId = addon._getConfig().addonId;
         await checkAddonBaseExists(addon._getConfig().type);
         await addon._build(watch || false);
 

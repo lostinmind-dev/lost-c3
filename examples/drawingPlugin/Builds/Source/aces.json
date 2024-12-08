@@ -12,7 +12,52 @@
                         "id": "1",
                         "type": "string",
                         "initialValue": "",
-                        "autocompleteId": ""
+                        "autocompleteId": "e1d1bbaa507cc2102a9ee44fb7f384d4"
+                    }
+                ]
+            },
+            {
+                "id": "test",
+                "scriptName": "doAction",
+                "highlight": false,
+                "isDeprecated": false,
+                "isAsync": true,
+                "params": [
+                    {
+                        "id": "1",
+                        "type": "string",
+                        "initialValue": "",
+                        "autocompleteId": "e1d1bbaa507cc2102a9ee44fb7f384d4"
+                    }
+                ]
+            },
+            {
+                "id": "test",
+                "scriptName": "doAction",
+                "highlight": false,
+                "isDeprecated": false,
+                "isAsync": true,
+                "params": [
+                    {
+                        "id": "1",
+                        "type": "string",
+                        "initialValue": "",
+                        "autocompleteId": "e1d1bbaa507cc2102a9ee44fb7f384d4"
+                    }
+                ]
+            },
+            {
+                "id": "test",
+                "scriptName": "doAction",
+                "highlight": false,
+                "isDeprecated": false,
+                "isAsync": true,
+                "params": [
+                    {
+                        "id": "1",
+                        "type": "string",
+                        "initialValue": "",
+                        "autocompleteId": "e1d1bbaa507cc2102a9ee44fb7f384d4"
                     }
                 ]
             }
@@ -29,10 +74,104 @@
                 "isLooping": false,
                 "isInvertible": true,
                 "isCompatibleWithTriggers": true,
-                "params": []
+                "params": [
+                    {
+                        "id": "test",
+                        "type": "string",
+                        "initialValue": "",
+                        "autocompleteId": "e1d1bbaa507cc2102a9ee44fb7f384d4"
+                    }
+                ]
+            },
+            {
+                "id": "myId",
+                "scriptName": "onCondition",
+                "highlight": false,
+                "isDeprecated": false,
+                "isTrigger": true,
+                "isFakeTrigger": false,
+                "isStatic": false,
+                "isLooping": false,
+                "isInvertible": true,
+                "isCompatibleWithTriggers": true,
+                "params": [
+                    {
+                        "id": "test",
+                        "type": "string",
+                        "initialValue": "",
+                        "autocompleteId": "e1d1bbaa507cc2102a9ee44fb7f384d4"
+                    }
+                ]
+            },
+            {
+                "id": "myId",
+                "scriptName": "onCondition",
+                "highlight": false,
+                "isDeprecated": false,
+                "isTrigger": true,
+                "isFakeTrigger": false,
+                "isStatic": false,
+                "isLooping": false,
+                "isInvertible": true,
+                "isCompatibleWithTriggers": true,
+                "params": [
+                    {
+                        "id": "test",
+                        "type": "string",
+                        "initialValue": "",
+                        "autocompleteId": "e1d1bbaa507cc2102a9ee44fb7f384d4"
+                    }
+                ]
+            },
+            {
+                "id": "myId",
+                "scriptName": "onCondition",
+                "highlight": false,
+                "isDeprecated": false,
+                "isTrigger": true,
+                "isFakeTrigger": false,
+                "isStatic": false,
+                "isLooping": false,
+                "isInvertible": true,
+                "isCompatibleWithTriggers": true,
+                "params": [
+                    {
+                        "id": "test",
+                        "type": "string",
+                        "initialValue": "",
+                        "autocompleteId": "e1d1bbaa507cc2102a9ee44fb7f384d4"
+                    }
+                ]
             }
         ],
         "expressions": [
+            {
+                "id": "id1",
+                "expressionName": "GetValue",
+                "highlight": false,
+                "isDeprecated": false,
+                "returnType": "any",
+                "isVariadicParameters": false,
+                "params": []
+            },
+            {
+                "id": "id1",
+                "expressionName": "GetValue",
+                "highlight": false,
+                "isDeprecated": false,
+                "returnType": "any",
+                "isVariadicParameters": false,
+                "params": []
+            },
+            {
+                "id": "id1",
+                "expressionName": "GetValue",
+                "highlight": false,
+                "isDeprecated": false,
+                "returnType": "any",
+                "isVariadicParameters": false,
+                "params": []
+            },
             {
                 "id": "id1",
                 "expressionName": "GetValue",

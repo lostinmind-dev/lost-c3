@@ -7,20 +7,24 @@ export default class {
     
     @Action('test', '', '', {
         params: [
-            addParam('1', '', { type: Param.String })
+            addParam('1', '', { type: Param.String, autocompleteId: 'test1' })
         ],
         isAsync: true
     })
     doAction(): void {
         console.log('hello')
         console.log('hello')
-        console.log('hello')
-        console.log('hello')
-        console.log('hello')
     }
 
     @Condition('myId', '', '', {
-        isTrigger: true
+        isTrigger: true,
+        params: [
+            addParam('test', 'test21', {
+                type: Param.String,
+                autocompleteId: 'test1'
+            })
+
+        ]
     })
     onCondition(this: Instance): boolean {
         return false;

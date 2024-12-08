@@ -1,4 +1,6 @@
 import { Md5 } from "../../deps.ts";
+import { Paths } from "../../shared/paths.ts";
+import { Addon } from "../addon.ts";
 import type { EntityParamOptions, EntityType } from './entity.ts';
 
 
@@ -6,6 +8,7 @@ import type { EntityParamOptions, EntityType } from './entity.ts';
  * @class represents ACE's parameter info.
  */
 export class Parameter<E extends EntityType = EntityType> {
+    static addonId: string = '';
     readonly _id: string;
     readonly _name: string;
     readonly _description: string;
@@ -24,8 +27,10 @@ export class Parameter<E extends EntityType = EntityType> {
 
         if (opts.type === Param.String) {
             if (opts.autocompleteId) {
-                const hash = Md5.hashStr(id + opts.autocompleteId);
-                opts.autocompleteId = hash;
+                (async () => {
+                    const hash = Md5.hashStr(Parameter.addonId + opts.autocompleteId);
+                    opts.autocompleteId = hash;
+                })()
             }
         }
         if (opts.type === Param.Combo) {
@@ -298,6 +303,5 @@ export function addParam(
             `Invalid parameter options provided. Ensure you pass either a description and options, or only options.`
         );
     }
-
     return new Parameter(id, name, description, options);
 }

@@ -246,6 +246,11 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                             }));
                         }
                         break;
+                    case "projectfile":
+                        properties.push(new SDK.PluginProperty(_opts.type, _id, {
+                            filter: '.svg'
+                        }))
+                        break;
                 }
             });
         }

@@ -12,7 +12,7 @@ export class ExpressionEntity extends Entity<EntityType.Expression> {
         func: (this: any, ...args: any[]) => EntityFuncReturnType<EntityType.Expression>,
         opts?: IExpressionOptions
     ) {
-        super(EntityType.Expression, id, name, description, func, opts?.isDeprecated || false);
+        super(EntityType.Expression, id, name, description, func, opts?.isDeprecated || false, '', opts?.params);
         this._opts = opts;
     }
 }

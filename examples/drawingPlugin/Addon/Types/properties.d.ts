@@ -1,1 +1,1 @@
-declare type PluginProperties = [unknown, unknown]
+declare type PluginProperties = []

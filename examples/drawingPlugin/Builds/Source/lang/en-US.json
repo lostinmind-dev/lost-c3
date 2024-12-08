@@ -7,27 +7,21 @@
                 "name": "LostPlugin",
                 "description": "My awesome addon was made with Lost",
                 "help-url": "https://myaddon.com/help/en",
-                "properties": {
-                    "test": {
-                        "name": "Make 1:1",
-                        "desc": "There is no any description yet...",
-                        "link-text": "Make 1:1"
-                    },
-                    "test1": {
-                        "name": "Edit image",
-                        "desc": "There is no any description yet...",
-                        "link-text": "Edit image"
-                    }
-                },
+                "properties": {},
                 "aceCategories": {
                     "id1": "name"
                 },
                 "conditions": {
                     "myId": {
                         "list-name": "myId",
-                        "display-text": "myId",
+                        "display-text": "myId ([i]test2[/i]: [b]{0}[/b])",
                         "description": "There is no any description yet...",
-                        "params": {}
+                        "params": {
+                            "test": {
+                                "name": "test2",
+                                "desc": "There is no any description yet..."
+                            }
+                        }
                     }
                 },
                 "actions": {

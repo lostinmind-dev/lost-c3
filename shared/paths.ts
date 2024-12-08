@@ -11,6 +11,7 @@ type AddonBaseCollection = {
 
 export abstract class Paths {
     static readonly Main = Deno.cwd();
+    static readonly AddonModulePath = import.meta.resolve(`file://${join(this.Main, 'addon.ts')}`);
     static readonly ConstructTypes = 'https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/types/construct.d.ts';
     static readonly BareBones: BareBonesCollection = {
         plugin: 'https://github.com/lostinmind-dev/lostc3-plugin-bare-bones.git',

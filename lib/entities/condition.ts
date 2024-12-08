@@ -12,7 +12,7 @@ export class ConditionEntity extends Entity<EntityType.Condition> {
         func: (this: any, ...args: any[]) => EntityFuncReturnType<EntityType.Condition>,
         opts?: IConditionOptions
     ) {
-        super(EntityType.Condition, id, name, description, func, opts?.isDeprecated || false, displayText);
+        super(EntityType.Condition, id, name, description, func, opts?.isDeprecated || false, displayText, opts?.params);
         this._opts = opts;
     }
 }

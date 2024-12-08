@@ -471,7 +471,7 @@ setTimeout(() => {
                                 switch (_opts.type) {
                                     case Param.String:
                                         AceParam['initialValue'] = (_opts.initialValue) ? `"${String(_opts.initialValue)}"` : "";
-                                        AceParam['autocompleteId'] = _opts.autocompleteId || '';
+                                        AceParam['autocompleteId'] = _opts.autocompleteId;
                                         break;
                                     case Param.Combo:
                                         const items = _opts.items.map(item => item[0]);
@@ -480,7 +480,7 @@ setTimeout(() => {
                                         AceParam['initialValue'] = _initialValue;
                                         break;
                                     case Param.Object:
-                                        AceParam['allowedPluginIds'] = _opts.allowedPluginIds || [];
+                                        AceParam['allowedPluginIds'] = _opts.allowedPluginIds;
                                         break;
                                     case Param.Number:
                                         AceParam['initialValue'] = String(_opts.initialValue || 0);
@@ -513,7 +513,7 @@ setTimeout(() => {
                         category._conditions.forEach(condition => {
                             const { _id, _opts, _params, _func, _isDeprecated } = condition;
                             const AceCondition = {} as AceCondition;
-    
+
                             AceCondition['id'] = _id;
                             AceCondition['scriptName'] = _func.name;
                             AceCondition['highlight'] = _opts?.highlight || false;
@@ -525,8 +525,7 @@ setTimeout(() => {
                             AceCondition['isInvertible'] = _opts?.isInvertible || true;
                             AceCondition['isCompatibleWithTriggers'] = _opts?.isCompatibleWithTriggers || true;
                             AceCondition['params'] = [];
-    
-    
+                            
                             _params.forEach(param => {
                                 const { _id, _opts } = param;
                                 const AceParam = {} as AceParam;

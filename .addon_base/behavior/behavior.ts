@@ -18,9 +18,24 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
 		this._info.SetAuthor(config.author);
 		this._info.SetHelpUrl(globalThis.lang(".help-url"));
 		this._info.SetIcon(icon.path, icon.iconType);
-		this._info.SetIsDeprecated(config.deprecated || false);
-		this._info.SetCanBeBundled(config.canBeBundled || true);
-		this._info.SetIsOnlyOneAllowed(true);
+		
+		if (config.deprecated) {
+			this._info.SetIsDeprecated(config.deprecated);
+		} else {
+			this._info.SetIsDeprecated(false);
+		}
+
+		if (config.canBeBundled) {
+			this._info.SetCanBeBundled(config.canBeBundled);
+		} else {
+			this._info.SetCanBeBundled(true);
+		}
+		
+		if (config.isOnlyOneAllowed) {
+			this._info.SetIsOnlyOneAllowed(config.isOnlyOneAllowed);
+		} else {
+			this._info.SetIsOnlyOneAllowed(false);
+		}
 
 		SDK.Lang.PushContext(".properties");
 
