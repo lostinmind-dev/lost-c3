@@ -1,5 +1,5 @@
 import DenoJson from '../deno.json' with { type: "json" };
-import { join, Logger } from "../deps.ts";
+import { Colors, join, Logger } from "../deps.ts";
 import type { AddonType } from "../lib/config.ts";
 import { Paths } from "../shared/paths.ts";
 
@@ -26,6 +26,7 @@ export async function downloadAddonBase(addonType: AddonType) {
 
     await Deno.writeTextFile(join(Paths.Main, Paths.AddonBaseFolderName, 'metadata.json'), JSON.stringify(metadata, null, 4));
     await Deno.writeTextFile(Paths.LocalAddonBase[addonType], fileContent);
+    Logger.Success(Colors.bold(`${Colors.green('Successfully')} installed addon base!`));
 }
     
 

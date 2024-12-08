@@ -66,7 +66,11 @@ async function main() {
             `)
             break;
         case 'create':
-            if (!flags.plugin) {
+            if (
+                !flags.plugin &&
+                !flags.behavior &&
+                !flags["drawing-plugin"]
+            ) {
                 Logger.Log('🎓', Colors.blue(Colors.italic('Specify one of the available types of addon:')))
                 printCreate();
                 break;
@@ -119,6 +123,7 @@ async function installTypes() {
 
         const fileContent = await response.text();
         await Deno.writeTextFile(join(Paths.Main, 'Addon', 'Types', 'construct.d.ts'), fileContent);
+        Logger.Success(Colors.bold(`${Colors.green('Successfully')} installed construct types!`));
     } catch (e) {
         Logger.Error('cli', 'Error while installing construct types file', `Error: ${e}`);
         Deno.exit(1);
@@ -128,7 +133,7 @@ async function installTypes() {
 async function createBareBones(type: AddonBareBonesType) {
     Logger.Process(`Creating bare-bones for ${Colors.magenta(`"${type}"`)} addon type`);
     await cloneRepo(Paths.BareBones[type]);
-    await installTypes();
+
     switch (type) {
         case "plugin":
             await downloadAddonBase('plugin');
@@ -153,6 +158,7 @@ async function cloneRepo(url: string) {
 
     if (code === 0) {
         Logger.Success(Colors.bold(`${Colors.green('Successfully')} created bare-bones!`));
+        await installTypes();
     } else {
         Logger.Error('cli', 'Error occured while creating bare-bones.', `Error code: ${code}`);
     }
