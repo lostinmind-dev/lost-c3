@@ -3,7 +3,7 @@
 <div align="center">
   <h3>
     Lost for easy making Construct 3 Addons. <br />
-    v3.0.2
+    v3.2.3
   </h3>
 </div>
 
@@ -19,8 +19,6 @@ lostinmind.
 - **[🚀 Quickstart](#-quickstart)**
 - **[🔌 Creating ***`Plugin`*** addon](#-creating-plugin-addon)**
 - **[🎛️ Creating ***`Behavior`*** addon](#️-creating-behavior-addon)**
-<!-- - **[🎨 Creating ***`Theme`*** addon](#-creating-theme-addon)** -->
-<!-- - **[✨ Creating ***`Effect`*** addon](#-creating-effect-addon)** --> -->
 - **[🏗️ Building addon](#️-building-addon)**
 - **[🧪 Testing addon](#-testing-addons-in-developer-mode)**
 
@@ -61,20 +59,17 @@ lost create
 ```
 - **Create a bare-bones project for addon by using one of the following commands:**
 ```bash
-lost create --plugin    # Creates a bare-bones project for 'plugin' addon
+lost create --plugin    # Creates a bare-bones project for 'Plugin' addon
 ```
 
 ```bash
-lost create --behavior    # Creates a bare-bones project for 'plugin' addon
-```
-
-<!-- ```bash
-lost create --theme    # Creates a bare-bones project for 'theme' addon
+lost create --drawing-plugin    # Creates a bare-bones project for 'Drawing Plugin' addon
 ```
 
 ```bash
-lost create --effect    # Creates a bare-bones project for 'effect' addon
-``` -->
+lost create --behavior    # Creates a bare-bones project for 'Behavior' addon
+```
+
 
 
 >[!IMPORTANT] Check and install the latest version of Lost CLI!
@@ -89,21 +84,25 @@ lost create --plugin    # Creates a bare-bones project for 'plugin' addon
 
 ### 🧱 File structure
 ```bash
-├── Addon/                      # Addon folder
+├── Addon/                      # Addon runtime classes folder
 │   ├── Categories/             # Categories folder
+│   ├── DomSide/                # Addon DOM side scripts folder
 │   ├── Files/                  # Addon files folder
 │   ├── Scripts/                # Addon scripts folder
 │   ├── Modules/                # Addon modules folder
 │   ├── Types/                  # Addon scripts folder
 │       └── global.d.ts         # Declaration file for your purposes
 │   ├── icon.svg                # Your .svg OR .png addon icon
-│   ├── Instance.ts             # Addon Instance class
-│   ├── Plugin.ts               # Addon Plugin class
-│   └── Type.ts                 # Addon Type class
+│   ├── Instance.ts             # Addon runtime Instance class
+│   ├── Plugin.ts               # Addon runtime Plugin class
+│   └── Type.ts                 # Addon runtime Type class
 ├── Builds/                     # Builds folder
 │   ├── Source/                 # Final Construct 3 addon folder
 │       └── ...
 │   └── AddonId_Version.c3addon # Final .c3addon file
+├── Editor/                     # Builds folder
+│   ├── Instance.ts             # Editor Instance class
+│   └── Type.ts                 # Editor Type class
 ├── deno.json                   # deno.json file for Deno enviroment
 ├── addon.ts                    # Main addon file
 ├── lost.config.ts              # Addon config file
@@ -113,13 +112,17 @@ lost create --plugin    # Creates a bare-bones project for 'plugin' addon
 Let's setup _`lost.config.ts`_ config file at first.
 
 ```typescript
-import type { LostConfig } from "jsr:@lost-c3/lib@";
+import { defineConfig } from "jsr:@lost-c3/lib";
 
-const config: LostConfig = {
+export default defineConfig<'plugin'>({
     /**
      * Set addon type
      */
     type: 'plugin',
+    /**
+     * Set plugin type
+     */
+    pluginType: 'object' | 'world',
     /**
      * Set a boolean of whether the addon is deprecated or not.
      */
@@ -158,59 +161,63 @@ const config: LostConfig = {
     helpUrl: {
         EN: 'https://myaddon.com/help/en'
     }
-}
-
-export default config;
+})
 ```
 
 ### ⚙️ Addon setup
 Let's setup _`addon.ts`_ file at second.
 
 ```typescript
-import { Plugin, Property } from 'jsr:@lost-c3/lib@3.0.0';
+import { defineAddon, Plugin, Property } from 'jsr:@lost-c3/lib';
+import type { EditorInstance } from "@Editor/Instance.ts";
+import type { EditorType } from "@Editor/Type.ts";
 import config from "./lost.config.ts";
 
-const Addon = new Plugin(config)
+export default defineAddon(
+    new Plugin<EditorInstance, EditorType>(config)
+        .addFilesToOutput()
 
-Addon
-    .addFilesToOutput()
+        .setRuntimeScripts()
 
-    .setRuntimeScripts()
+        .addRemoteScripts('https://cdn/index.js')
 
-    .addRemoteScripts('https://cdn/index.js')
-
-    /** @Properties  */
-    .addPluginProperty('integer', 'Integer', { type: Property.Integer })
-    .addPluginProperty('float', 'Float', { type: Property.Float })
-    .addPluginProperty('percent', 'Percent', { type: Property.Percent })
-    .addPluginProperty('text', 'Text', { type: Property.Text })
-    .addPluginProperty('longText', 'Long Text', { type: Property.LongText })
-    .addPluginProperty('check', 'Check', { type: Property.Checkbox })
-    .addPluginProperty('font', 'Font', { type: Property.Font })
-    .addPluginProperty('combo', 'Combo', {
-        type: Property.Combo,
-        items: [['item1', 'item2']]
-    })
-    .addPluginProperty('color', 'Color', { type: Property.Color, initialValue: [255, 210, 155] })
-    .createGroup('group', 'Awesome Group')
-        .addPluginProperty('info', 'Info', { type: Property.Info, info: 'Lost' })
-        .addPluginProperty('link', 'Link', {
-            type: Property.Link,
-            callbackType: 'for-each-instance',
-            callback: (inst) => {
-                console.log('Link property for each instance');
-            }
+        /** @Properties  */
+        .addProperty('integer', 'Integer', { type: Property.Integer })
+        .addProperty('float', 'Float', { type: Property.Float })
+        .addProperty('percent', 'Percent', { type: Property.Percent })
+        .addProperty('text', 'Text', { type: Property.Text })
+        .addProperty('longText', 'Long Text', { type: Property.LongText })
+        .addProperty('check', 'Check', { type: Property.Checkbox })
+        .addProperty('font', 'Font', { type: Property.Font })
+        .addProperty('combo', 'Combo', {
+            type: Property.Combo,
+            items: [['item1', 'item2']]
         })
-        .addPluginProperty('link2', 'Link', {
-            type: Property.Link,
-            callbackType: 'once-for-type',
-            callback: (type) => {
-                console.log('Link property once for type');
-            }
-        })
-;
-
-export default Addon;
+        .addProperty('color', 'Color', { type: Property.Color, initialValue: [255, 210, 155] })
+        .createGroup('group', 'Awesome Group')
+            .addProperty('info', 'Info', {
+                type: Property.Info,
+                callback: (inst) => {
+                    return '';
+                }
+            })
+            .addProperty('link', 'Link', {
+                type: Property.Link,
+                linkText: 'Do ...',
+                callbackType: 'for-each-instance',
+                callback: (inst) => {
+                    console.log('Link property for each instance');
+                }
+            })
+            .addProperty('link2', 'Link', {
+                type: Property.Link,
+                linkText: 'Do ...',
+                callbackType: 'once-for-type',
+                callback: (type) => {
+                    console.log('Link property once for type');
+                }
+            })
+)
 ```
 
 ### 📁 Creating category
@@ -224,7 +231,7 @@ import { Category, Action, Condition, Expression, addParam } from "jsr:@lost-c3/
 import type { Instance } from "../Instance.ts";
 
 @Category('myCategory', 'Category Name', { isDeprecated: false, inDevelopment: false })
-export default class MyCategory {
+export default class {
     /** @Actions */
 
     /** @Conditions */
@@ -313,7 +320,7 @@ import { Category, Action, Condition, Expression } from 'jsr:@lost-c3/lib';
 import type { Instance } from '../Instance.ts';
 
 @Category('categoryId', 'Category Name')
-export default class MyCategory {
+export default class {
     @Condition(
         `onEvent`,
         `On event`,
@@ -369,7 +376,7 @@ import { Category, Action, Condition, Expression } from 'jsr:@lost-c3/lib';
 import type { Instance } from '../Instance.ts';
 
 @Category('categoryId', 'Category Name')
-export default class MyCategory {
+export default class {
     @Expression(
         `getValue`,
         `GetValue`,
@@ -431,7 +438,7 @@ import { bold } from 'jsr:@lost-c3/lib/misc';
 import type { Instance } from '../Instance.ts';
 
 @Category('categoryId', 'Category Name')
-export default class MyCategory {
+export default class {
     @Action({
         `doActionWithParams`,
         `Do action`,
@@ -468,7 +475,7 @@ import { Action, Category, Condition, Expression } from 'jsr:@lost-c3/lib';
 import type { Instance } from '../Instance.ts';
 
 @Category('categoryId', 'Category Name')
-export default class MyCategory {
+export default class {
     @Action(`doAction`, `Do action`, `Do action`, {
         /**
          * Default is False. Set to true to deprecate the ACE.
@@ -489,8 +496,6 @@ Example of using Instance properties and functions inside any category entity
 _Instance.ts_
 
 ```typescript
-const C3 = globalThis.C3;
-
 class LostInstance extends globalThis.ISDKInstanceBase {
     readonly value: string = 'My property value';
     /**
@@ -522,7 +527,6 @@ class LostInstance extends globalThis.ISDKInstanceBase {
     }
 }
 
-C3.Plugins[Lost.addonId].Instance = LostInstance;
 export type { LostInstance as Instance };
 ```
 
@@ -536,7 +540,7 @@ import { Action, Category, Condition, Expression } from 'jsr:@lost-c3/lib';
 import type { Instance } from '../Instance.ts';
 
 @Category('categoryId', 'Category Name')
-export default class MyCategory {
+export default class {
     @Expression(`getValue`, `GetValue`)
     /**
      * Set the first argument of your method to: this: Instance
@@ -570,16 +574,15 @@ To use any script you should copy OR create _**script.js**_ OR _**script.ts**_ f
 *Example*
 
 ```typescript
-import { Plugin, Property } from 'jsr:@lost-c3/lib@3.0.0';
+import { Plugin, Property } from 'jsr:@lost-c3/lib';
+import type { EditorInstance } from "@Editor/Instance.ts";
+import type { EditorType } from "@Editor/Type.ts";
 import config from "./lost.config.ts";
 
-const Addon = new Plugin(config)
-
-Addon
-    .setRuntimeScripts('runtime-index.js')
-;
-
-export default Addon;
+export default defineAddon(
+    new Plugin<EditorInstance, EditorType>(config)
+        .setRuntimeScripts('myscript1.ts', 'main/myscript.ts')
+)
 ```
 
 ### 📄 Using Files
@@ -594,16 +597,15 @@ To use any file you should copy OR create _**file.***_ file at path:
 *Example*
 
 ```typescript
-import { Plugin, Property } from 'jsr:@lost-c3/lib@3.0.0';
+import { Plugin, Property } from 'jsr:@lost-c3/lib';
+import type { EditorInstance } from "@Editor/Instance.ts";
+import type { EditorType } from "@Editor/Type.ts";
 import config from "./lost.config.ts";
 
-const Addon = new Plugin(config)
-
-Addon
-    .addFilesToOutput('myfile.wasm')
-;
-
-export default Addon;
+export default defineAddon(
+    new Plugin<EditorInstance, EditorType>(config)
+        .addFilesToOutput('myfile.wasm')
+)
 ```
 
 ### 📦 Using Modules
@@ -616,8 +618,6 @@ To use any module you should copy OR create _**mymodule.js**_ file at path:
 
 ```typescript
 import * as MyModule from './Modules/mymodule.ts';
-
-const C3 = globalThis.C3;
 
 class LostInstance extends globalThis.ISDKInstanceBase {
 
@@ -640,7 +640,6 @@ class LostInstance extends globalThis.ISDKInstanceBase {
 
 };
 
-C3.Plugins[Lost.addonId].Instance = LostInstance;
 export type { LostInstance as Instance };
 ```
 
@@ -675,7 +674,7 @@ import { Action, Category } from 'jsr:@lost-c3/lib';
 import type { Instance } from '../Instance.ts';
 
 @Category('categoryId', 'Category Name')
-export default class MyCategory {
+export default class {
     @Action(
         `doAction`,
         `${bold('Action name')}`,
@@ -685,196 +684,6 @@ export default class MyCategory {
     doAction(this: Instance) { /* do something */}
 }
 ```
-
-<!-- ## 🎛️ Creating `Behavior` addon -->
-
-<!-- ## 🎨 Creating `Theme` addon
-```bash
-lost create --theme    # Creates a bare-bones project for 'theme' addon
-```
-
-### 🧱 File structure
-```bash
-├── Addon/                      # Addon folder
-│   └── Styles/                 # Addon styles collections folder
-│       └── *.css               # Your .css file
-│   └── icon.svg                # Your .svg OR .png addon icon
-├── Builds/                     # Builds folder
-│   ├── Source/                 # Final Construct 3 addon folder
-│       └── ...
-│   └── AddonId_Version.c3addon # Final .c3addon file
-├── deno.json                   # deno.json file for Deno enviroment
-├── lost.config.ts              # Addon config file
-```
-
-
-### ⚙️ Config setup
-Let's setup _`lost.config.ts`_ config file at first.
-
-```typescript
-import type { LostConfig } from "jsr:@lost-c3/lib";
-
-const Config: LostConfig<'theme'> = {
-    /**
-     * Set addon type
-     */
-    Type: 'theme',
-
-    /**
-     * An object name that will applied after plugin was installed/added to project.
-     */
-    ObjectName: 'LostPluginName',
-    AddonId: 'Lost_MyAddon',
-    AddonName: 'Lost addon for Construct 3',
-    AddonDescription: 'Amazing addon made with Lost.',
-    Category: 'general',
-    Version: '1.0.0.0',
-    Author: 'lostinmind.',
-    WebsiteURL: `https://addon.com`,
-    DocsURL: `https://docs.addon.com`
-}
-
-export default Config;
-```
-
-### 🛠️ Theme development
->[!TIP] For more info about developing themes you can read official docs
->
-> https://www.construct.net/en/make-games/manuals/addon-sdk/guide/themes -->
-
-<!-- ## ✨ Creating `Effect` addon
-```bash
-lost create --effect    # Creates a bare-bones project for 'effect' addon
-```
-
-### 🧱 File structure
-```bash
-├── Addon/                      # Addon folder
-│   └── Effects/                # .fx OR .wgsl files collections folder
-├── Builds/                     # Builds folder
-│   ├── Source/                 # Final Construct 3 addon folder
-│       └── ...
-│   └── AddonId_Version.c3addon # Final .c3addon file
-├── deno.json                   # deno.json file for Deno enviroment
-├── lost.config.ts              # Addon config file
-├── parameters.ts               # Effect parameters file
-```
-
-### ⚙️ Config setup
-Let's setup _`lost.config.ts`_ config file at first.
-
-```typescript
-import type { LostConfig } from "jsr:@lost-c3/lib";
-
-const Config: LostConfig<'effect'> = {
-    /**
-     * Set addon type
-     */
-    Type: 'effect',
-
-    AddonId: 'Lost_MyAddon',
-    AddonName: 'Lost addon for Construct 3',
-    AddonDescription: 'Amazing addon made with Lost.',
-    Category: 'general',
-    Version: '1.0.0.0',
-    Author: 'lostinmind.',
-    WebsiteURL: `https://addon.com`,
-    DocsURL: `https://docs.addon.com`,
-
-    /**
-     * An array of strings indicating the supported renderers for this effect.
-     */
-    SupportedRenderers: ['webgl', 'webgl2', 'webgpu'],
-
-    /**
-     * Boolean indicating whether the effect blends with the background.
-     */
-    BlendsBackground: false,
-
-    /**
-     * Boolean indicating whether the effect samples the depth buffer with the samplerDepth uniform.
-     */
-    UsesDepth: false,
-    /**
-     * Boolean indicating whether a background-blending effect has inconsistent sampling of the background and foreground.
-     */
-    CrossSampling: false,
-
-    /**
-     * Boolean indicating whether the effect preserves opaque pixels, i.e. every input pixel with an alpha of 1 is also output with an alpha of 1.
-     */
-    PreservesOpaqueness: true,
-
-    /**
-     * Boolean indicating whether the effect is animated, i.e. changes over time using the seconds uniform.
-     */
-    Animated: false,
-
-    /**
-     * Optional. Default is False. Boolean indicating whether to force the pre-draw step.
-     */
-    MustPredraw?: false,
-
-    /**
-     * Optional. Default is False. Boolean indicating whether 3D objects can render directly with this effect.
-     */
-    Supports3DDirectRendering?: false,
-
-    /**
-     * Amount to extend the rendered box horizontally and vertically as [0, 0].
-     */
-    ExtendBox: [0, 0]
-}
-
-export default Config;
-```
-
-### 📜 Specifying effect parameters
-Use _`parameters.ts`_ file to specify any effect parameters. That file located in following path: `./parameters.ts`.
-
-**List of available effect parameters types:**
-
-| Type | Description |
-| ----------- | ----------- |
-| ```"color"``` | **A color parameter.** |
-| ```"float"``` | **A float parameter.** |
-| ```"percent"``` | **A percent parameter.** |
-
-*Example*
-
-```typescript
-import { EffectParameter } from "jsr:@lost-c3/lib@1.2.5";
-
-const EffectParameters: EffectParameter<any>[] = [
-    new EffectParameter<any>({
-        Type: 'color',
-        Id: 'myColor',
-        InitialValue: [0, 0, 0]
-    }),
-    new EffectParameter<any>({
-        Type: 'float',
-        Id: 'myFloat',
-        InitialValue: 1
-    }),
-    new EffectParameter<any>({
-        Type: 'percent',
-        Id: 'myPercent',
-        InitialValue: 0.5
-    })
-]
-
-export default EffectParameters;
-```
-
-### 🔮 Effect development
->[!TIP] For more info about developing WebGL shaders you can read official docs
->
-> https://www.construct.net/en/make-games/manuals/addon-sdk/guide/configuring-effects/webgl-shaders
-
->[!TIP] For more info about developing WebGPU shaders you can read official docs
->
-> https://www.construct.net/en/make-games/manuals/addon-sdk/guide/configuring-effects/webgpu-shaders
- -->
 
 ## 🏗️ Building addon
 
