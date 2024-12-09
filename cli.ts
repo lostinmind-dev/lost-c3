@@ -1,5 +1,3 @@
-import type { AddonType } from "./lib/config.ts";
-
 import DenoJson from './deno.json' with { type: "json" };
 import { Colors, join, Logger, parseArgs } from './deps.ts';
 import { Paths } from './shared/paths.ts';
@@ -8,6 +6,7 @@ import Build from './cli/main.ts';
 import Serve from './cli/serve-addon.ts';
 import { dedent } from "./shared/misc.ts";
 import { downloadAddonBase } from "./cli/check-addon-base-exists.ts";
+import { AddonFileManager } from "./lib/addon-file-manager.ts";
 
 
 let rebuildTimeout: number | undefined;
@@ -38,7 +37,7 @@ async function BuildAndWatch() {
                     }
 
                     rebuildTimeout = setTimeout(async () => {
-                        await Build(true);
+                        await Build({ watch: true });
                     }, 500);
                 }
             }
@@ -48,8 +47,8 @@ async function BuildAndWatch() {
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
-        boolean: ['drawing-plugin', 'plugin', 'behavior', 'watch'],
-        alias: { dp: 'drawing-plugin', p: 'plugin', b: 'behavior', w: 'watch', },
+        boolean: ['drawing-plugin', 'plugin', 'behavior', 'watch', 'minify'],
+        alias: { dp: 'drawing-plugin', p: 'plugin', b: 'behavior', w: 'watch', m: 'minify'},
         "--": true,
     });
 
@@ -91,7 +90,12 @@ async function main() {
             if (flags.watch) {
                 await BuildAndWatch();
             } else {
-                await Build();
+                if (flags.minify) {
+                    AddonFileManager.minify = true;
+                } else {
+                    AddonFileManager.minify = false;
+                }
+                await Build({});
             }
             break;
         case 'serve':
@@ -176,6 +180,7 @@ function printHelp() {
 
     Logger.Log(`  ${Colors.yellow('build')}`);
     Logger.Log('   ⚙️', Colors.gray('  --watch, -w'), Colors.italic('   Runs build command with auto-reload.'));
+    Logger.Log('   ⚙️', Colors.gray('  --minify, -m'), Colors.italic('   Runs build command with minification.'));
     Logger.Log(`  ${Colors.yellow('serve')}`);
     Logger.Log(`  ${Colors.yellow('types')}`, Colors.italic('   Creates "properties.d.ts" of your plugin properties.'));
 }

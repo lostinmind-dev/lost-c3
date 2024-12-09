@@ -14,11 +14,22 @@
                 "conditions": {
                     "myId": {
                         "list-name": "myId",
-                        "display-text": "myId ([i]test2[/i]: [b]{0}[/b])",
+                        "display-text": "myId ([i]test2112[/i]: [b]{0}[/b])",
                         "description": "There is no any description yet...",
                         "params": {
                             "test": {
-                                "name": "test2",
+                                "name": "test2112",
+                                "desc": "There is no any description yet..."
+                            }
+                        }
+                    },
+                    "myId2": {
+                        "list-name": "myId2",
+                        "display-text": "myId2 ([i]test2112[/i]: [b]{0}[/b])",
+                        "description": "There is no any description yet...",
+                        "params": {
+                            "test": {
+                                "name": "test2112",
                                 "desc": "There is no any description yet..."
                             }
                         }

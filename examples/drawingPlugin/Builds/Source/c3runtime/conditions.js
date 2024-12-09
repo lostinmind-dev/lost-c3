@@ -1,7 +1,1 @@
-const C3 = globalThis.C3;
-
-C3.Plugins["LostPluginId"].Cnds = {
-  onCondition: function onCondition() {
-    return false;
-  }
-}
+let n=globalThis.C3;n.Plugins.LostPluginId.Cnds={onCondition:function(){return!1},onCondition1:function(){return!1}};

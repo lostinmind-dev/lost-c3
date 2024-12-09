@@ -12,26 +12,76 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         this._info.SetAuthor(config.author);
         this._info.SetHelpUrl(globalThis.lang(".help-url"));
         this._info.SetIcon(icon.path, icon.iconType);
-        this._info.SetIsDeprecated(config.deprecated || false);
-        this._info.SetCanBeBundled(config.canBeBundled || true);
+        if (config.deprecated) {
+            this._info.SetIsDeprecated(config.deprecated);
+        }
+        else {
+            this._info.SetIsDeprecated(false);
+        }
+        if (config.canBeBundled) {
+            this._info.SetCanBeBundled(config.canBeBundled);
+        }
+        else {
+            this._info.SetCanBeBundled(true);
+        }
         this._info.SetPluginType(config.pluginType);
         if (config.pluginType === 'object') {
             this._info.SetIsSingleGlobal(config.isSingleGlobal || false);
         }
         if (config.pluginType === 'world') {
             this._info.SetHasImage(true);
-            this._info.SetIsResizable(config.isResizable || true);
-            this._info.SetIsRotatable(config.isRotatable || true);
-            this._info.SetIs3D(config.is3D || false);
-            this._info.SetIsTiled(config.isTiled || false);
+            if (config.isResizable) {
+                this._info.SetIsResizable(config.isResizable);
+            }
+            else {
+                this._info.SetIsResizable(true);
+            }
+            if (config.isRotatable) {
+                this._info.SetIsRotatable(config.isRotatable);
+            }
+            else {
+                this._info.SetIsRotatable(true);
+            }
+            if (config.is3D) {
+                this._info.SetIs3D(config.is3D);
+            }
+            else {
+                this._info.SetIs3D(false);
+            }
+            if (config.isTiled) {
+                this._info.SetIsTiled(config.isTiled);
+            }
+            else {
+                this._info.SetIsTiled(false);
+            }
             if (_lostData.hasDefaultImage) {
                 this._info.SetDefaultImageURL('default.png');
             }
             ;
-            this._info.SetSupportsZElevation(config.supportsZElevation || true);
-            this._info.SetSupportsColor(config.supportsColor || true);
-            this._info.SetSupportsEffects(config.supportsEffects || true);
-            this._info.SetMustPreDraw(config.mustPreDraw || true);
+            if (config.supportsZElevation) {
+                this._info.SetSupportsZElevation(config.supportsZElevation);
+            }
+            else {
+                this._info.SetSupportsZElevation(true);
+            }
+            if (config.supportsColor) {
+                this._info.SetSupportsColor(config.supportsColor);
+            }
+            else {
+                this._info.SetSupportsColor(true);
+            }
+            if (config.supportsEffects) {
+                this._info.SetSupportsEffects(config.supportsEffects);
+            }
+            else {
+                this._info.SetSupportsEffects(true);
+            }
+            if (config.mustPreDraw) {
+                this._info.SetMustPreDraw(config.mustPreDraw);
+            }
+            else {
+                this._info.SetMustPreDraw(true);
+            }
             if (config.commonACEs) {
                 const commonAces = new Set(config.commonACEs);
                 commonAces.forEach(value => {
@@ -245,11 +295,6 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                                 }
                             }));
                         }
-                        break;
-                    case "projectfile":
-                        properties.push(new SDK.PluginProperty(_opts.type, _id, {
-                            filter: '.svg'
-                        }))
                         break;
                 }
             });

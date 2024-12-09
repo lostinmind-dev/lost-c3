@@ -15,3 +15,6 @@ export { Md5 } from 'npm:ts-md5@1.3.1';
 export * as path from 'jsr:@std/path@1.0.6';
 
 export * as Colors from 'jsr:@std/fmt@1.0.2/colors';
+
+export * as UglifyJS from 'npm:uglify-js@3.19.3';
+

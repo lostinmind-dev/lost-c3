@@ -9,7 +9,7 @@ import checkAddonBaseExists from "./check-addon-base-exists.ts";
 import Zip from "./zip-addon.ts";
 import { Parameter } from "../lib/entities/parameter.ts";
 
-export default async function build(watch?: true) {
+export default async function build(opts: { watch?: true }) {
 
     if (!isBuilding) {
         isBuildError = false;
@@ -23,10 +23,10 @@ export default async function build(watch?: true) {
 
         Parameter.addonId = addon._getConfig().addonId;
         await checkAddonBaseExists(addon._getConfig().type);
-        await addon._build(watch || false);
+        await addon._build(opts.watch || false);
 
         if (!isBuildError) {
-            if (!watch) {
+            if (!opts.watch) {
                 Logger.Process('Creating .c3addon file');
                 await Zip(addon._getConfig());
             }
@@ -38,7 +38,7 @@ export default async function build(watch?: true) {
             );
         }
 
-        if (watch) {
+        if (opts.watch) {
             Logger.Log(
                 '\n👀', Colors.blue('Watching for file changes...\n')
             );

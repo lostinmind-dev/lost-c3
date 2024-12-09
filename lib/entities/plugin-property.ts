@@ -180,10 +180,6 @@ interface TextProperty extends PropertyOptionsBase {
      * *Optional*. A field the user can enter a string in to.
      */
     initialValue?: string;
-    /**
-     * *Optional*. Set to a globally unique ID and string constants with the same ID will offer autocomplete in the editor.
-     */
-    autocompleteId?: string;
 }
 
 /** Object represents 'longtext' plugin property */

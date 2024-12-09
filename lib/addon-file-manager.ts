@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-case-declarations
 
-import { join } from "../deps.ts";
+import { join, UglifyJS } from "../deps.ts";
 import { dedent, findClassesInheritingFrom, getRelativePath, serializeObjectWithFunctions } from "../shared/misc.ts";
 import { Paths } from "../shared/paths.ts";
 import { transpileTs } from "../shared/transpile-ts.ts";
@@ -41,7 +41,8 @@ export enum JsonFile {
 }
 
 export abstract class AddonFileManager {
-
+    static minify: boolean = false;
+    
     static async #getDirectoryFiles(directoryPath: string): Promise<string[]> {
         const files: string[] = [];
 
@@ -760,6 +761,16 @@ setTimeout(() => {
     }
 
     static async #saveScript(content: string, path: string) {
+        if (AddonFileManager.minify) {
+            const options = {
+                mangle: {
+                    toplevel: true,
+                },
+                nameCache: {}
+            };
+            content = UglifyJS.minify(content, options).code
+        }
+
         await Deno.writeTextFile(join(path), content);
     }
 

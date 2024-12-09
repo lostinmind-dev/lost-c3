@@ -19,7 +19,7 @@ export default class {
     @Condition('myId', '', '', {
         isTrigger: true,
         params: [
-            addParam('test', 'test21', {
+            addParam('test', 'test2112', {
                 type: Param.String,
                 autocompleteId: 'test1'
             })
@@ -27,6 +27,20 @@ export default class {
         ]
     })
     onCondition(this: Instance): boolean {
+        return false;
+    }
+
+    @Condition('myId2', '', '', {
+        isTrigger: true,
+        params: [
+            addParam('test', 'test2112', {
+                type: Param.String,
+                autocompleteId: 'test1'
+            })
+
+        ]
+    })
+    onCondition1(this: Instance): boolean {
         return false;
     }
 

@@ -1,11 +1,1 @@
-const C3 = globalThis.C3;
-
-C3.Plugins["LostPluginId"].Acts = {
-  doAction: function doAction() {
-    console.log('hello');
-    console.log('hello');
-    console.log('hello');
-    console.log('hello');
-    console.log('hello');
-  }
-}
+let l=globalThis.C3;l.Plugins.LostPluginId.Acts={doAction:function(){console.log("hello"),console.log("hello")}};

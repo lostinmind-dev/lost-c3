@@ -1,7 +1,1 @@
-const C3 = globalThis.C3;
-
-C3.Plugins["LostPluginId"].Exps = {
-  GetValue: function GetValue() {
-    return 2;
-  }
-}
+let l=globalThis.C3;l.Plugins.LostPluginId.Exps={GetValue:function(){return 2}};
