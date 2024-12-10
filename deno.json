@@ -23,7 +23,7 @@
     },
     "publish": {
         "exclude": [
-            "examples",
+            "tests",
             ".addon_base",
             ".github"
         ]
