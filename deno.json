@@ -7,7 +7,7 @@
         "./misc": "./misc.ts"
     },
     "tasks": {
-        "publish": "npx jsr publish",
+        "publish": "npx jsr publish --allow-slow-types",
         "uninstall": "deno uninstall lost -g",
         "install": " deno task uninstall | deno install --name lost ./cli.ts --global -f -A",
         "build:base": "deno run --watch -A ./.addon_base/main.ts"
