@@ -13,6 +13,7 @@
         "build:base": "deno run --watch -A ./.addon_base/main.ts"
     },
     "compilerOptions": {
+        "types": ["./types"],
         "lib": [
             "deno.window",
             "dom",
