@@ -1,8 +1,8 @@
 import { join, walk, BlobWriter, ZipWriter, TextReader } from "../deps.ts";
-import type { LostConfig } from "../lib/config.ts";
+import type { AddonType, LostConfig } from "../lib/config.ts";
 import { Paths } from "../shared/paths.ts";
 
-export default async function zipAddon(config: LostConfig) {
+export default async function zipAddon(config: LostConfig<AddonType>) {
     const zipWriter = new ZipWriter(new BlobWriter('application/zip'));
     const addonFilePath = join(Paths.Main, 'Builds', `${config.addonId}_${config.version}`)
 
