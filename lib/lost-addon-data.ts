@@ -1,3 +1,5 @@
+import { Paths } from "../shared/paths.ts";
+import { AddonFolders } from "../shared/paths/addon-folders.ts";
 import type { AddonType, LostConfig } from "./config.ts";
 import type { PluginProperty } from "./entities/plugin-property.ts";
 
@@ -39,33 +41,69 @@ export class LostAddonData {
         this.remoteScripts = remoteScripts;
 
         for (const file of userFiles) {
+            let path: string;
+            const folders = Paths.getFoldersAfterFolder(file.localPath, AddonFolders.Files);
+
+            if (folders.length > 0) {
+                path = `${file.finalPath}/${folders.join('/')}/${file.localName}`
+            } else {
+                path = `${file.finalPath}/${file.localName}`
+            }
+
             this.files.push({
                 type: 'file',
-                path: file.relativePath,
+                path,
                 dependencyType: file.dependencyType,
                 mimeType: (file as AddonFileCopyToOutput).mimeType
             })
         }
 
         for (const file of userScripts) {
+            let path: string;
+            const folders = Paths.getFoldersAfterFolder(file.localPath, AddonFolders.Scripts);
+
+            if (folders.length > 0) {
+                path = `${file.finalPath}/${folders.join('/')}/${file.localName}`
+            } else {
+                path = `${file.finalPath}/${file.localName}`
+            }
+
             this.files.push({
                 type: 'script',
-                path: file.relativePath,
+                path,
                 dependencyType: file.dependencyType
             })
         }
 
         for (const file of userModules) {
+            let path: string;
+            const folders = Paths.getFoldersAfterFolder(file.localPath, AddonFolders.Modules);
+
+            if (folders.length > 0) {
+                path = `${file.finalPath}/${folders.join('/')}/${file.localName}`
+            } else {
+                path = `${file.finalPath}/${file.localName}`
+            }
+
             this.files.push({
                 type: 'module',
-                path: file.relativePath
+                path
             })
         }
 
         for (const file of userDomSideScripts) {
+            let path: string;
+            const folders = Paths.getFoldersAfterFolder(file.localPath, AddonFolders.DomSide);
+
+            if (folders.length > 0) {
+                path = `${file.finalPath}/${folders.join('/')}/${file.localName}`
+            } else {
+                path = `${file.finalPath}/${file.localName}`
+            }
+
             this.files.push({
                 type: 'dom-side-script',
-                path: file.relativePath
+                path
             })
         }
     }

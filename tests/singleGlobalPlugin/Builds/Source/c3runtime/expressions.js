@@ -1,1 +1,0 @@
-let l=globalThis.C3;l.Plugins.LostPluginId.Exps={GetValue:function(){return 2}};

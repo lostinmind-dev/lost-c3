@@ -1,1 +1,0 @@
-let s={addonId:"LostPluginId"};class e extends SDK.ITypeBase{constructor(s,e){super(s,e)}}setTimeout(()=>{globalThis.SDK.Plugins.LostPluginId.Type=e});

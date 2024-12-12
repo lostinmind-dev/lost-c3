@@ -2,8 +2,7 @@ import type {
     LanguageJSON, AceParametersCollection, LanguageAceParameter, LanguageAceComboParameter,
     LanguageAction, LanguageCondition, LanguageExpression, LanguageActionsCollection,
     LanguageConditionsCollection, LanguageExpressionsCollection, LanguageAceCategoriesCollection, LanguageProperty,
-    LanguageLinkProperty, LanguageComboProperty, LanguagePropertiesCollection,
-    LanguageAceComboGroupedParameter
+    LanguageLinkProperty, LanguageComboProperty, LanguagePropertiesCollection
 } from "../../shared/json-types.ts";
 import { Param } from "../entities/parameter.ts";
 import { Property } from "../entities/plugin-property.ts";

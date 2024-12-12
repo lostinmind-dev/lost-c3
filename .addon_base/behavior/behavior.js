@@ -41,8 +41,9 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
     setupUserModules() {
         const modules = _lostData.files.filter(file => file.type === 'module');
         if (modules.length > 0) {
+            this._info.SetRuntimeModuleMainScript('c3runtime/main.js');
             modules.forEach(file => {
-                this._info.AddC3RuntimeScript(`c3runtime/modules/${file.path}`);
+                this._info.AddC3RuntimeScript(file.path);
             });
         }
     }
@@ -57,14 +58,14 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
             files.forEach(file => {
                 if (file.dependencyType === 'copy-to-output') {
                     this._info.AddFileDependency({
-                        filename: `files/${file.path}`,
+                        filename: file.path,
                         type: file.dependencyType,
                         fileType: file.mimeType
                     });
                 }
                 else {
                     this._info.AddFileDependency({
-                        filename: `files/${file.path}`,
+                        filename: file.path,
                         type: file.dependencyType || 'copy-to-output'
                     });
                 }
@@ -76,7 +77,7 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
         if (files.length > 0) {
             files.forEach(file => {
                 this._info.AddFileDependency({
-                    filename: `scripts/${file.path}`,
+                    filename: file.path,
                     type: file.dependencyType || 'external-dom-script'
                 });
             });

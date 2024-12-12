@@ -135,7 +135,7 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
             const list: string[] = [];
 
             domSideScripts.forEach(file => {
-                list.push(`c3runtime/domSide/${file.path}`);
+                list.push(file.path);
             })
 
             this._info.SetDOMSideScripts(list)
@@ -145,8 +145,10 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
     private setupUserModules() {
         const modules = _lostData.files.filter(file => file.type === 'module');
         if (modules.length > 0) {
+            this._info.SetRuntimeModuleMainScript('c3runtime/main.js');
+            
             modules.forEach(file => {
-                this._info.AddC3RuntimeScript(`c3runtime/modules/${file.path}`);
+                this._info.AddC3RuntimeScript(file.path);
             })
         }
     }
@@ -164,13 +166,13 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
             files.forEach(file => {
                 if (file.dependencyType === 'copy-to-output') {
                     this._info.AddFileDependency({
-                        filename: `files/${file.path}`,
+                        filename: file.path,
                         type: file.dependencyType,
                         fileType: file.mimeType
                     })
                 } else {
                     this._info.AddFileDependency({
-                        filename: `files/${file.path}`,
+                        filename: file.path,
                         type: file.dependencyType || 'copy-to-output'
                     })
                 }
@@ -184,7 +186,7 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         if (files.length > 0) {
             files.forEach(file => {
                 this._info.AddFileDependency({
-                    filename: `scripts/${file.path}`,
+                    filename: file.path,
                     type: file.dependencyType || 'external-dom-script'
                 })
             })

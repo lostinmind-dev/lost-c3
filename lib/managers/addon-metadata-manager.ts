@@ -1,5 +1,4 @@
 import type { AddonJSON } from "../../shared/json-types.ts";
-import { Paths } from "../../shared/paths.ts";
 import { AddonFileManager } from "./addon-file-manager.ts";
 import type { LostConfig, AddonType } from "../config.ts";
 
@@ -23,7 +22,7 @@ export abstract class AddonMetadataManager {
                 "type.js",
                 "instance.js"
             ],
-            "file-list": await AddonFileManager.getDirectoryFiles(Paths.Build)
+            "file-list": await AddonFileManager.getFilesList()
         }
 
         switch (config.type) {

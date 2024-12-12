@@ -18,8 +18,8 @@ export default async function build(opts: { watch?: true }) {
 
         Logger.Clear();
         Logger.LogBetweenLines('🚀 Starting build process...');
-
-        const addon = (await import(`${Paths.AddonModulePath}?t=${Date.now()}`)).default as Addon<any, any, any>;
+        // console.log(Paths)
+        const addon = (await import(`${Paths.ProjectFiles.AddonModule}?t=${Date.now()}`)).default as Addon<any, any, any>;
 
         Parameter.addonId = addon._getConfig().addonId;
         await checkAddonBaseExists(addon._getConfig().type);
@@ -27,7 +27,7 @@ export default async function build(opts: { watch?: true }) {
 
         if (!isBuildError) {
             if (!opts.watch) {
-                Logger.Process('Creating .c3addon file');
+                Logger.LogBetweenLines(Colors.bgMagenta('Bundling addon...'));
                 await Zip(addon._getConfig());
             }
 

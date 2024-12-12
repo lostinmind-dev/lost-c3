@@ -108,16 +108,6 @@ export class Behavior extends Addon<'behavior', any, any> {
     }
 
     /**
-     * Adds files to project bundle
-     * @description This is useful for bundling additional resources, such as an image file that needs to be loaded at runtime, or a script that is dynamically loaded.
-     * @param fileNames An array of file names *(Not a path to file)*.
-     */
-    addFilesToOutput(...paths: string[]): this {
-        this.filesToOutput.push(...paths);
-        return this;
-    }
-
-    /**
      * Change script dependencyType to: 'external-runtime-script'
      * @description This means the script is always directly available to runtime code. However the dependency must be designed to work in a Web Worker, e.g. not assuming the DOM is present. 
      * The script is not minified on export.

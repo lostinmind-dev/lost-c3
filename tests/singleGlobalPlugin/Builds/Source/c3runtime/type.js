@@ -1,1 +1,0 @@
-let s={addonId:"LostPluginId"};class e extends globalThis.ISDKObjectTypeBase{constructor(){super()}_onCreate(){}}globalThis.C3.Plugins.LostPluginId.Type=e;

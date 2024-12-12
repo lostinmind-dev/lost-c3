@@ -26,9 +26,11 @@ declare type AddonFileType =
 
 declare type AddonFileBase = {
     readonly type: AddonFileType;
-    readonly fileName: string;
-    readonly path: string;
-    readonly relativePath: string;
+    readonly originalName: string;
+    readonly originalPath: string;
+    readonly localName: string;
+    readonly localPath: string;
+    readonly finalPath: string;
 }
 
 declare interface AddonUserDomSideScriptFile extends AddonFileBase {

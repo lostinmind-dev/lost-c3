@@ -6,9 +6,9 @@ import { Paths } from "../shared/paths.ts";
 export async function downloadAddonBase(addonType: AddonType) {
     Logger.Log(`🌐 Downloading addon base ...`);
 
-    await Deno.mkdir(join(Paths.Main, '.addon_base'), { recursive: true });
+    await Deno.mkdir(join(Paths.Root, '.addon_base'), { recursive: true });
 
-    const response = await fetch(Paths.AddonBaseUrl[addonType]);
+    const response = await fetch(Paths.Links.AddonBase[addonType]);
 
     if (!response.ok) {
         Logger.Error('build', 'Error while getting addon base', `Status: ${response.statusText}`);
@@ -18,14 +18,14 @@ export async function downloadAddonBase(addonType: AddonType) {
     const fileContent = await response.text();
 
     const metadata: IAddonBaseMetadata = {
-        download_url: Paths.AddonBaseUrl[addonType],
+        download_url: Paths.Links.AddonBase[addonType],
         addon_type: addonType,
         version: DenoJson.version,
         timestamp: Date.now()
     }
 
-    await Deno.writeTextFile(join(Paths.Main, Paths.AddonBaseFolderName, 'metadata.json'), JSON.stringify(metadata, null, 4));
-    await Deno.writeTextFile(Paths.LocalAddonBase[addonType], fileContent);
+    await Deno.writeTextFile(join(Paths.ProjectFolders.AddonBase, 'metadata.json'), JSON.stringify(metadata, null, 4));
+    await Deno.writeTextFile(Paths.ProjectFiles.AddonBase[addonType], fileContent);
     Logger.Success(Colors.bold(`${Colors.green('Successfully')} installed addon base!`));
 }
     
@@ -33,10 +33,10 @@ export async function downloadAddonBase(addonType: AddonType) {
 export default async function checkAddonBaseExists(addonType: AddonType) {
     
     try {
-        const dirStat = await Deno.stat(Paths.LocalAddonBase[addonType]);
+        const dirStat = await Deno.stat(Paths.ProjectFiles.AddonBase[addonType]);
 
         if (dirStat) {
-            const fileContent = await Deno.readTextFile(join(Paths.Main, Paths.AddonBaseFolderName, 'metadata.json'));
+            const fileContent = await Deno.readTextFile(join(Paths.ProjectFolders.AddonBase, 'metadata.json'));
             const metadata: IAddonBaseMetadata = JSON.parse(fileContent);
 
             if (metadata.version !== DenoJson.version) {

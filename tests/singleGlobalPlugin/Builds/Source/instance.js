@@ -1,1 +1,0 @@
-let e={addonId:"LostPluginId"};class n extends SDK.IInstanceBase{constructor(e,n){super(e,n)}Release(){}OnCreate(){}OnPropertyChanged(){}LoadC2Property(){return!1}}setTimeout(()=>{globalThis.SDK.Plugins.LostPluginId.Instance=n});

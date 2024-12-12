@@ -1,5 +1,4 @@
 import type { AddonType } from "../lib/config.ts";
-import { EntityType } from "../lib/entities/entity.ts";
 import type { ExpressionReturnType } from "../lib/entities/expression.ts";
 import type { Param } from "../lib/entities/parameter.ts";
 

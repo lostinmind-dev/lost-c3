@@ -13,15 +13,17 @@ let rebuildTimeout: number | undefined;
 
 async function BuildAndWatch() {
     const watcher = Deno.watchFs([
-        join(Paths.Main, 'Addon'),
-        join(Paths.Main, 'Editor'),
-        join(Paths.Main, 'addon.ts'),
-        join(Paths.Main, 'lost.config.ts')
+        Paths.ProjectFolders.Addon,
+        Paths.ProjectFolders.Editor,
+        'addon.ts',
+        'lost.config.ts'
     ]);
     Logger.Clear();
     Logger.Log(
         '\n👀', Colors.blue('Watching for file changes...\n')
     );
+
+    await Build({ watch: true });
 
     for await (const event of watcher) {
         if (event.kind === 'modify') {
@@ -118,7 +120,7 @@ if (import.meta.main) {
 
 async function installTypes() {
     try {
-        const response = await fetch(Paths.ConstructTypes)
+        const response = await fetch(Paths.Links.ConstructTypes)
 
         if (!response.ok) {
             Logger.Error('cli', 'Error while installing "construct.d.ts" file', `Status: ${response.statusText}`);
@@ -126,7 +128,7 @@ async function installTypes() {
         }
 
         const fileContent = await response.text();
-        await Deno.writeTextFile(join(Paths.Main, 'Addon', 'Types', 'construct.d.ts'), fileContent);
+        await Deno.writeTextFile(join(Paths.Root, 'Addon', 'Types', 'construct.d.ts'), fileContent);
         Logger.Success(Colors.bold(`${Colors.green('Successfully')} installed construct types!`));
     } catch (e) {
         Logger.Error('cli', 'Error while installing construct types file', `Error: ${e}`);
@@ -136,7 +138,7 @@ async function installTypes() {
 
 async function createBareBones(type: AddonBareBonesType) {
     Logger.Process(`Creating bare-bones for ${Colors.magenta(`"${type}"`)} addon type`);
-    await cloneRepo(Paths.BareBones[type]);
+    await cloneRepo(Paths.Links.BareBones[type]);
 
     switch (type) {
         case "plugin":

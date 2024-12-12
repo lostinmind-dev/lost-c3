@@ -37,9 +37,11 @@ export async function transpileTs(filePath: string): Promise<string | null> {
 
         // Проверяем, что путь заканчивается на .ts
         if (moduleSpecifier.endsWith('.ts')) {
-            // Преобразуем путь, заменяя расширение на .js и все папки на маленькие буквы
-            let newPath = moduleSpecifier.replace(/\.ts$/, '.js'); // Заменяем .ts на .js
-            newPath = newPath.split('/').map(part => part.toLowerCase()).join('/'); // Преобразуем все папки в нижний регистр
+            // Преобразуем путь, заменяя расширение на .js
+            let newPath = moduleSpecifier.replace(/\.ts$/, '.js');
+
+            // Преобразуем только папку Modules в нижний регистр
+            newPath = newPath.replace(/\/Modules\//, '/modules/');
 
             // Заменяем старый путь новым
             importDeclaration.getModuleSpecifier().replaceWithText(`'${newPath}'`);

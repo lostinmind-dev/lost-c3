@@ -1,1 +1,0 @@
-let n=globalThis.C3;n.Plugins.LostPluginId.Cnds={onCondition:function(){return!1},onCondition1:function(){return!1}};

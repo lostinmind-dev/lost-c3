@@ -1,5 +1,3 @@
-import type { CategoryClassType } from "../lib/entities/category.ts";
-
 export function findClassesInheritingFrom(fileContent: string, parentClass: string) {
     // Динамическое регулярное выражение для поиска классов
     const classRegex = new RegExp(`class\\s+(\\w+)\\s+extends\\s+${parentClass.replace('.', '\\.')}\\s*{`, 'g');
@@ -12,19 +10,6 @@ export function findClassesInheritingFrom(fileContent: string, parentClass: stri
     }
 
     return matches[0];
-}
-
-export function getRelativePath(path: string, basePath: string, fileName: string, replaceTsToJs?: true) {
-    const relativePathIndex = path.indexOf(basePath);
-    const relativePath = path.substring(relativePathIndex + basePath.length + 1);
-
-    const newFileName = (replaceTsToJs === true) ? fileName.replace('.ts', '.js') : fileName;
-
-    if (relativePath.length > 0) {
-        return `${relativePath}/${newFileName}`;
-    } else {
-        return newFileName;
-    }
 }
 
 
@@ -73,23 +58,6 @@ export async function isDirectoryExists(path: string): Promise<boolean> {
     } catch (_e) {
         return false;
     }
-}
-
-type CategoryModule = {
-    default: new () => CategoryClassType;
-}
-
-export async function getCategory(path: string) {
-    const getModule = async (path: string) => {
-        const module = await import(path);
-        return module as CategoryModule;
-    }
-
-    const module = await getModule(path);
-    const _class = new module.default();
-    const _prototype = _class.constructor.prototype as CategoryClassType;
-
-    return (_prototype) ? _prototype : null;
 }
 
 export function serializeObjectWithFunctions(obj: any): string {

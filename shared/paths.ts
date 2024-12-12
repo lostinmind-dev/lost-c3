@@ -1,40 +1,37 @@
-import { join } from "../deps.ts";
-import type { AddonType } from "../lib/config.ts";
+import { AddonFoldersPaths } from "./paths/addon-folders.ts";
+import { ProjectFilesPaths } from "./paths/project-files.ts";
+import { ProjectFoldersPaths } from "./paths/project-folders.ts";
 
-type BareBonesCollection = {
-    readonly [key in AddonBareBonesType]: string;
-}
-
-type AddonBaseCollection = {
-    readonly [key in AddonType]: string;
-}
+import { Links } from "./paths/links.ts";
 
 export abstract class Paths {
-    static readonly Main = Deno.cwd();
-    static readonly AddonModulePath = import.meta.resolve(`file://${join(this.Main, 'addon.ts')}`);
-    static readonly ConstructTypes = 'https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/types/construct.d.ts';
-    static readonly BareBones: BareBonesCollection = {
-        plugin: 'https://github.com/lostinmind-dev/lostc3-plugin-bare-bones.git',
-        behavior: 'https://github.com/lostinmind-dev/lostc3-behavior-bare-bones.git',
-        'drawing-plugin': 'https://github.com/lostinmind-dev/lostc3-drawing-plugin-bare-bones.git'
-    };
-    static readonly AddonBaseFolderName = '.addon_base';
+    static readonly Root = Deno.cwd();
 
-    static readonly AddonBaseUrl: AddonBaseCollection = {
-        plugin: `https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/${this.AddonBaseFolderName}/plugin/plugin.js`,
-        behavior: `https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/${this.AddonBaseFolderName}/behavior/behavior.js`,
-    };
-    static readonly LocalAddonBase: AddonBaseCollection = {
-        plugin: join(this.Main, this.AddonBaseFolderName, 'plugin.js'),
-        behavior: join(this.Main, this.AddonBaseFolderName, 'behavior.js'),
-    };
-    static readonly Build = join(this.Main, 'Builds', 'Source');
+    static readonly ProjectFolders = ProjectFoldersPaths;
+    static readonly ProjectFiles = ProjectFilesPaths;
 
-    /** Addon */
-    static readonly UserAddonFolderName = 'Addon';
-    static readonly UserCategories = join(this.Main, this.UserAddonFolderName, 'Categories');
-    static readonly UserFiles = join(this.Main, this.UserAddonFolderName, 'Files');
-    static readonly UserScripts = join(this.Main, this.UserAddonFolderName, 'Scripts');
-    static readonly UserModules = join(this.Main, this.UserAddonFolderName, 'Modules');
-    static readonly UserDomSideScripts = join(this.Main, this.UserAddonFolderName, 'DomSide');
+    static readonly AddonFolders = AddonFoldersPaths;
+    static readonly Links = Links;
+
+    // static getPathWithoutFile()
+
+    static getFoldersAfterFolder(path: string, folderName: string): string[] {
+        const normalizedPath = path.replace(/\\/g, '/'); // Приводим путь к универсальному виду
+        const regex = new RegExp(`/${folderName}/`);
+        const match = normalizedPath.match(regex);
+
+        if (!match) {
+            // console.warn(`Folder "${folderName}" not found in the path.`);
+            return [];
+        }
+
+        // Индекс конца первого вхождения папки
+        const endIndex = normalizedPath.indexOf(match[0]) + match[0].length;
+
+        // Извлекаем часть пути после папки
+        const remainingPath = normalizedPath.slice(endIndex);
+
+        // Разделяем оставшуюся часть на папки
+        return remainingPath.split('/').filter(Boolean); // Убираем пустые элементы
+    }
 }

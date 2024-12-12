@@ -4,14 +4,17 @@ import type { CategoryClassType } from "./entities/category.ts";
 import type { PluginProperty } from "./entities/plugin-property.ts";
 import { Colors, join, Logger } from "../deps.ts";
 import { MIME } from "../shared/mime.ts";
-import { dedent, getCategory, getRelativePath, isDirectoryExists, isFileExists } from "../shared/misc.ts";
+import { dedent, isDirectoryExists, isFileExists } from "../shared/misc.ts";
 import { Paths } from "../shared/paths.ts";
 import { transpileTs } from "../shared/transpile-ts.ts";
 import { Property } from './entities/plugin-property.ts';
 
 import Icon from "./defaults/addon-icon.ts";
-import { AddonFileManager, EditorScript, JsonFile, RuntimeScript } from "./managers/addon-file-manager.ts";
+import { AddonFileManager } from "./managers/addon-file-manager.ts";
 import { LostAddonData } from "./lost-addon-data.ts";
+import { ProjectFolders } from "../shared/paths/project-folders.ts";
+import { EditorScript, JsonFile, RuntimeScript } from "../shared/paths/addon-files.ts";
+import { AddonFolders } from "../shared/paths/addon-folders.ts";
 
 export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
     protected readonly type: AddonType;
@@ -24,7 +27,6 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
     protected readonly pluginProperties: PluginProperty<A, I, T>[] = [];
     protected readonly categories: CategoryClassType[] = [];
     protected readonly remoteScripts: string[] = [];
-    protected readonly filesToOutput: string[] = [];
     protected readonly runtimeScripts: string[] = [];
 
     protected hasDefaultImage: boolean = false;
@@ -33,34 +35,39 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
         type: 'icon',
         isDefault: true,
         iconType: 'image/svg+xml',
-        fileName: 'icon.svg',
-        path: '',
-        relativePath: 'icon.svg'
+        originalName: 'icon.svg',
+        originalPath: '',
+        localName: 'icon.svg',
+        localPath: '',
+        finalPath: 'icon.svg'
     };
 
     constructor(type: A, config: LostConfig<A>) {
         this.type = type;
         this.config = config;
-        this.#load();
+        if (
+            this.type === 'plugin' ||
+            this.type === 'behavior'
+        ) {
+            this.#load();
+        }
     }
 
     async #load() {
-        await this.#loadAddonIcon();
-        await this.#loadUserFiles();
-        await this.#loadUserScripts();
-        await this.#loadUserModules();
-        await this.#loadUserDomSideScripts();
-        await this.#createTypes();
-        await this.#loadCategories();
+        await this.#loadAddonIcon(Paths.Root);
+        await this.#loadUserFiles(Paths.ProjectFolders.Files);
+        await this.#loadUserScripts(Paths.ProjectFolders.Scripts);
+        await this.#loadUserModules(Paths.ProjectFolders.Modules);
+        await this.#loadUserDomSideScripts(Paths.ProjectFolders.DomSide);
+        await this.#createTypes(Paths.ProjectFolders.Types);
+        await this.#loadCategories(Paths.ProjectFolders.Categories);
     }
 
     /** Creates **properties.d.ts** declaration file for plugin properties types */
-    async #createTypes() {
-        if (
-            (this.type === 'plugin' || this.type === 'behavior') &&
-            this.pluginProperties.length > 0
-        ) {
-            let fileContent = `declare type PluginProperties = [`
+    async #createTypes(folderPath: string) {
+        if (this.pluginProperties.length > 0) {
+            let fileContent = `declare type PluginProperties = [`;
+
             this.pluginProperties.forEach((property, i) => {
                 switch (property._opts.type) {
                     case Property.Integer:
@@ -111,286 +118,237 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
 
             fileContent = fileContent + `]`
 
-            await Deno.mkdir(join(Paths.Main, 'Addon', 'Types'), { recursive: true });
+            await Deno.mkdir(folderPath, { recursive: true });
 
-            await Deno.writeTextFile(join(Paths.Main, 'Addon', 'Types', 'properties.d.ts'), fileContent);
-            Logger.Success(`Created plugin properties types at path: ${join('Addon', 'Types', 'properties.d.ts')}`)
+            await Deno.writeTextFile(join(folderPath, 'properties.d.ts'), fileContent);
+            Logger.Success(`Created 'properties.d.ts' file.`);
         }
     }
 
-    async #loadAddonIcon() {
-        if (
-            this.type === 'plugin' ||
-            this.type === 'behavior'
-        ) {
-            let iconFound = false;
-            for await (const entry of Deno.readDir(Paths.Main)) {
-                if (
-                    entry.isFile &&
-                    (entry.name !== 'default.png') &&
-                    (entry.name.endsWith('.png') || entry.name.endsWith('.svg'))
-                ) {
-                    const iconType: AddonIconMimeType = (entry.name.endsWith('.png')) ? 'image/png' : 'image/svg+xml';
+    async #loadAddonIcon(folderPath: string) {
+        Logger.LogBetweenLines(Colors.bgRed('Loading icon...'));
+        let iconFound = false;
+        for await (const entry of Deno.readDir(folderPath)) {
+            if (
+                entry.isFile &&
+                (entry.name !== 'default.png') &&
+                (entry.name.endsWith('.png') || entry.name.endsWith('.svg'))
+            ) {
+                const iconType: AddonIconMimeType = (entry.name.endsWith('.png')) ? 'image/png' : 'image/svg+xml';
 
-                    this.icon = {
-                        isDefault: false,
-                        type: 'icon',
-                        fileName: entry.name,
-                        path: join(Paths.Main, entry.name),
-                        relativePath: getRelativePath(Paths.Main, Paths.Main, entry.name, true),
-                        iconType
-                    }
-
-                    iconFound = true;
+                this.icon = {
+                    isDefault: false,
+                    type: 'icon',
+                    originalName: entry.name,
+                    originalPath: folderPath,
+                    localName: entry.name,
+                    localPath: Paths.ProjectFolders.Build,
+                    iconType,
+                    finalPath: entry.name
                 }
-            }
 
-            if (!iconFound) {
-                Logger.Warning(
-                    `Addon icon was not detected, will be used default [SVG] icon`
-                );
-            } else {
-                Logger.Info(`Loaded [${this.icon.iconType}] addon icon`, `Filename: ${this.icon.fileName}`);
+                iconFound = true;
             }
+        }
+
+        if (!iconFound) {
+            Logger.Warning(
+                `Addon icon was not detected, will be used default [SVG] icon`
+            );
         } else {
-            return;
-            //Logger.Warning("Can't load addon icon. Addon type must be 'plugin' OR 'behavior'");
+            Logger.Info(`Loaded [${this.icon.iconType}] addon icon`, `Filename: ${this.icon.originalName}`);
         }
     }
 
-    async #loadUserFiles() {
-        if (
-            this.type === 'plugin' ||
-            this.type === 'behavior'
-        ) {
-            if (await isDirectoryExists(Paths.UserFiles)) {
+    async #loadUserFiles(folderPath: string) {
+        if (await isDirectoryExists(folderPath)) {
+            Logger.LogBetweenLines(Colors.bgGreen('Loading files...'));
 
-                const readDir = async (path: string) => {
-                    for await (const entry of Deno.readDir(path)) {
-                        if (entry.isDirectory) {
-                            await readDir(join(path, entry.name));
-                        } else if (entry.isFile) {
+            const readDir = async (path: string) => {
+                for await (const entry of Deno.readDir(path)) {
+                    if (entry.isDirectory) {
+                        await readDir(join(path, entry.name));
+                    } else if (entry.isFile) {
 
-                            const dependencyType = (entry.name.endsWith('.css')) ? 'external-css' : 'copy-to-output';
-                            const relativePath = getRelativePath(path, Paths.UserFiles, entry.name);
+                        const dependencyType = (entry.name.endsWith('.css')) ? 'external-css' : 'copy-to-output';
 
-                            switch (dependencyType) {
-                                case 'copy-to-output':
-                                    const mimeType = MIME.getFileType(entry.name);
+                        switch (dependencyType) {
+                            case 'copy-to-output':
+                                const mimeType = MIME.getFileType(entry.name);
 
-                                    if (mimeType) {
-                                        this.#addUserFile({
-                                            type: 'file',
-                                            fileName: entry.name,
-                                            path: join(path, entry.name),
-                                            relativePath,
-                                            dependencyType,
-                                            mimeType
-                                        })
-                                    } else {
-                                        Logger.Warning(
-                                            dedent`
+                                if (mimeType) {
+                                    this.#addUserFile({
+                                        type: 'file',
+                                        originalName: entry.name,
+                                        originalPath: path,
+                                        localName: entry.name,
+                                        localPath: join(Paths.AddonFolders.Files, ...Paths.getFoldersAfterFolder(path, ProjectFolders.Files)),
+                                        dependencyType,
+                                        mimeType,
+                                        finalPath: `${AddonFolders.Files}`
+                                    })
+                                } else {
+                                    Logger.Warning(
+                                        dedent`
                                             Found 'copy-to-output' file (${entry.name}) with unknown MIME type.
                                             File will not be included in final addon build'
                                             ${'https://www.construct.net/en/make-games/manuals/construct-3/tips-and-guides/mime-types'}`
-                                        );
-                                    }
-                                    break;
-                                case 'external-css':
-                                    if (this.#isFilePathInOutputFilesArray(relativePath)) {
-                                        this.#addUserFile({
-                                            type: 'file',
-                                            fileName: entry.name,
-                                            path: join(path, entry.name),
-                                            relativePath,
-                                            dependencyType: 'copy-to-output',
-                                            mimeType: 'text/css'
-                                        })
-                                    } else {
-                                        this.#addUserFile({
-                                            type: 'file',
-                                            fileName: entry.name,
-                                            path: join(path, entry.name),
-                                            relativePath,
-                                            dependencyType: 'external-css'
-                                        })
-                                    }
-                                    break;
-                            }
-                        }
-                    }
-                }
-
-                await readDir(Paths.UserFiles);
-            }
-        } else {
-            return;
-            //Logger.Warning("Can't load addon user files. Addon type must be 'plugin' OR 'behavior'");
-        }
-    }
-
-    async #loadUserScripts() {
-        if (
-            this.type === 'plugin' ||
-            this.type === 'behavior'
-        ) {
-            if (await isDirectoryExists(Paths.UserScripts)) {
-                
-                const readDir = async (path: string) => {
-                    for await (const entry of Deno.readDir(path)) {
-                        if (entry.isDirectory) {
-                            await readDir(join(path, entry.name));
-                        } else if (
-                            entry.isFile &&
-                            (entry.name.endsWith('.ts') || entry.name.endsWith('.js'))
-                        ) {
-                            const isTypescript = (entry.name.endsWith('.ts')) ? true : false;
-                            const relativePath = getRelativePath(path, Paths.UserScripts, entry.name);
-
-                            if (this.#isFilePathInRuntimeScriptsArray(relativePath)) {
-                                this.#addUserScript({
-                                    type: 'script',
-                                    fileName: entry.name,
-                                    path: join(path, entry.name),
-                                    relativePath: relativePath.replace('.ts', '.js'),
-                                    dependencyType: 'external-runtime-script',
-                                    isTypescript
-                                })
-                            } else {
-                                this.#addUserScript({
-                                    type: 'script',
-                                    fileName: entry.name,
-                                    path: join(path, entry.name),
-                                    relativePath: relativePath.replace('.ts', '.js'),
-                                    dependencyType: 'external-dom-script',
-                                    isTypescript
-                                })
-                            }
-                        }
-                    }
-                }
-
-                await readDir(Paths.UserScripts);
-            }
-        } else {
-            return;
-            //Logger.Warning("Can't load addon user files. Addon type must be 'plugin' OR 'behavior'");
-        }
-    }
-
-    async #loadUserModules() {
-        if (
-            this.type === 'plugin' ||
-            this.type === 'behavior'
-        ) {
-            if (await isDirectoryExists(Paths.UserModules)) {
-
-                const readDir = async (path: string) => {
-                    for await (const entry of Deno.readDir(path)) {
-                        if (entry.isDirectory) {
-                            await readDir(join(path, entry.name));
-                        } else if (
-                            entry.isFile &&
-                            (entry.name.endsWith('.ts') || entry.name.endsWith('.js'))
-                        ) {
-                            const isTypescript = (entry.name.endsWith('.ts')) ? true : false;
-                            const relativePath = getRelativePath(path, Paths.UserScripts, entry.name);
-
-                            this.#addUserModule({
-                                type: 'module',
-                                fileName: entry.name,
-                                path: join(path, entry.name),
-                                relativePath: relativePath.replace('.ts', '.js'),
-                                isTypescript
-                            })
-                        }
-                    }
-                }
-
-                await readDir(Paths.UserModules);
-            }
-        } else {
-            return;
-            //Logger.Warning("Can't load addon user modules. Addon type must be 'plugin' OR 'behavior'");
-        }
-    }
-
-    async #loadUserDomSideScripts() {
-        if (
-            this.type === 'plugin' ||
-            this.type === 'behavior'
-        ) {
-            if (await isDirectoryExists(Paths.UserDomSideScripts)) {
-
-                const readDir = async (path: string) => {
-                    for await (const entry of Deno.readDir(path)) {
-                        if (entry.isDirectory) {
-                            await readDir(join(path, entry.name));
-                        } else if (
-                            entry.isFile &&
-                            entry.name.endsWith('.ts')
-                        ) {
-                            const relativePath = getRelativePath(path, Paths.UserScripts, entry.name);
-
-                            this.#addUserDomSideScript({
-                                type: 'dom-side-script',
-                                fileName: entry.name,
-                                path: join(path, entry.name),
-                                relativePath: relativePath.replace('.ts', '.js')
-                            })
-                        }
-                    }
-                }
-
-                await readDir(Paths.UserDomSideScripts);
-            }
-        } else {
-            return;
-            //Logger.Warning("Can't load addon user dom side scripts. Addon type must be 'plugin' OR 'behavior'");
-        }
-    }
-
-    async #loadCategories() {
-        if (
-            this.type === 'plugin' ||
-            this.type === 'behavior'
-        ) {
-
-            if (await isDirectoryExists(Paths.UserCategories)) {
-
-                const readDir = async (path: string) => {
-                    for await (const entry of Deno.readDir(path)) {
-                        if (entry.isDirectory) {
-                            await readDir(join(path, entry.name));
-                        } else if (
-                            entry.isFile &&
-                            entry.name.endsWith('.ts')
-                        ) {
-                            try {
-                                const category = await getCategory(`file://${join(path, entry.name)}`);
-
-                                if (category) {
-                                    this.#addCategory(category);
+                                    );
                                 }
-                            } catch (e) {
-                                Logger.Error('build', `Error importing category: ${Colors.bold(Colors.magenta(entry.name))}`, e);
-                                Deno.exit();
-                            }
+                                break;
+                            case 'external-css':
+                                this.#addUserFile({
+                                    type: 'file',
+                                    originalName: entry.name,
+                                    originalPath: path,
+                                    localName: entry.name,
+                                    localPath: join(Paths.AddonFolders.Files, ...Paths.getFoldersAfterFolder(path, ProjectFolders.Files)),
+                                    dependencyType: 'external-css',
+                                    finalPath: `${AddonFolders.Files}`
+                                })
+                                break;
                         }
                     }
                 }
-
-                await readDir(Paths.UserCategories);
-
-            } else {
-                Logger.Warning(
-                    `Addon categories folder was not detected at path: ${Colors.bold(join('Addon', 'Categories'))}!`,
-                    `Your addon is building without any ACEs`
-                );
             }
 
+            await readDir(folderPath);
+        }
+    }
+
+    async #loadUserScripts(folderPath: string) {
+        if (await isDirectoryExists(folderPath)) {
+            Logger.LogBetweenLines(Colors.bgYellow('Loading scripts...'));
+
+            const readDir = async (path: string) => {
+                for await (const entry of Deno.readDir(path)) {
+                    if (entry.isDirectory) {
+                        await readDir(join(path, entry.name));
+                    } else if (
+                        entry.isFile &&
+                        ((entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts')) || entry.name.endsWith('.js'))
+                    ) {
+                        if (this.#isFilePathInRuntimeScriptsArray('')) {
+                            this.#addUserScript({
+                                type: 'script',
+                                originalName: entry.name,
+                                originalPath: path,
+                                localName: entry.name,
+                                localPath: join(Paths.AddonFolders.Scripts, ...Paths.getFoldersAfterFolder(path, ProjectFolders.Scripts)),
+                                dependencyType: 'external-runtime-script',
+                                isTypescript: (entry.name.endsWith('.ts')) ? true : false,
+                                finalPath: `${AddonFolders.Scripts}`
+                            })
+                        } else {
+                            this.#addUserScript({
+                                type: 'script',
+                                originalName: entry.name,
+                                originalPath: path,
+                                localName: entry.name,
+                                localPath: join(Paths.AddonFolders.Scripts, ...Paths.getFoldersAfterFolder(path, ProjectFolders.Scripts)),
+                                dependencyType: 'external-dom-script',
+                                isTypescript: (entry.name.endsWith('.ts')) ? true : false,
+                                finalPath: `${AddonFolders.Scripts}`
+                            })
+                        }
+                    }
+                }
+            }
+
+            await readDir(folderPath);
+        }
+    }
+
+    async #loadUserModules(folderPath: string) {
+        if (await isDirectoryExists(folderPath)) {
+            Logger.LogBetweenLines(Colors.bgBlue('Loading modules...'));
+
+            const readDir = async (path: string) => {
+                for await (const entry of Deno.readDir(path)) {
+                    if (entry.isDirectory) {
+                        await readDir(join(path, entry.name));
+                    } else if (
+                        entry.isFile &&
+                        ((entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts')) || entry.name.endsWith('.js'))
+                    ) {
+                        this.#addUserModule({
+                            type: 'module',
+                            originalName: entry.name,
+                            originalPath: path,
+                            localName: entry.name.replace('.ts', '.js'),
+                            localPath: join(Paths.AddonFolders.Modules, ...Paths.getFoldersAfterFolder(path, ProjectFolders.Modules)),
+                            isTypescript: (entry.name.endsWith('.ts')) ? true : false,
+                            finalPath: `${AddonFolders.Runtime}/${AddonFolders.Modules}`
+                        })
+                    }
+                }
+            }
+
+            await readDir(folderPath);
+        }
+    }
+
+    async #loadUserDomSideScripts(folderPath: string) {
+        if (await isDirectoryExists(folderPath)) {
+
+            const readDir = async (path: string) => {
+                for await (const entry of Deno.readDir(path)) {
+                    if (entry.isDirectory) {
+                        await readDir(join(path, entry.name));
+                    } else if (
+                        entry.isFile &&
+                        entry.name.endsWith('.ts')
+                    ) {
+                        this.#addUserDomSideScript({
+                            type: 'dom-side-script',
+                            originalName: entry.name,
+                            originalPath: path,
+                            localName: entry.name.replace('.ts', '.js'),
+                            localPath: join(Paths.AddonFolders.DomSide, ...Paths.getFoldersAfterFolder(path, ProjectFolders.DomSide)),
+                            finalPath: `${AddonFolders.Runtime}/${AddonFolders.DomSide}`
+                        })
+                    }
+                }
+            }
+
+            await readDir(folderPath);
+        }
+    }
+
+    async #loadCategories(folderPath: string) {
+        if (await isDirectoryExists(folderPath)) {
+
+            const readDir = async (path: string) => {
+                for await (const entry of Deno.readDir(path)) {
+                    if (entry.isDirectory) {
+                        await readDir(join(path, entry.name));
+                    } else if (
+                        entry.isFile &&
+                        entry.name.endsWith('.ts')
+                    ) {
+                        try {
+                            const categoryPath = import.meta.resolve(`file://${join(path, entry.name)}`);
+                            const categoryModule = (await import(`${categoryPath}?t=${Date.now()}`)).default;
+                            const category = (new categoryModule()).constructor.prototype as CategoryClassType;
+                            
+                            if (category) {
+                                this.#addCategory(category);
+                            }
+                        } catch (e) {
+                            Logger.Error('build', `Error importing category: ${Colors.bold(Colors.magenta(entry.name))}`, e);
+                            Deno.exit();
+                        }
+                    }
+                }
+            }
+
+            await readDir(folderPath);
+
         } else {
-            return;
+            Logger.Warning(
+                `Addon categories folder was not detected at path: ${Colors.bold(join('Addon', 'Categories'))}!`,
+                `Your addon is building without any ACEs`
+            );
         }
     }
 
@@ -400,12 +358,12 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
         switch (file.dependencyType) {
             case "copy-to-output":
                 Logger.Loading(
-                    `Found file at path: ${Colors.bold(Colors.green(`${join('Addon', 'Files', file.relativePath)}`))}, will be included in project build`
+                    `Found [${Colors.dim(Colors.bold(file.mimeType))}] file ${Colors.bold(Colors.green(Colors.bold((file.originalName))))}, will be included in project build`
                 );
                 break;
             case "external-css":
                 Logger.Loading(
-                    `Found CSS file at path: ${Colors.bold(Colors.dim(`${join('Addon', 'Files', file.relativePath)}`))}`
+                    `Found [${Colors.dim(Colors.bold('CSS'))}] file ${Colors.bold(Colors.dim(Colors.bold((file.originalName))))}`
                 );
                 break;
         }
@@ -416,12 +374,12 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
 
         if (file.isTypescript) {
             if (file.dependencyType === 'external-runtime-script')
-            Logger.Loading(
-                `Found script at path: ${Colors.blue(`${Colors.bold(join('Addon', 'Scripts', file.relativePath))}`)} (${file.dependencyType})`
-            );
+                Logger.Loading(
+                    `Found script ${Colors.blue(Colors.bold((file.originalName)))} (${file.dependencyType})`
+                );
         } else {
             Logger.Loading(
-                `Found script at path: ${Colors.yellow(`${Colors.bold(join('Addon', 'Scripts', file.relativePath))}`)} (${file.dependencyType})`
+                `Found script ${Colors.yellow(Colors.bold((file.originalName)))} (${file.dependencyType})`
             );
         }
     }
@@ -431,11 +389,11 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
 
         if (file.isTypescript) {
             Logger.Loading(
-                `Found module at path: ${Colors.blue(`${Colors.bold(join('Addon', 'Modules', file.relativePath))}`)}`
+                `Found [${Colors.dim(Colors.bold('TS'))}] module ${Colors.blue(Colors.bold((file.originalName)))}`
             );
         } else {
             Logger.Loading(
-                `Found module at path: ${Colors.yellow(`${Colors.bold(join('Addon', 'Modules', file.relativePath))}`)}`
+                `Found [${Colors.dim(Colors.bold('JS'))}] module ${Colors.yellow(Colors.bold((file.originalName)))}`
             );
         }
     }
@@ -444,21 +402,13 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
         this.userDomSideScripts.push(file);
 
         Logger.Loading(
-            `Found DOM side script at path: ${Colors.dim(`${Colors.bold(join('Addon', 'DomSide', file.relativePath))}`)}`
+            `Found [${Colors.dim(Colors.bold('TS'))}] DOM side script ${Colors.dim(Colors.bold((file.originalName)))}`
         );
     }
 
     #addCategory(category: CategoryClassType) {
         if (!category._inDevelopment) {
             this.categories.push(category);
-        }
-    }
-
-    #isFilePathInOutputFilesArray(path: string) {
-        if (this.filesToOutput.includes(path)) {
-            return true;
-        } else {
-            return false;
         }
     }
 
@@ -490,135 +440,100 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
     }
 
     async #createIcon() {
-        if (
-            this.type === 'plugin' ||
-            this.type === 'behavior'
-        ) {
-            if (this.icon.isDefault) {
-                await Deno.writeTextFile(join(Paths.Build, this.icon.relativePath), Icon())
-            } else {
-                await Deno.copyFile(this.icon.path, join(Paths.Build, this.icon.fileName));
-            }
+        if (this.icon.isDefault) {
+            await Deno.writeTextFile(join(this.icon.localPath, this.icon.localName), Icon())
         } else {
-            return;
+            await Deno.copyFile(join(this.icon.originalPath, this.icon.originalName), join(this.icon.localPath, this.icon.localName));
         }
     }
 
-    async #copyUserFilesTo(folderName: string) {
+    async #copyUserFiles() {
         if (this.userFiles.length > 0) {
-            await Deno.mkdir(join(Paths.Build, folderName));
+            await Deno.mkdir(Paths.AddonFolders.Files);
 
             this.userFiles.forEach(async file => {
-                const destinationPath = join(Paths.Build, folderName, file.relativePath);
-                const normalizedPath = destinationPath.replace(/\\/g, '/');
-                const destinationDir = destinationPath.substring(0, normalizedPath.lastIndexOf('/'));
+                await Deno.mkdir(file.localPath, { recursive: true });
 
-                await Deno.mkdir(destinationDir, { recursive: true });
-
-                await Deno.copyFile(file.path, join(Paths.Build, folderName, file.relativePath));
+                await Deno.copyFile(join(file.originalPath, file.originalName), join(file.localPath, file.localName));
             })
         }
     }
 
-    async #copyUserScriptsTo(folderName: string) {
+    async #copyUserScripts() {
         if (this.userScripts.length > 0) {
-            await Deno.mkdir(join(Paths.Build, folderName));
+            await Deno.mkdir(Paths.AddonFolders.Scripts);
 
             this.userScripts.forEach(async file => {
                 if (file.isTypescript) {
-                    const newFilePath = file.relativePath.replace('.ts', '.js');
+                    const fileContent = await transpileTs(join(file.originalPath, file.originalName)) || '';
 
-                    const destinationPath = join(Paths.Build, folderName, newFilePath);
-                    const normalizedPath = destinationPath.replace(/\\/g, '/');
-                    const destinationDir = destinationPath.substring(0, normalizedPath.lastIndexOf('/'));
+                    await Deno.mkdir(file.localPath, { recursive: true });
 
-                    await Deno.mkdir(destinationDir, { recursive: true });
-
-                    const fileContent = await transpileTs(file.path) as string || '';
-                    await Deno.writeTextFile(join(Paths.Build, folderName, newFilePath), fileContent);
+                    await Deno.writeTextFile(join(file.localPath, file.localName), fileContent);
                 } else {
-                    const destinationPath = join(Paths.Build, folderName, file.relativePath);
-                    const normalizedPath = destinationPath.replace(/\\/g, '/');
-                    const destinationDir = destinationPath.substring(0, normalizedPath.lastIndexOf('/'));
+                    await Deno.mkdir(file.localPath, { recursive: true });
 
-                    await Deno.mkdir(destinationDir, { recursive: true });
-
-                    await Deno.copyFile(file.path, join(Paths.Build, folderName, file.relativePath));
+                    await Deno.copyFile(join(file.originalPath, file.originalName), join(file.localPath, file.localName));
                 }
             })
         }
     }
 
-    async #copyUserModulesTo(folderName: string) {
+    async #copyUserModules() {
         if (this.userModules.length > 0) {
-            await Deno.mkdir(join(Paths.Build, 'c3runtime', folderName));
+            await Deno.mkdir(Paths.AddonFolders.Modules);
 
             this.userModules.forEach(async file => {
                 if (file.isTypescript) {
-                    const destinationPath = join(Paths.Build, 'c3runtime', folderName, file.relativePath);
-                    const normalizedPath = destinationPath.replace(/\\/g, '/');
-                    const destinationDir = destinationPath.substring(0, normalizedPath.lastIndexOf('/'));
+                    const fileContent = await transpileTs(join(file.originalPath, file.originalName)) || '';
 
-                    await Deno.mkdir(destinationDir, { recursive: true });
-
-                    await Deno.copyFile(file.path, join(Paths.Build, 'c3runtime', folderName, file.relativePath));
+                    await Deno.mkdir(file.localPath, { recursive: true });
+                    
+                    await Deno.writeTextFile(join(file.localPath, file.localName), fileContent);
                 } else {
-                    const newFilePath = file.relativePath;
+                    await Deno.mkdir(file.localPath, { recursive: true });
 
-                    const destinationPath = join(Paths.Build, 'c3runtime', folderName, newFilePath);
-                    const normalizedPath = destinationPath.replace(/\\/g, '/');
-                    const destinationDir = destinationPath.substring(0, normalizedPath.lastIndexOf('/'));
-
-                    await Deno.mkdir(destinationDir, { recursive: true });
-
-                    await Deno.copyFile(file.path, join(Paths.Build, 'c3runtime', folderName, newFilePath));
+                    await Deno.copyFile(join(file.originalPath, file.originalName), join(file.localPath, file.localName));
                 }
             })
         }
     }
 
-    async #copyUserDomSideScriptsTo(folderName: string) {
+    async #copyUserDomSideScripts() {
         if (this.userDomSideScripts.length > 0) {
-            await Deno.mkdir(join(Paths.Build, 'c3runtime', folderName));
+            await Deno.mkdir(Paths.AddonFolders.DomSide, { recursive: true });
 
             this.userDomSideScripts.forEach(async file => {
-                const newFilePath = file.relativePath.replace('.ts', '.js');
+                const fileContent = await transpileTs(join(file.originalPath, file.originalName)) || '';
 
-                const destinationPath = join(Paths.Build, 'c3runtime', folderName, newFilePath);
-                const normalizedPath = destinationPath.replace(/\\/g, '/');
-                const destinationDir = destinationPath.substring(0, normalizedPath.lastIndexOf('/'));
+                await Deno.mkdir(file.localPath, { recursive: true });
 
-                await Deno.mkdir(destinationDir, { recursive: true });
-
-                const fileContent = await transpileTs(file.path) as string || '';
-                await Deno.writeTextFile(join(Paths.Build, 'c3runtime', folderName, newFilePath), fileContent);
+                await Deno.writeTextFile(join(file.localPath, file.localName), fileContent);
             })
         }
     }
 
     async #copyDefaultImageFile() {
         const fileName = 'default.png';
-        const filePath = join(Paths.Main, fileName);
+        const filePath = Paths.Root;
 
-        if (await isFileExists(filePath)) {
+        if (await isFileExists(join(filePath, fileName))) {
             this.hasDefaultImage = true;
             Logger.Loading(
                 `Found default image for drawing plugin`
             );
-            await Deno.copyFile(
-                filePath, join(Paths.Build, fileName)
-            );
+            await Deno.copyFile(join(filePath, fileName), join(Paths.ProjectFolders.Build, fileName));
         }
     }
 
     async #createAddonStructure() {
-        if (await isDirectoryExists(Paths.Build)) {
-            await Deno.remove(Paths.Build, { recursive: true });
+        if (await isDirectoryExists(Paths.ProjectFolders.Build)) {
+            await Deno.remove(Paths.ProjectFolders.Build, { recursive: true });
         }
 
-        await Deno.mkdir(Paths.Build);
-        await Deno.mkdir(join(Paths.Build, 'c3runtime'));
-        await Deno.mkdir(join(Paths.Build, 'lang'));
+        await Deno.mkdir(Paths.ProjectFolders.Build);
+        await Deno.mkdir(Paths.AddonFolders.Runtime);
+        await Deno.mkdir(Paths.AddonFolders.Lang)
 
         await this.#createIcon();
         if (
@@ -627,10 +542,10 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
         ) {
             await this.#copyDefaultImageFile();
         }
-        await this.#copyUserFilesTo('files');
-        await this.#copyUserScriptsTo('scripts');
-        await this.#copyUserModulesTo('modules');
-        await this.#copyUserDomSideScriptsTo('domSide');
+        await this.#copyUserFiles();
+        await this.#copyUserScripts();
+        await this.#copyUserModules();
+        await this.#copyUserDomSideScripts();
     }
 
     #checkCategories(watch: boolean) {
@@ -864,9 +779,9 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
         await AddonFileManager.createRuntimeScript(RuntimeScript.Conditions, this.config, this.categories);
         await AddonFileManager.createRuntimeScript(RuntimeScript.Expressions, this.config, this.categories);
 
-        // if (this.userModules.length > 0) {
-        //     await AddonFileManager.createRuntimeScript(RuntimeScript.Module, this.config);
-        // }
+        if (this.userModules.length > 0) {
+            await AddonFileManager.createRuntimeScript(RuntimeScript.Module, this.config);
+        }
     }
 
     async #createC3EditorFiles() {
@@ -875,7 +790,7 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
 
         const lostAddonData = new LostAddonData(
             this.hasDefaultImage,
-            { path: this.icon.relativePath, iconType: this.icon.iconType },
+            { path: this.icon.finalPath, iconType: this.icon.iconType },
             this.config, this.pluginProperties, this.remoteScripts,
             this.userFiles, this.userScripts, this.userModules, this.userDomSideScripts
         )

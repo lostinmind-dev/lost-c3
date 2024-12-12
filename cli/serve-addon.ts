@@ -25,7 +25,7 @@ export default function serveAddon(port: number) {
         try {
             const url = new URL(req.url);
             // let filePath = url.pathname;
-            let filePath = join(Paths.Build, url.pathname);
+            let filePath = join(Paths.ProjectFolders.Build, url.pathname);
 
             try {
                 const fileInfo = await Deno.stat(filePath);
