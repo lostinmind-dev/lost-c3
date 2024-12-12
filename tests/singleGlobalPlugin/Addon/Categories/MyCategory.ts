@@ -31,7 +31,7 @@ export default class {
 
     @Expression('id1', '', {
         params: [
-            addParam('', '', { type: Param.Animation })
+            addParam('test', '', { type: Param.String })
         ]
     })
     GetValue(this: string): string | number {

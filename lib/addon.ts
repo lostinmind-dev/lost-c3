@@ -10,7 +10,7 @@ import { transpileTs } from "../shared/transpile-ts.ts";
 import { Property } from './entities/plugin-property.ts';
 
 import Icon from "./defaults/addon-icon.ts";
-import { AddonFileManager, EditorScript, JsonFile, RuntimeScript } from "./addon-file-manager.ts";
+import { AddonFileManager, EditorScript, JsonFile, RuntimeScript } from "./managers/addon-file-manager.ts";
 import { LostAddonData } from "./lost-addon-data.ts";
 
 export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
@@ -563,7 +563,7 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
 
                     await Deno.copyFile(file.path, join(Paths.Build, 'c3runtime', folderName, file.relativePath));
                 } else {
-                    const newFilePath = file.relativePath.replace('.ts', '.js');
+                    const newFilePath = file.relativePath;
 
                     const destinationPath = join(Paths.Build, 'c3runtime', folderName, newFilePath);
                     const normalizedPath = destinationPath.replace(/\\/g, '/');
@@ -571,9 +571,7 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
 
                     await Deno.mkdir(destinationDir, { recursive: true });
 
-                    const fileContent = await transpileTs(file.path) as string || '';
-
-                    await Deno.writeTextFile(join(Paths.Build, 'c3runtime', folderName, newFilePath), fileContent);
+                    await Deno.copyFile(file.path, join(Paths.Build, 'c3runtime', folderName, newFilePath));
                 }
             })
         }
@@ -866,7 +864,9 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
         await AddonFileManager.createRuntimeScript(RuntimeScript.Conditions, this.config, this.categories);
         await AddonFileManager.createRuntimeScript(RuntimeScript.Expressions, this.config, this.categories);
 
-        // await AddonFileManager.createRuntimeScript(RuntimeScript.Module, this.config);
+        // if (this.userModules.length > 0) {
+        //     await AddonFileManager.createRuntimeScript(RuntimeScript.Module, this.config);
+        // }
     }
 
     async #createC3EditorFiles() {

@@ -1,4 +1,4 @@
-import { GPUResourceManager } from "./Modules/index.ts";
+import { GPUResourceManager } from "./Modules/index.js";
 
 class Instance extends globalThis.ISDKInstanceBase {
 

@@ -99,6 +99,7 @@ export class Plugin<
                 id.length > 0 &&
                 name.length > 0
             ) {
+                //@ts-ignore
                 this.addProperty(id, name, { type: Property.Group });
             }  else if (id.length === 0) {
                 Logger.Error('build', `Group id can't be empty.`, 'Please specify your group Id.')

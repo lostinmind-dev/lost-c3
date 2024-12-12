@@ -1,11 +1,1 @@
-const Lost = {"addonId":"LostPluginId"};
-class LostType extends globalThis.ISDKObjectTypeBase {
-    constructor() {
-        super();
-    }
-    _onCreate() { }
-}
-;
-export {};
-
-globalThis.C3.Plugins["LostPluginId"].Type = LostType;
+let s={addonId:"LostPluginId"};class e extends globalThis.ISDKObjectTypeBase{constructor(){super()}_onCreate(){}}globalThis.C3.Plugins.LostPluginId.Type=e;

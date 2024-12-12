@@ -1,10 +1,1 @@
-const Lost = {"addonId":"LostPluginId"};
-class LostEditorType extends SDK.ITypeBase {
-    constructor(sdkPlugin, iObjectType) {
-        super(sdkPlugin, iObjectType);
-    }
-}
-;
-export {};
-
-globalThis.SDK.Plugins["LostPluginId"].Type = LostEditorType;
+let s={addonId:"LostPluginId"};class e extends SDK.ITypeBase{constructor(s,e){super(s,e)}}setTimeout(()=>{globalThis.SDK.Plugins.LostPluginId.Type=e});

@@ -1,6 +1,6 @@
 {
     "name": "@lost-c3/lib",
-    "version": "3.2.4",
+    "version": "3.3.1",
     "exports": {
         ".": "./mod.ts",
         "./cli": "./cli.ts",
@@ -13,7 +13,11 @@
         "build:base": "deno run --watch -A ./.addon_base/main.ts"
     },
     "compilerOptions": {
-        "types": ["./cli/global.d.ts"],
+        "types": [
+            "./types/construct.d.ts",
+            "./types/global.d.ts",
+            "./types/cli.d.ts"
+        ],
         "lib": [
             "deno.window",
             "dom",

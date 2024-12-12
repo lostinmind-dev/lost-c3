@@ -6,7 +6,7 @@ import Build from './cli/main.ts';
 import Serve from './cli/serve-addon.ts';
 import { dedent } from "./shared/misc.ts";
 import { downloadAddonBase } from "./cli/check-addon-base-exists.ts";
-import { AddonFileManager } from "./lib/addon-file-manager.ts";
+import { AddonFileManager } from "./lib/managers/addon-file-manager.ts";
 
 
 let rebuildTimeout: number | undefined;

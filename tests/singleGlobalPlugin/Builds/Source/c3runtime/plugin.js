@@ -1,10 +1,1 @@
-const Lost = {"addonId":"LostPluginId"};
-class LostPlugin extends globalThis.ISDKPluginBase {
-    constructor() {
-        super();
-    }
-}
-;
-export {};
-
-globalThis.C3.Plugins["LostPluginId"] = LostPlugin;
+let s={addonId:"LostPluginId"};class l extends globalThis.ISDKPluginBase{constructor(){super()}}globalThis.C3.Plugins.LostPluginId=l;
