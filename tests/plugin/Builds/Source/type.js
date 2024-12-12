@@ -7,4 +7,6 @@ class LostEditorType extends SDK.ITypeBase {
 ;
 export {};
 
-globalThis.SDK.Plugins["LostPluginId"].Type = LostEditorType;
+setTimeout(() => {
+    globalThis.SDK.Plugins["LostPluginId"].Type = LostEditorType;
+})

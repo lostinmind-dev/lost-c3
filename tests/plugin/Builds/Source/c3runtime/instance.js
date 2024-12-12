@@ -1,5 +1,5 @@
 const Lost = {"addonId":"LostPluginId"};
-import { GPUResourceManager } from './modules/index.js';
+import { GPUResourceManager } from "./Modules/index.js";
 class Instance extends globalThis.ISDKInstanceBase {
     constructor() {
         super();

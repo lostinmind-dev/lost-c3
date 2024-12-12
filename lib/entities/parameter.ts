@@ -7,7 +7,7 @@ import type { EntityParamOptions, EntityType } from './entity.ts';
 /**
  * @class represents ACE's parameter info.
  */
-export class Parameter<E extends EntityType = EntityType> {
+export class Parameter<E extends EntityType = EntityType > {
     static addonId: string = '';
     readonly _id: string;
     readonly _name: string;
@@ -63,7 +63,9 @@ export enum Param {
     EventVar = 'eventvar',
     EventVarBool = 'eventvarbool',
     Animation = 'animation',
-    ObjInstanceVar = 'objinstancevar'
+    ObjInstanceVar = 'objinstancevar',
+    /** BetaR419 */
+    ComboGrouped = 'combo-grouped'
 }
 
 /** All available ACE's parameter options  */
@@ -85,6 +87,7 @@ export type ParamOptions =
     | EventVarBoolParam
     | AnimationParam
     | ObjInstanceVarParam
+    | ComboGroupedParam
 ;
 
 /** All available expression parameter options  */
@@ -147,7 +150,7 @@ interface ComboParam extends ParamOptionsBase {
     type: Param.Combo;
     /**
      * Must be used to specify the available items.
-     * @example [["item_one", "Item 1"], ["item_two", "Item 2"]]
+     * @example [["item_id", "Item Name"], ["item_id2", "Item Name"]]
      */
     items: [string, string][];
     /**
@@ -258,6 +261,35 @@ interface ObjInstanceVarParam extends ParamOptionsBase {
      * @requires An Param.Object type parameter.
      */
     type: Param.ObjInstanceVar;
+}
+
+/** Object represents 'combo-grouped' parameter */
+interface ComboGroupedParam extends ParamOptionsBase {
+    type: Param.ComboGrouped;
+    /**
+     * Must be used to specify groups with items.
+     */
+    groups: ComboGroup[];
+    /**
+     * *Optional*. A dropdown list. Items must be specified with the "items" property.
+     */
+    initialValue?: string;
+}
+
+type ComboGroup = {
+    /**
+     * Group Id
+     */
+    id: string;
+    /**
+     * Group Name
+     */
+    name: string;
+    /**
+     * Must be used to specify the available items.
+     * @example [["item_id", "Item Name"], ["item_id2", "Item Name"]]
+     */
+    items: [string, string][];
 }
 
 /**

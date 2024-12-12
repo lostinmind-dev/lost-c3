@@ -11,6 +11,19 @@
                 "aceCategories": {
                     "id1": "name"
                 },
+                "actions": {
+                    "test": {
+                        "list-name": "test",
+                        "display-text": "test ([i]1[/i]: [b]{0}[/b])",
+                        "description": "There is no any description yet...",
+                        "params": {
+                            "1": {
+                                "name": "1",
+                                "desc": "There is no any description yet..."
+                            }
+                        }
+                    }
+                },
                 "conditions": {
                     "myId": {
                         "list-name": "myId",
@@ -35,19 +48,6 @@
                         }
                     }
                 },
-                "actions": {
-                    "test": {
-                        "list-name": "test",
-                        "display-text": "test ([i]1[/i]: [b]{0}[/b])",
-                        "description": "There is no any description yet...",
-                        "params": {
-                            "1": {
-                                "name": "1",
-                                "desc": "There is no any description yet..."
-                            }
-                        }
-                    }
-                },
                 "expressions": {
                     "id1": {
                         "translated-name": "id1",
@@ -56,7 +56,6 @@
                     }
                 }
             }
-        },
-        "behaviors": {}
+        }
     }
 }

@@ -563,17 +563,14 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
 
                     await Deno.copyFile(file.path, join(Paths.Build, 'c3runtime', folderName, file.relativePath));
                 } else {
-                    const newFilePath = file.relativePath.replace('.ts', '.js');
 
-                    const destinationPath = join(Paths.Build, 'c3runtime', folderName, newFilePath);
+                    const destinationPath = join(Paths.Build, 'c3runtime', folderName, file.relativePath);
                     const normalizedPath = destinationPath.replace(/\\/g, '/');
                     const destinationDir = destinationPath.substring(0, normalizedPath.lastIndexOf('/'));
 
                     await Deno.mkdir(destinationDir, { recursive: true });
 
-                    const fileContent = await transpileTs(file.path) as string || '';
-
-                    await Deno.writeTextFile(join(Paths.Build, 'c3runtime', folderName, newFilePath), fileContent);
+                    await Deno.copyFile(file.path, join(Paths.Build, 'c3runtime', folderName, file.relativePath));
                 }
             })
         }

@@ -11,26 +11,18 @@
                 "aceCategories": {
                     "main": "name"
                 },
-                "conditions": {
-                    "myId": {
-                        "list-name": "myId",
-                        "display-text": "myId",
-                        "description": "There is no any description yet...",
-                        "params": {}
-                    }
-                },
                 "actions": {
                     "test": {
                         "list-name": "test",
-                        "display-text": "test ([i]1[/i]: [b]{0}[/b], [i]2[/i]: [b]{1}[/b])",
+                        "display-text": "test ([i]test1[/i]: [b]{0}[/b], [i]test2[/i]: [b]{1}[/b])",
                         "description": "There is no any description yet...",
                         "params": {
-                            "1": {
-                                "name": "1",
+                            "test1": {
+                                "name": "test1",
                                 "desc": "There is no any description yet..."
                             },
-                            "2": {
-                                "name": "2",
+                            "test2": {
+                                "name": "test2",
                                 "desc": "There is no any description yet...",
                                 "items": {
                                     "hello": "Test",
@@ -40,15 +32,27 @@
                         }
                     }
                 },
+                "conditions": {
+                    "myId": {
+                        "list-name": "myId",
+                        "display-text": "myId",
+                        "description": "There is no any description yet...",
+                        "params": {}
+                    }
+                },
                 "expressions": {
                     "id1": {
                         "translated-name": "id1",
                         "description": "There is no any description yet...",
-                        "params": {}
+                        "params": {
+                            "test1": {
+                                "name": "test1",
+                                "desc": "There is no any description yet..."
+                            }
+                        }
                     }
                 }
             }
-        },
-        "behaviors": {}
+        }
     }
 }

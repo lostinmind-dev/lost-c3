@@ -1,4 +1,7 @@
-const _lostData = {"icon":{"path":"icon.svg","iconType":"image/svg+xml"},"config":{"type":"plugin","pluginType":"object","isSingleGlobal":true,"objectName":"LostPlugin","addonId":"LostPluginId","category":"general","addonName":"Lost plugin for Construct 3","addonDescription":"My awesome addon was made with Lost","version":"1.0.0.0","author":"lostinmind.","docsUrl":"https://myaddon.com/docs","helpUrl":{"EN":"https://myaddon.com/help/en"},"websiteUrl":"https://myaddon.com"},"remoteScripts":[],"files":[{"type":"file","path":"other/info.txt","dependencyType":"copy-to-output","mimeType":"text/plain"},{"type":"file","path":"styles.css","dependencyType":"external-css"},{"type":"script","path":"index.js","dependencyType":"external-dom-script"},{"type":"module","path":"index.js"}],"pluginProperties":[]};
+const _lostMethods = {
+    
+};
+const _lostData = {"hasDefaultImage":false,"icon":{"path":"icon.svg","iconType":"image/svg+xml"},"config":{"type":"plugin","pluginType":"object","isSingleGlobal":true,"objectName":"LostPlugin","addonId":"LostPluginId","category":"general","addonName":"Lost plugin for Construct 3","addonDescription":"My awesome addon was made with Lost","version":"1.0.0.0","author":"lostinmind.","docsUrl":"https://myaddon.com/docs","helpUrl":{"EN":"https://myaddon.com/help/en"},"websiteUrl":"https://myaddon.com"},"remoteScripts":[],"files":[{"type":"file","path":"other/info.txt","dependencyType":"copy-to-output","mimeType":"text/plain"},{"type":"file","path":"styles.css","dependencyType":"external-css"},{"type":"script","path":"index.js","dependencyType":"external-dom-script"},{"type":"module","path":"index.js"},{"type":"module","path":"\\test/tes.js"}],"pluginProperties":[]};
 
 const config = _lostData.config;
 const { icon } = _lostData;
@@ -13,23 +16,76 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         this._info.SetAuthor(config.author);
         this._info.SetHelpUrl(globalThis.lang(".help-url"));
         this._info.SetIcon(icon.path, icon.iconType);
-        this._info.SetIsDeprecated(config.deprecated || false);
-        this._info.SetCanBeBundled(config.canBeBundled || true);
+        if (config.deprecated) {
+            this._info.SetIsDeprecated(config.deprecated);
+        }
+        else {
+            this._info.SetIsDeprecated(false);
+        }
+        if (config.canBeBundled) {
+            this._info.SetCanBeBundled(config.canBeBundled);
+        }
+        else {
+            this._info.SetCanBeBundled(true);
+        }
         this._info.SetPluginType(config.pluginType);
         if (config.pluginType === 'object') {
             this._info.SetIsSingleGlobal(config.isSingleGlobal || false);
         }
         if (config.pluginType === 'world') {
             this._info.SetHasImage(true);
-            this._info.SetIsResizable(config.isResizable || true);
-            this._info.SetIsRotatable(config.isRotatable || true);
-            this._info.SetIs3D(config.is3D || false);
-            this._info.SetIsTiled(config.isTiled || false);
-            this._info.SetHasAnimations(config.hasAnimations || false);
-            this._info.SetSupportsZElevation(config.supportsZElevation || true);
-            this._info.SetSupportsColor(config.supportsColor || true);
-            this._info.SetSupportsEffects(config.supportsEffects || true);
-            this._info.SetMustPreDraw(config.mustPreDraw || true);
+            if (config.isResizable) {
+                this._info.SetIsResizable(config.isResizable);
+            }
+            else {
+                this._info.SetIsResizable(true);
+            }
+            if (config.isRotatable) {
+                this._info.SetIsRotatable(config.isRotatable);
+            }
+            else {
+                this._info.SetIsRotatable(true);
+            }
+            if (config.is3D) {
+                this._info.SetIs3D(config.is3D);
+            }
+            else {
+                this._info.SetIs3D(false);
+            }
+            if (config.isTiled) {
+                this._info.SetIsTiled(config.isTiled);
+            }
+            else {
+                this._info.SetIsTiled(false);
+            }
+            if (_lostData.hasDefaultImage) {
+                this._info.SetDefaultImageURL('default.png');
+            }
+            ;
+            if (config.supportsZElevation) {
+                this._info.SetSupportsZElevation(config.supportsZElevation);
+            }
+            else {
+                this._info.SetSupportsZElevation(true);
+            }
+            if (config.supportsColor) {
+                this._info.SetSupportsColor(config.supportsColor);
+            }
+            else {
+                this._info.SetSupportsColor(true);
+            }
+            if (config.supportsEffects) {
+                this._info.SetSupportsEffects(config.supportsEffects);
+            }
+            else {
+                this._info.SetSupportsEffects(true);
+            }
+            if (config.mustPreDraw) {
+                this._info.SetMustPreDraw(config.mustPreDraw);
+            }
+            else {
+                this._info.SetMustPreDraw(true);
+            }
             if (config.commonACEs) {
                 const commonAces = new Set(config.commonACEs);
                 commonAces.forEach(value => {
@@ -124,7 +180,7 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
         const properties = [];
         if (_lostData.pluginProperties.length > 0) {
             _lostData.pluginProperties.forEach(property => {
-                const { _id, _opts, _funcString } = property;
+                const { _id, _opts } = property;
                 switch (_opts.type) {
                     case "integer":
                         if (_opts.min && _opts.max) {
@@ -224,22 +280,22 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                         properties.push(new SDK.PluginProperty(_opts.type, _id));
                         break;
                     case "info":
-                        const infoFunc = this.deserializeFunction(_funcString || '');
+                        const infoFunc = _lostMethods[_id];
                         if (infoFunc) {
                             properties.push(new SDK.PluginProperty(_opts.type, _id, {
-                                infoCallback: (i) => {
-                                    return infoFunc(i);
+                                infoCallback: (inst) => {
+                                    return infoFunc(inst);
                                 }
                             }));
                         }
                         break;
                     case "link":
-                        const func = this.deserializeFunction(_funcString || '');
-                        if (func) {
+                        const linkFunc = _lostMethods[_id];
+                        if (linkFunc) {
                             properties.push(new SDK.PluginProperty(_opts.type, _id, {
                                 callbackType: _opts.callbackType,
-                                linkCallback: (p) => {
-                                    func(p);
+                                linkCallback: (instOrType) => {
+                                    linkFunc(instOrType);
                                 }
                             }));
                         }
@@ -248,28 +304,6 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
             });
         }
         this._info.SetProperties(properties);
-    }
-    deserializeFunction(funcString) {
-        try {
-            const cleanedFuncString = funcString.trim();
-            const arrowFunctionMatch = cleanedFuncString.match(/^\((.*)\)\s*=>\s*\{([\s\S]*)\}$/);
-            const regularFunctionMatch = cleanedFuncString.match(/^function\s*\((.*)\)\s*\{([\s\S]*)\}$/);
-            if (arrowFunctionMatch) {
-                const args = arrowFunctionMatch[1].trim();
-                const body = arrowFunctionMatch[2].trim();
-                return new Function(args, body);
-            }
-            if (regularFunctionMatch) {
-                const args = regularFunctionMatch[1].trim();
-                const body = regularFunctionMatch[2].trim();
-                return new Function(args, body);
-            }
-            return null;
-        }
-        catch (error) {
-            // console.error("Failed to deserialize function:", error);
-            return null;
-        }
     }
 };
 PLUGIN_CLASS.Register(config.addonId, PLUGIN_CLASS);

@@ -16,4 +16,6 @@ class LostEditorInstance extends SDK.IInstanceBase {
 ;
 export {};
 
-globalThis.SDK.Plugins["LostPluginId"].Instance = LostEditorInstance;
+setTimeout(() => {
+    globalThis.SDK.Plugins["LostPluginId"].Instance = LostEditorInstance;
+})

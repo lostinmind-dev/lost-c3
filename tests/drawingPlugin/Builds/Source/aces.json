@@ -4,8 +4,6 @@
             {
                 "id": "test",
                 "scriptName": "doAction",
-                "highlight": false,
-                "isDeprecated": false,
                 "isAsync": true,
                 "params": [
                     {
@@ -21,12 +19,7 @@
             {
                 "id": "myId",
                 "scriptName": "onCondition",
-                "highlight": false,
-                "isDeprecated": false,
                 "isTrigger": true,
-                "isFakeTrigger": false,
-                "isStatic": false,
-                "isLooping": false,
                 "isInvertible": true,
                 "isCompatibleWithTriggers": true,
                 "params": [
@@ -41,12 +34,7 @@
             {
                 "id": "myId2",
                 "scriptName": "onCondition1",
-                "highlight": false,
-                "isDeprecated": false,
                 "isTrigger": true,
-                "isFakeTrigger": false,
-                "isStatic": false,
-                "isLooping": false,
                 "isInvertible": true,
                 "isCompatibleWithTriggers": true,
                 "params": [
@@ -63,11 +51,7 @@
             {
                 "id": "id1",
                 "expressionName": "GetValue",
-                "highlight": false,
-                "isDeprecated": false,
-                "returnType": "any",
-                "isVariadicParameters": false,
-                "params": []
+                "returnType": "any"
             }
         ]
     }

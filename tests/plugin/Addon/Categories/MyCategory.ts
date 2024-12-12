@@ -1,16 +1,13 @@
 import { Category, Action, Condition, Expression, addParam, Param } from "../../../../mod.ts";
 import type { Instance } from "../Instance.ts";
 
-
-type ComboItemsCollection = ['id1', 'id2', 'hello', 'test', 'test1'];
-
 @Category<CategoriesCollection>('main', 'name')
 export default class {
 
     @Action('test', '', '', {
         params: [
-            addParam('1', '', { type: Param.String, initialValue: '' }),
-            addParam('2', '', { type: Param.Combo, items: [['hello', 'Test'], ['id2', 'Test 2']] })
+            addParam('test1', '', { type: Param.String, initialValue: '' }),
+            addParam('test2', '', { type: Param.Combo, items: [['hello', 'Test'], ['id2', 'Test 2']] })
         ],
         isAsync: true
     })
@@ -31,7 +28,7 @@ export default class {
 
     @Expression('id1', '', {
         params: [
-            addParam('', '', { type: Param.Animation })
+            addParam('test1', '', { type: Param.Animation })
         ]
     })
     GetValue(this: string): string | number {

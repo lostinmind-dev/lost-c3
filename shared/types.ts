@@ -44,6 +44,7 @@ export type AceParam = {
     "items"?: string[];
     "allowedPluginIds"?: string[];
     "autocompleteId"?: string;
+    "itemGroups"?: {id: string; items: string[]}[]
 }
 
 export interface AceAction extends AceBase {
@@ -124,6 +125,14 @@ export interface LanguageParam {
     "items"?: {
         [itemId: string]: string;
     };
+    "itemGroups"?: {
+        [groupId: string]: {
+            "name": string;
+            "items": {
+                [itemId: string]: string;
+            }
+        }
+    }
 }
 
 export interface LanguageCondition {
