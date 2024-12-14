@@ -1,12 +1,13 @@
 import DenoJson from './deno.json' with { type: "json" };
 import { Colors, join, Logger, parseArgs } from './deps.ts';
 import { Paths } from './shared/paths.ts';
-
-import Build from './cli/main.ts';
-import Serve from './cli/serve-addon.ts';
 import { dedent } from "./shared/misc.ts";
 import { downloadAddonBase } from "./cli/check-addon-base-exists.ts";
 import { AddonFileManager } from "./lib/managers/addon-file-manager.ts";
+
+import Build from './cli/main.ts';
+import Serve from './cli/serve-addon.ts';
+import Bundle from "./bundler/main.ts";
 
 
 let rebuildTimeout: number | undefined;
@@ -49,15 +50,29 @@ async function BuildAndWatch() {
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
-        string: ['type', 'port'],
-        boolean: ['watch', 'minify'],
+        string: [
+            'type', 'port', 
+            'name'
+        ],
+        boolean: ['watch', 'minify', 'npm'],
         alias: { w: 'watch', m: 'minify' },
         "--": true,
     });
 
-    const command = _[0]
+    const command = _[0];
+    const secondCommand = _[1];
 
     switch (command) {
+        case 'bundle':
+            if (
+                secondCommand &&
+                secondCommand === 'npm'
+            ) {
+                if (flags.name) {
+                    await Bundle({ type: 'npm', packageName: flags.name });
+                }
+            }
+            break;
         case 'help':
             printHelp();
             break;
