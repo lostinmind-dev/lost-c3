@@ -52,7 +52,7 @@ async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
         string: [
             'type', 'port', 
-            'name'
+            'package'
         ],
         boolean: ['watch', 'minify', 'npm'],
         alias: { w: 'watch', m: 'minify' },
@@ -68,8 +68,8 @@ async function main() {
                 secondCommand &&
                 secondCommand === 'npm'
             ) {
-                if (flags.name) {
-                    await Bundle({ type: 'npm', packageName: flags.name });
+                if (flags.package) {
+                    await Bundle({ type: 'npm', packageName: flags.package });
                 }
             }
             break;

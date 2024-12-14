@@ -67,7 +67,7 @@ export class Logger {
         })
     };
 
-    static Error(step: 'build' | 'serve' | 'cli', errorMessage: string, ...data: any[]) {
+    static Error(step: 'build' | 'serve' | 'cli' | 'bundle', errorMessage: string, ...data: any[]) {
         isBuildError = true;
         this.Line();
         switch (step) {
@@ -87,6 +87,13 @@ export class Logger {
                 break;
             case 'serve':
                 console.log('⛔', Colors.bold(Colors.red('Lost serve error.')));
+                this.Info(Colors.italic(errorMessage));
+                data.forEach(entry => {
+                    this.Info(entry)
+                })
+                break;
+            case 'bundle':
+                console.log('⛔', Colors.bold(Colors.red('Lost bundle error.')));
                 this.Info(Colors.italic(errorMessage));
                 data.forEach(entry => {
                     this.Info(entry)

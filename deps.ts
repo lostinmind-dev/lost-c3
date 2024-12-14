@@ -1,3 +1,5 @@
+export type { PackageJson } from 'npm:types-package-json@2.0.39';
+
 export { execSync } from 'node:child_process';
 
 export { BlobReader, BlobWriter, TextReader, TextWriter, ZipReader, ZipWriter } from 'jsr:@zip-js/zip-js@2.7.53';
