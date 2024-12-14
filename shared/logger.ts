@@ -86,6 +86,11 @@ export class Logger {
                 })
                 break;
             case 'serve':
+                console.log('⛔', Colors.bold(Colors.red('Lost serve error.')));
+                this.Info(Colors.italic(errorMessage));
+                data.forEach(entry => {
+                    this.Info(entry)
+                })
                 break;
         }
         this.Line();

@@ -9,6 +9,8 @@ type BareBonesCollection = {
 }
 
 export abstract class Links {
+    static readonly GitHub = 'https://github.com/lostinmind-dev/lost-c3';
+    static readonly JSR = 'https://jsr.io/@lost-c3/lib';
     static readonly ConstructTypes = 'https://raw.githubusercontent.com/lostinmind-dev/lost-c3/refs/heads/master/types/construct.d.ts';
 
     static readonly BareBones: BareBonesCollection = {

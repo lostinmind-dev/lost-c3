@@ -48,8 +48,13 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
         }
     }
     addRemoteScripts() {
-        _lostData.remoteScripts.forEach(url => {
-            this._info.AddRemoteScriptDependency(url);
+        _lostData.remoteScripts.forEach(script => {
+            if (script.type) {
+                this._info.AddRemoteScriptDependency(script.url, script.type);
+            }
+            else {
+                this._info.AddRemoteScriptDependency(script.url);
+            }
         });
     }
     addUserFiles() {

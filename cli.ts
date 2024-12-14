@@ -49,8 +49,9 @@ async function BuildAndWatch() {
 
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
-        boolean: ['drawing-plugin', 'plugin', 'behavior', 'watch', 'minify'],
-        alias: { dp: 'drawing-plugin', p: 'plugin', b: 'behavior', w: 'watch', m: 'minify'},
+        string: ['type', 'port'],
+        boolean: ['watch', 'minify'],
+        alias: { w: 'watch', m: 'minify' },
         "--": true,
     });
 
@@ -63,29 +64,27 @@ async function main() {
         case 'version':
             Logger.LogBetweenLines(dedent`
                 👾 ${Colors.bold(`Lost ➜  ${Colors.yellow(DenoJson.version)} by ${Colors.italic(Colors.magenta('lostinmind.'))}`)}
-                🌐 ${Colors.bold('https://github.com/lostinmind-dev/lost-c3')}
+                🌐 ${Colors.bold(`[GitHub] ${Paths.Links.GitHub}`)}
+                🌐 ${Colors.bold(`[JSR] ${Paths.Links.JSR}`)}
             `)
             break;
         case 'create':
-            if (
-                !flags.plugin &&
-                !flags.behavior &&
-                !flags["drawing-plugin"]
-            ) {
+            if (flags.type) {
+                const type = flags.type as AddonBareBonesType;
+
+                if (
+                    type === 'plugin' ||
+                    type === 'drawing-plugin' ||
+                    type === 'behavior'
+                ) {
+                    await createBareBones(type);
+                } else {
+                    Logger.Log('🎓', Colors.blue(Colors.italic('Specify one of the available types of addon:')))
+                    printCreate();
+                }
+            } else {
                 Logger.Log('🎓', Colors.blue(Colors.italic('Specify one of the available types of addon:')))
                 printCreate();
-                break;
-            } else {
-                if (flags.plugin) {
-                    await createBareBones('plugin');
-                }
-
-                if (flags.behavior) {
-                    await createBareBones('behavior');
-                }
-                if (flags["drawing-plugin"]) {
-                    await createBareBones('drawing-plugin');
-                }
             }
             break;
         case 'build':
@@ -101,15 +100,19 @@ async function main() {
             }
             break;
         case 'serve':
-            Serve(65432);
+            if (flags.port) {
+                const port = Number(flags['port']);
+                Serve(port);
+            } else {
+                Serve(65432);
+            }
             break;
         case 'types':
             await installTypes();
             break;
         default:
-            Logger.Log(`❌ ${Colors.red(Colors.bold(`Unknown command:`)), Colors.italic(String(command))}`);
-            Logger.Log(Colors.blue(Colors.italic('Enter')), Colors.italic(Colors.bold(`${Colors.yellow('lost')} help`)), Colors.italic(Colors.blue('to get of available commands.')))
-            Deno.exit(1);
+            printHelp();
+            break;
     }
 
 }
@@ -128,7 +131,7 @@ async function installTypes() {
         }
 
         const fileContent = await response.text();
-        await Deno.writeTextFile(join(Paths.Root, 'Addon', 'Types', 'construct.d.ts'), fileContent);
+        await Deno.writeTextFile(join(Paths.ProjectFolders.Types, 'construct.d.ts'), fileContent);
         Logger.Success(Colors.bold(`${Colors.green('Successfully')} installed construct types!`));
     } catch (e) {
         Logger.Error('cli', 'Error while installing construct types file', `Error: ${e}`);
@@ -167,6 +170,7 @@ async function cloneRepo(url: string) {
         await installTypes();
     } else {
         Logger.Error('cli', 'Error occured while creating bare-bones.', `Error code: ${code}`);
+        Deno.exit(1);
     }
 }
 
@@ -182,15 +186,16 @@ function printHelp() {
 
     Logger.Log(`  ${Colors.yellow('build')}`);
     Logger.Log('   ⚙️', Colors.gray('  --watch, -w'), Colors.italic('   Runs build command with auto-reload.'));
-    Logger.Log('   ⚙️', Colors.gray('  --minify, -m'), Colors.italic('   Runs build command with minification.'));
+    Logger.Log('   ⚙️', Colors.gray('  --minify, -m'), Colors.italic('   Runs build command with script minification.'));
     Logger.Log(`  ${Colors.yellow('serve')}`);
-    Logger.Log(`  ${Colors.yellow('types')}`, Colors.italic('   Creates "properties.d.ts" of your plugin properties.'));
+    Logger.Log('   ⚙️', Colors.gray('  --port "{port}"'));
+    Logger.Log(`  ${Colors.yellow('types')}`, Colors.italic('   Creates "construct.d.ts" for all Construct 3 declarations.'));
 }
 
 function printCreate() {
-    Logger.Log('   ⚙️', Colors.gray('  --plugin, -p'), Colors.italic('   Creates a bare-bones for "Plugin" addon type.'));
-    Logger.Log('   ⚙️', Colors.gray('  --drawing-plugin, -dp'), Colors.italic('   Creates a bare-bones for "Drawing Plugin" addon type.'));
-    Logger.Log('   ⚙️', Colors.gray('  --behavior, -b'), Colors.italic('   Creates a bare-bones for "Behavior" addon type.'));
+    Logger.Log('   ⚙️', Colors.gray('  --type "plugin"'), Colors.italic('   Creates a bare-bones for "Plugin" addon type.'));
+    Logger.Log('   ⚙️', Colors.gray('  --type "drawing-plugin"'), Colors.italic('   Creates a bare-bones for "Drawing Plugin" addon type.'));
+    Logger.Log('   ⚙️', Colors.gray('  --type "behavior"'), Colors.italic('   Creates a bare-bones for "Behavior" addon type.'));
     // Logger.Log('   ⚙️', Colors.gray('  --theme, -t'), Colors.italic('   Creates a bare-bones for "theme" addon type.'));
     // Logger.Log('   ⚙️', Colors.gray('  --effect, -e'), Colors.italic('   Creates a bare-bones for "effect" addon type.'));
 }

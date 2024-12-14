@@ -1,5 +1,6 @@
 import { Paths } from "../shared/paths.ts";
 import { AddonFolders } from "../shared/paths/addon-folders.ts";
+import { RemoteScriptType } from "../shared/types.ts";
 import type { AddonType, LostConfig } from "./config.ts";
 import type { PluginProperty } from "./entities/plugin-property.ts";
 
@@ -19,7 +20,7 @@ export class LostAddonData {
     readonly hasDefaultImage: boolean;
     readonly icon: AddonIconData;
     readonly config: LostConfig<AddonType>;
-    readonly remoteScripts: string[] = [];
+    readonly remoteScripts: RemoteScriptType[] = [];
     readonly files: LostAddonDataFile[] = [];
     readonly pluginProperties: PluginProperty<any, any, any>[];
 
@@ -28,7 +29,7 @@ export class LostAddonData {
         icon: AddonIconData,
         config: LostConfig<AddonType>,
         pluginProperties: PluginProperty<any, any, any>[],
-        remoteScripts: string[],
+        remoteScripts: RemoteScriptType[],
         userFiles: AddonUserFile[],
         userScripts: AddonUserScriptFile[],
         userModules: AddonUserModuleFile[],

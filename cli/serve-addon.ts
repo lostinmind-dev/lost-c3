@@ -22,6 +22,7 @@ export default function serveAddon(port: number) {
     }
 
     const handler = async (req: Request): Promise<Response> => {
+
         try {
             const url = new URL(req.url);
             // let filePath = url.pathname;
@@ -33,12 +34,17 @@ export default function serveAddon(port: number) {
                     filePath = `${filePath}/index.html`;
                 }
             } catch {
+                Logger.Error('serve', 'File not found')
                 return new Response("File not found", { status: 404 });
             }
 
             const file = await Deno.readFile(filePath);
             const contentType = getContentType(filePath) || 'application/octet-stream';
 
+            // Logger.Info(`Sent file from path: "${Colors.yellow(url.pathname)}"`);
+            Logger.LogBetweenLines(
+                `📃 Sent file from path: "${Colors.yellow(url.pathname)}"`
+            )
             return new Response(file, {
                 status: 200,
                 headers: {

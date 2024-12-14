@@ -15,6 +15,7 @@ import { LostAddonData } from "./lost-addon-data.ts";
 import { ProjectFolders } from "../shared/paths/project-folders.ts";
 import { EditorScript, JsonFile, RuntimeScript } from "../shared/paths/addon-files.ts";
 import { AddonFolders } from "../shared/paths/addon-folders.ts";
+import type { RemoteScriptType, RuntimeScriptType } from "../shared/types.ts";
 
 export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
     protected readonly type: AddonType;
@@ -26,8 +27,8 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
     protected readonly userDomSideScripts: AddonUserDomSideScriptFile[] = [];
     protected readonly pluginProperties: PluginProperty<A, I, T>[] = [];
     protected readonly categories: CategoryClassType[] = [];
-    protected readonly remoteScripts: string[] = [];
-    protected readonly runtimeScripts: string[] = [];
+    protected readonly remoteScripts: RemoteScriptType[] = [];
+    protected readonly runtimeScripts: RuntimeScriptType[] = [];
 
     protected hasDefaultImage: boolean = false;
 
@@ -156,7 +157,9 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
                 `Addon icon was not detected, will be used default [SVG] icon`
             );
         } else {
-            Logger.Info(`Loaded [${this.icon.iconType}] addon icon`, `Filename: ${this.icon.originalName}`);
+            Logger.Info(
+                `Loaded [${this.icon.iconType}] addon icon with file name: ${this.icon.originalName}`
+            );
         }
     }
 
@@ -228,29 +231,16 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
                         entry.isFile &&
                         ((entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts')) || entry.name.endsWith('.js'))
                     ) {
-                        if (this.#isFilePathInRuntimeScriptsArray('')) {
-                            this.#addUserScript({
-                                type: 'script',
-                                originalName: entry.name,
-                                originalPath: path,
-                                localName: entry.name,
-                                localPath: join(Paths.AddonFolders.Scripts, ...Paths.getFoldersAfterFolder(path, ProjectFolders.Scripts)),
-                                dependencyType: 'external-runtime-script',
-                                isTypescript: (entry.name.endsWith('.ts')) ? true : false,
-                                finalPath: `${AddonFolders.Scripts}`
-                            })
-                        } else {
-                            this.#addUserScript({
-                                type: 'script',
-                                originalName: entry.name,
-                                originalPath: path,
-                                localName: entry.name,
-                                localPath: join(Paths.AddonFolders.Scripts, ...Paths.getFoldersAfterFolder(path, ProjectFolders.Scripts)),
-                                dependencyType: 'external-dom-script',
-                                isTypescript: (entry.name.endsWith('.ts')) ? true : false,
-                                finalPath: `${AddonFolders.Scripts}`
-                            })
-                        }
+                        this.#addUserScript({
+                            type: 'script',
+                            originalName: entry.name,
+                            originalPath: path,
+                            localName: entry.name.replace('.ts', '.js'),
+                            localPath: join(Paths.AddonFolders.Scripts, ...Paths.getFoldersAfterFolder(path, ProjectFolders.Scripts)),
+                            dependencyType: await this.#getScriptDependencyType(path, entry.name),
+                            isTypescript: (entry.name.endsWith('.ts')) ? true : false,
+                            finalPath: `${AddonFolders.Scripts}`
+                        })
                     }
                 }
             }
@@ -412,12 +402,45 @@ export abstract class Addon<A extends AddonType, I, T extends SDK.ITypeBase> {
         }
     }
 
-    #isFilePathInRuntimeScriptsArray(path: string) {
-        if (this.runtimeScripts.includes(path)) {
-            return true;
-        } else {
-            return false;
+    async #getScriptDependencyType(filePath: string, fileName: string): Promise<AddonScriptDependencyType> {
+        let dependencyType: AddonScriptDependencyType = 'external-dom-script';
+
+        for (const script of this.runtimeScripts) {
+            switch (script.type) {
+                case "file":
+                    let convertedPath: string = `${fileName}`;
+
+                    const folders = Paths.getFoldersAfterFolder(filePath, ProjectFolders.Scripts);
+                    
+                    if (folders.length > 0) {
+                        convertedPath = `${folders.join('/')}/${fileName}`
+                    }
+
+                    if (script.path === convertedPath) {
+                        dependencyType = 'external-runtime-script';
+                    }
+                    break;
+                case "directory":
+                    const readDir = async (path: string) => {
+                        for await (const entry of Deno.readDir(path)) {
+                            if (entry.isDirectory) {
+                                await readDir(join(path, entry.name));
+                            } else if (
+                                entry.isFile &&
+                                (!entry.name.endsWith('.d.ts') && entry.name.endsWith('.ts')) || entry.name.endsWith('.js')
+                            ) {
+                                // console.log(entry.isDirectory)
+                                dependencyType = 'external-runtime-script';
+                            }
+                        }
+                    }
+
+                    await readDir(join(Paths.ProjectFolders.Scripts, script.path))
+                    break;
+            }
         }
+
+        return dependencyType;
     }
 
     /**

@@ -154,8 +154,12 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
     }
 
     private addRemoteScripts() {
-        _lostData.remoteScripts.forEach(url => {
-            this._info.AddRemoteScriptDependency(url);
+        _lostData.remoteScripts.forEach(script => {
+            if (script.type) {
+                this._info.AddRemoteScriptDependency(script.url, script.type);
+            } else {
+                this._info.AddRemoteScriptDependency(script.url);
+            }
         })
     }
 

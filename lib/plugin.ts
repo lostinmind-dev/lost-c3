@@ -1,10 +1,12 @@
 
 import type { LostConfig } from "./config.ts";
+import type { RemoteScriptType, RuntimeScriptType } from "../shared/types.ts";
 
 import { PluginProperty, Property, type AddonPropertyOptions } from "./entities/plugin-property.ts";
 import { Addon } from "./addon.ts";
-import { Colors, Logger } from "../deps.ts";
-
+import { Colors, join, Logger } from "../deps.ts";
+import { isDirectoryExists, isFileExists } from "../shared/misc.ts";
+import { Paths } from "../shared/paths.ts";
 
 
 export class Plugin<
@@ -117,34 +119,74 @@ export class Plugin<
     }
 
     /**
-     * Change script dependencyType to: 'external-runtime-script'
+     * Changes script dependencyType to: 'external-runtime-script'
+     * - - -
      * @description This means the script is always directly available to runtime code. However the dependency must be designed to work in a Web Worker, e.g. not assuming the DOM is present. 
      * The script is not minified on export.
-     * @param paths Path to script file.
+     * @param scripts Runtime script file info.
      */
-    setRuntimeScripts(...paths: string[]): this {
-        paths.forEach(path => {
-            this.runtimeScripts.push(path);
+    setRuntimeScripts(...scripts: RuntimeScriptType[]): this {
+        scripts.forEach(async script => {
+            switch (script.type) {
+                case 'file':
+                    if (
+                        (!script.path.endsWith('.d.ts') && script.path.endsWith('.ts')) ||
+                        script.path.endsWith('.js')
+                    ) {
+                        if (await isFileExists(join(Paths.ProjectFolders.Scripts, script.path))) {
+                            Logger.Info(`Added runtime script file: "${Colors.dim(script.path)}"`)
+                            this.runtimeScripts.push(script);
+                        } else {
+                            Logger.Error(
+                                'build', `Failed to add runtime script with path: (${script.path})`, 'File not found'
+                            );
+                            Deno.exit(1);
+                        }
+                    } else {
+                        Logger.Error(
+                            'build', `Failed to add runtime script with path: (${script.path})`, 'You can only use ".js" OR ".ts" files'
+                        );
+                        Deno.exit(1);
+                    }
+                    break;
+                case 'directory':
+                    if (await isDirectoryExists(join(Paths.ProjectFolders.Scripts, script.path))) {
+                        Logger.Info(`Added runtime scripts directory: "${Colors.dim(script.path)}"`)
+                        this.runtimeScripts.push(script);
+                    } else {
+                        Logger.Error(
+                            'build', `Failed to add runtime scripts directory with path: (${script.path})`, 'Directory not found'
+                        );
+                        Deno.exit(1);
+                    }
+                    break;
+            }
         })
         return this;
     }
 
     /**
      * Adds a remote URL to load a script from.
+     * - - -
      * @param urls The script URL (or URL's), must not use http: in its URL.
      * @description On the modern web this will often be blocked from secure sites as mixed content.
-     * You must either use secure HTTPS, or a same-protocol URL.
+     * ***You must either use secure HTTPS, or a same-protocol URL.***
      */
-    addRemoteScripts(...urls: string[]): this {
+    addRemoteScripts(...scripts: RemoteScriptType[]): this {
         /**
          * Check to https link
          */
-        urls.forEach(url => {
-            if (url.includes('https')) {
-                Logger.Log(`🌐 Added remoted script with url: ${Colors.dim(url)}`)
-                this.remoteScripts.push(url);
+        scripts.forEach(script => {
+            if (script.url.includes('https')) {
+                if (script.url.endsWith('.js')) {
+                    Logger.Log(`🌐 Added remoted script with url: ${Colors.dim(script.url)}`)
+                    this.remoteScripts.push(script);
+                } else {
+                    Logger.Error('build', `Failed to add remote script with url: (${script.url})`, 'Your url must ends with ".js" script extension.')
+                    Deno.exit(1);
+                }
             } else {
-                Logger.Error('build', `Failed to add remote script with url: (${url})`, 'You must either use secure HTTPS, or a same-protocol URL.')
+                Logger.Error('build', `Failed to add remote script with url: (${script.url})`, 'You must either use secure HTTPS, or a same-protocol URL.')
                 Deno.exit(1);
             }
         })

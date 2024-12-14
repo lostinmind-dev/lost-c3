@@ -50,10 +50,15 @@ declare interface AddonFileCopyToOutput extends AddonFileBase {
     readonly dependencyType: 'copy-to-output';
 }
 
+declare type AddonScriptDependencyType =
+    | 'external-dom-script'
+    | 'external-runtime-script'
+;
+
 declare interface AddonUserScriptFile extends AddonFileBase {
     readonly type: 'script';
     readonly scriptType?: 'module';
-    readonly dependencyType: 'external-dom-script' | 'external-runtime-script';
+    readonly dependencyType: AddonScriptDependencyType;
     readonly isTypescript: boolean;
 }
 
