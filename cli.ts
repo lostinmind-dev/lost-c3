@@ -7,7 +7,7 @@ import { AddonFileManager } from "./lib/managers/addon-file-manager.ts";
 
 import Build from './cli/main.ts';
 import Serve from './cli/serve-addon.ts';
-import Bundle from "./bundler/main.ts";
+import { PackageBundler } from "./bundler/package-manager.ts";
 
 
 let rebuildTimeout: number | undefined;
@@ -51,30 +51,38 @@ async function BuildAndWatch() {
 async function main() {
     const { _, ...flags } = parseArgs(Deno.args, {
         string: [
-            'type', 'port', 
-            'package'
+            'type', 'port',
+            'package', 'format'
         ],
-        boolean: ['watch', 'minify', 'npm'],
+        boolean: ['watch', 'minify'],
         alias: { w: 'watch', m: 'minify' },
         "--": true,
     });
 
     const command = _[0];
-    const secondCommand = _[1];
 
     switch (command) {
         case 'bundle':
-            if (
-                secondCommand &&
-                secondCommand === 'npm'
-            ) {
-                if (flags.package) {
-                    await Bundle({ type: 'npm', packageName: flags.package });
+            if (flags.package) {
+                if (
+                    flags['format'] &&
+                    (flags['format'] === 'esm' || flags['format'] === 'cjs' || flags['format'] === 'iife')
+                ) {
+                        await PackageBundler.bundle(
+                            flags.package,
+                            flags['minify'] || false,
+                            flags['format'] || 'esm'
+                        );
+                } else {
+                    await PackageBundler.bundle(
+                        flags.package,
+                        flags['minify'] || false,
+                        'esm'
+                    );
                 }
+            } else {
+                Logger.Log('🎓', Colors.blue(Colors.italic('Enter package name ')))
             }
-            break;
-        case 'help':
-            printHelp();
             break;
         case 'version':
             Logger.LogBetweenLines(dedent`
@@ -158,16 +166,15 @@ async function createBareBones(type: AddonBareBonesType) {
     Logger.Process(`Creating bare-bones for ${Colors.magenta(`"${type}"`)} addon type`);
     await cloneRepo(Paths.Links.BareBones[type]);
 
-    switch (type) {
-        case "plugin":
-            await downloadAddonBase('plugin');
-            break;
-        case "drawing-plugin":
-            await downloadAddonBase('plugin');
-            break;
-        case "behavior":
-            await downloadAddonBase('behavior');
-            break;
+    if (
+        type === 'plugin' ||
+        type === 'drawing-plugin'
+    ) {
+        await downloadAddonBase('plugin');
+    }
+
+    if (type === 'behavior') {
+        await downloadAddonBase('behavior');
     }
 }
 
@@ -193,11 +200,15 @@ function printHelp() {
     Logger.Info(Colors.bold('Usage: lost <command> [options]'));
 
     Logger.Log('✅', Colors.bold("Valid commands:"));
-    Logger.Log(`  ${Colors.yellow('help')}`);
     Logger.Log(`  ${Colors.yellow('version')}`);
 
     Logger.Log(`  ${Colors.yellow('create')}`);
     printCreate();
+
+    Logger.Log(`  ${Colors.yellow('bundle')}`, Colors.italic('   Runs creating bundle for NPM package.'));
+    Logger.Log('   ⚙️', Colors.gray('  --package "{package_name}"'));
+    Logger.Log('   ⚙️', Colors.gray('  --format "{esm | cjs | iife}"'));
+    Logger.Log('   ⚙️', Colors.gray('  --minify, -m'), Colors.italic('   ESBuild minification.'));
 
     Logger.Log(`  ${Colors.yellow('build')}`);
     Logger.Log('   ⚙️', Colors.gray('  --watch, -w'), Colors.italic('   Runs build command with auto-reload.'));
@@ -211,6 +222,4 @@ function printCreate() {
     Logger.Log('   ⚙️', Colors.gray('  --type "plugin"'), Colors.italic('   Creates a bare-bones for "Plugin" addon type.'));
     Logger.Log('   ⚙️', Colors.gray('  --type "drawing-plugin"'), Colors.italic('   Creates a bare-bones for "Drawing Plugin" addon type.'));
     Logger.Log('   ⚙️', Colors.gray('  --type "behavior"'), Colors.italic('   Creates a bare-bones for "Behavior" addon type.'));
-    // Logger.Log('   ⚙️', Colors.gray('  --theme, -t'), Colors.italic('   Creates a bare-bones for "theme" addon type.'));
-    // Logger.Log('   ⚙️', Colors.gray('  --effect, -e'), Colors.italic('   Creates a bare-bones for "effect" addon type.'));
 }

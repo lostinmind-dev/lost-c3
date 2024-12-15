@@ -27,3 +27,4 @@ export type RemoteScriptType = {
     /** *Optional*. Set to 'module' to load the script as a module */
     readonly type?: 'module'
 }
+

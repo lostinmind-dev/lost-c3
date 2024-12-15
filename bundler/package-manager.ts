@@ -7,7 +7,7 @@ export abstract class PackageBundler {
     static #packagePath: string;
     static #packageJson: PackageJson;
 
-    static async bundle(name: string) {
+    static async bundle(name: string, minify: boolean, format: 'esm' | 'cjs' | 'iife') {
         this.#packageName = name;
         Logger.Loading(`Creating bundle for "${Colors.dim(Colors.bold(this.#packageName))}"`);
         this.#packageJson = await this.#installPackage();
@@ -27,8 +27,8 @@ export abstract class PackageBundler {
                 entryPoints: [entryFile],
                 bundle: true,
                 outfile: join(outputDir, `${this.#packageName}.bundle.js`),
-                minify: false,
-                format: 'esm', // Формат для браузера
+                minify: minify,
+                format: format, // Формат для браузера
                 // globalName: opts.packageName.replace(/[^a-zA-Z0-9]/g, ''), // Глобальное имя
             })
             .then(async () => {
@@ -44,32 +44,12 @@ export abstract class PackageBundler {
     }
 
     static #getEntryFile() {
-        // let entryFile: string;
-
-        // entryFile = 
-        // this.#packageJson.main || (this.#packageJson.exports && this.#packageJson.exports['.']) || null;
-
         if (this.#packageJson.main) {
             return join(this.#packagePath, this.#packageJson.main);
         } else {
             Deno.exit(1);
         }
-        // if (
-        //     entryFile &&
-        //     typeof entryFile === 'object'
-        // ) {
-        //     entryFile = entryFile.require || entryFile.default || null;
-        // }
 
-        // if (entryFile) {
-        //     entryFile = join(this.#packagePath, entryFile);
-        // }
-
-        // if (entryFile) {
-        //     return entryFile;
-        // } else {
-        //     Deno.exit(1);
-        // }
     }
 
     static async #installPackage() {
