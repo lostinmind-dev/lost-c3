@@ -1572,7 +1572,7 @@ function convertOutputFiles({ path, contents, hash }) {
 }
 
 // lib/deno/mod.ts
-import * as denoflate from "https://deno.land/x/denoflate@1.2.1/mod.ts";
+import * as denoflate from "./denoFlate/mod.ts";
 var version = "0.24.0";
 var build = (options) => ensureServiceIsRunning().then((service) => service.build(options));
 var context = (options) => ensureServiceIsRunning().then((service) => service.context(options));
