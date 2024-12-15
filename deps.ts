@@ -24,5 +24,3 @@ export * as Colors from 'jsr:@std/fmt@1.0.2/colors';
 
 export * as UglifyJS from 'npm:uglify-js@3.19.3';
 
-export * as esbuild from 'https://raw.githubusercontent.com/esbuild/deno-esbuild/refs/heads/main/mod.js';
-
