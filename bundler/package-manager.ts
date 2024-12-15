@@ -1,4 +1,5 @@
-import { Logger, esbuild, join, PackageJson, Colors } from "../deps.ts";
+import * as esbuild from './esbuild/mod.js';
+import { Logger, join, PackageJson, Colors } from "../deps.ts";
 import { isDirectoryExists, isFileExists } from "../shared/misc.ts";
 import { Paths } from "../shared/paths.ts";
 
