@@ -6,37 +6,37 @@ import type {
 } from "../../shared/json-types.ts";
 import { Param } from "../entities/parameter.ts";
 import { Property } from "../entities/plugin-property.ts";
-import type { LostConfig, AddonType } from "../config.ts";
-import type { ActionEntity } from "../entities/action.ts";
-import type { CategoryClassType } from "../entities/category.ts";
-import type { ConditionEntity } from "../entities/condition.ts";
 import type { EntityType, Entity } from "../entities/entity.ts";
-import type { ExpressionEntity } from "../entities/expression.ts";
 import type { Parameter } from "../entities/parameter.ts";
 import type { PluginProperty } from "../entities/plugin-property.ts";
+import { LostAddonProject } from "../lost.ts";
 
 export abstract class LanguageManager {
+    static #addonConfig = LostAddonProject.addon._config;
+    static #categories = LostAddonProject.addon._categories;
+    static #properties = LostAddonProject.addon._properties;
 
-    static create(categories: CategoryClassType[], pluginProperties: PluginProperty<any, any, any>[], config: LostConfig<AddonType>): LanguageJSON {
-        const language: LanguageJSON = {
+    static create(): LanguageJSON {
+
+        const json: LanguageJSON = {
             "languageTag": 'en-US',
-            "fileDescription": `Strings for ${config.addonName} addon.`,
+            "fileDescription": `Strings for ${this.#addonConfig.addonName} addon.`,
             "text": {}
         } as LanguageJSON;
 
         let addonType: 'plugins' | 'behaviors';
 
-        switch (config.type) {
+        switch (this.#addonConfig.type) {
             case "plugin":
                 addonType = 'plugins'
-                language['text']['plugins'] = {};
+                json['text']['plugins'] = {};
                 break;
             case "behavior":
                 addonType = 'behaviors';
-                language['text']['behaviors'] = {};
+                json['text']['behaviors'] = {};
                 break;
         }
-        language['text'][addonType][config.addonId.toLocaleLowerCase()] = {
+        json['text'][addonType][this.#addonConfig.addonId.toLocaleLowerCase()] = {
             'name': '',
             'description': '',
             'help-url': '',
@@ -46,19 +46,19 @@ export abstract class LanguageManager {
             'conditions': {},
             'expressions': {}
         }
-        const deep = language['text'][addonType][config.addonId.toLocaleLowerCase()];
+        const deep = json['text'][addonType][this.#addonConfig.addonId.toLocaleLowerCase()];
 
-        deep['name'] = config.objectName;
-        deep['description'] = config.addonDescription;
-        deep['help-url'] = config.helpUrl.EN;
-        deep['properties'] = this.#createProperties(pluginProperties);
-        deep['aceCategories'] = this.#createAceCategories(categories);
+        deep['name'] = this.#addonConfig.objectName;
+        deep['description'] = this.#addonConfig.addonDescription;
+        deep['help-url'] = this.#addonConfig.helpUrl.EN;
+        deep['properties'] = this.#createProperties();
+        deep['aceCategories'] = this.#createAceCategories();
 
-        deep['actions'] = this.#createActionsCollection(categories.map(c => c._actions).flat())
-        deep['conditions'] = this.#createConditionsCollection(categories.map(c => c._conditions).flat());
-        deep['expressions'] = this.#createExpressionsCollection(categories.map(c => c._expressions).flat());
+        deep['actions'] = this.#createActionsCollection()
+        deep['conditions'] = this.#createConditionsCollection();
+        deep['expressions'] = this.#createExpressionsCollection();
 
-        return language;
+        return json;
     }
 
     static #createAceParameters(parameters: Parameter[]): AceParametersCollection {
@@ -144,7 +144,8 @@ export abstract class LanguageManager {
         return languageEntity;
     }
 
-    static #createActionsCollection(entities: ActionEntity[]): LanguageActionsCollection {
+    static #createActionsCollection(): LanguageActionsCollection {
+        const entities = this.#categories.map(c => c._actions).flat();
         const collection: LanguageActionsCollection = {} as LanguageActionsCollection;
 
         entities.forEach(entity => {
@@ -154,7 +155,8 @@ export abstract class LanguageManager {
         return collection;
     }
 
-    static #createConditionsCollection(entities: ConditionEntity[]): LanguageConditionsCollection {
+    static #createConditionsCollection(): LanguageConditionsCollection {
+        const entities = this.#categories.map(c => c._conditions).flat();
         const collection: LanguageConditionsCollection = {} as LanguageConditionsCollection;
 
         entities.forEach(entity => {
@@ -164,7 +166,8 @@ export abstract class LanguageManager {
         return collection;
     }
 
-    static #createExpressionsCollection(entities: ExpressionEntity[]): LanguageExpressionsCollection {
+    static #createExpressionsCollection(): LanguageExpressionsCollection {
+        const entities = this.#categories.map(c => c._expressions).flat();
         const collection: LanguageExpressionsCollection = {} as LanguageExpressionsCollection;
 
         entities.forEach(entity => {
@@ -174,43 +177,43 @@ export abstract class LanguageManager {
         return collection;
     }
 
-    static #createAceCategories(categories: CategoryClassType[]): LanguageAceCategoriesCollection {
+    static #createAceCategories(): LanguageAceCategoriesCollection {
 
         const aceCategories = {} as LanguageAceCategoriesCollection;
 
-        categories.forEach(category => {
+        this.#categories.forEach(category => {
             aceCategories[category._id] = category._name;
         })
 
         return aceCategories;
     }
 
-    static #createProperty(pluginProperty: PluginProperty<any, any, any>): LanguageProperty {
-        const property: LanguageProperty = {} as LanguageProperty;
+    static #createProperty(property: PluginProperty<any, any, any>): LanguageProperty {
+        const languageProperty: LanguageProperty = {} as LanguageProperty;
 
-        property['name'] = pluginProperty._name;
-        property['desc'] = pluginProperty._description;
+        languageProperty['name'] = property._name;
+        languageProperty['desc'] = property._description;
 
-        if (pluginProperty._opts.type === Property.Link) {
-            const p = property as LanguageLinkProperty;
-            p['link-text'] = pluginProperty._opts.linkText || 'Link Text';
+        if (property._opts.type === Property.Link) {
+            const p = languageProperty as LanguageLinkProperty;
+            p['link-text'] = property._opts.linkText || 'Link Text';
         };
 
-        if (pluginProperty._opts.type === Property.Combo) {
-            const p = property as LanguageComboProperty;
-            const items = pluginProperty._opts.items;
+        if (property._opts.type === Property.Combo) {
+            const p = languageProperty as LanguageComboProperty;
+            const items = property._opts.items;
 
             items.forEach(item => {
                 p['items'][item[0]] = item[1];
             })
         }
 
-        return property;
+        return languageProperty;
     }
-    static #createProperties(pluginProperties: PluginProperty<any, any, any>[]): LanguagePropertiesCollection {
+    static #createProperties(): LanguagePropertiesCollection {
         const collection: LanguagePropertiesCollection = {} as LanguagePropertiesCollection;
 
-        pluginProperties.forEach(p => {
+        this.#properties.forEach(p => {
             collection[p._id] = this.#createProperty(p);
         })
 

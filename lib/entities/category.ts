@@ -15,7 +15,7 @@ interface ICategoryOptions {
     readonly inDevelopment?: boolean;
 }
 
-export type CategoryClassType = {
+export interface ICategory {
     readonly _id: string;
     readonly _name: string;
     readonly _isDeprecated: boolean;

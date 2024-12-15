@@ -1,10 +1,11 @@
 import type { AddonJSON } from "../../shared/json-types.ts";
 import { AddonFileManager } from "./addon-file-manager.ts";
-import type { LostConfig, AddonType } from "../config.ts";
+import { LostAddonProject } from "../lost.ts";
 
 export abstract class AddonMetadataManager {
 
-    static async create(config: LostConfig<AddonType>): Promise<AddonJSON> {
+    static async create(): Promise<AddonJSON> {
+        const config = LostAddonProject.addon._config;
         const addon: AddonJSON = {
             "supports-worker-mode": (config.supportWorkerMode) ? config.supportWorkerMode : true,
             "min-construct-version": (config.minConstructVersion) ? config.minConstructVersion : undefined,

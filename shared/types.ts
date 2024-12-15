@@ -3,7 +3,7 @@ export type EntityCollection = {
 }
 
 
-export type RuntimeScriptType = {
+export type RuntimeScript = {
     /**
      * Use 'file' to mark only one file as 'external-runtime-script'.
      * - - -
@@ -19,7 +19,7 @@ export type RuntimeScriptType = {
     readonly path: string;
 }
 
-export type RemoteScriptType = {
+export type RemoteScript = {
     /** A cross-origin URL
      * @example https://example.com/api.js.
      */

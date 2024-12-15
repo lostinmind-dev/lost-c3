@@ -6,17 +6,19 @@ import type {
 } from "../../shared/json-types.ts";
 import { Param } from "../entities/parameter.ts";
 import type { ActionEntity } from "../entities/action.ts";
-import type { CategoryClassType } from "../entities/category.ts";
+import type { ICategory } from "../entities/category.ts";
 import type { ConditionEntity } from "../entities/condition.ts";
 import type { ExpressionEntity } from "../entities/expression.ts";
 import type { Parameter } from "../entities/parameter.ts";
+import { LostAddonProject } from "../lost.ts";
 
 export abstract class AcesManager {
+    static #categories = LostAddonProject.addon._categories;
 
-    static create(categories: CategoryClassType[]): AcesJSON {
+    static create(): AcesJSON {
         const aces: AcesJSON = {} as AcesJSON;
 
-        categories.forEach(c => {
+        this.#categories.forEach(c => {
             aces[c._id] = this.#createCategory(c);
         });
 
@@ -101,7 +103,7 @@ export abstract class AcesManager {
         return aceParameter;
     }
 
-    static #createCategory(category: CategoryClassType): AceCategory {
+    static #createCategory(category: ICategory): AceCategory {
         const aceCategory: AceCategory = {} as AceCategory;
 
         aceCategory['actions'] = [...category._actions.map(e => this.#createAction(e))],

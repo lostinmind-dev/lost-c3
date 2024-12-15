@@ -1,4 +1,4 @@
-export enum RuntimeScript {
+export enum RuntimeScriptType {
     Module = 'main.js',
     Actions = 'actions.js',
     Conditions = 'conditions.js',
@@ -9,14 +9,14 @@ export enum RuntimeScript {
     Type = 'type.js'
 }
 
-export enum EditorScript {
+export enum EditorScriptType {
     Plugin = 'plugin.js',
     Instance = 'instance.js',
     Behavior = 'behavior.js',
     Type = 'type.js'
 }
 
-export enum JsonFile {
+export enum JsonFileType {
     AddonMetadata = 'addon.json',
     Aces = 'aces.json',
     Language = 'en-US.json'

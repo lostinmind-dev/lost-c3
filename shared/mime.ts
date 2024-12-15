@@ -1,37 +1,38 @@
+import { MimeType } from './types/AddonFile.ts'
 
-type MimeFileCollection = Record<MIMEFileType, string[]>
+type MimeFileCollection = Record<MimeType, string[]>
 
 export abstract class MIME {
-    private static readonly Collection: MimeFileCollection = {
-        'text/html': ['.html'],
-        'application/javascript': ['.js'],
-        'application/json': ['.json', '.scon'],
-        'text/css': ['.css'],
-        'application/wasm': ['.wasm'],
-        'image/png': ['.png'],
-        'image/jpeg': ['.jpg', 'jpeg'],
-        'image/webp': ['.webp'],
-        'image/avif': ['.avif'],
-        'video/webm': ['.webm'],
-        'audio/mp4': ['.m4a'],
-        'audio/mpeg': ['.mp3'],
-        'audio/ogg': ['.ogg'],
-        'video/mp4': ['.mp4'],
-        'application/font-woff': ['.woff'],
-        'font/woff2': ['.woff2'],
-        'text/plain': ['.txt'],
-        'text/csv': ['.csv'],
-        'text/xml': ['.xml', '.scml'],
-        'image/svg+xml': ['.svg'],
-        'application/zip': ['.c3p']
+    static readonly #collection: MimeFileCollection = {
+        [MimeType.HTML]: ['.html'],
+        [MimeType.JS]: ['.js'],
+        [MimeType.JSON]: ['.json', '.scon'],
+        [MimeType.CSS]: ['.css'],
+        [MimeType.WASM]: ['.wasm'],
+        [MimeType.PNG]: ['.png'],
+        [MimeType.JPEG]: ['.jpg', 'jpeg'],
+        [MimeType.WEBP]: ['.webp'],
+        [MimeType.AVIF]: ['.avif'],
+        [MimeType.WEBM]: ['.webm'],
+        [MimeType.AUDIO_MP4]: ['.m4a'],
+        [MimeType.MPEG]: ['.mp3'],
+        [MimeType.OGG]: ['.ogg'],
+        [MimeType.VIDEO_MP4]: ['.mp4'],
+        [MimeType.FONT_WOFF]: ['.woff'],
+        [MimeType.WOFF2]: ['.woff2'],
+        [MimeType.TXT]: ['.txt'],
+        [MimeType.CSV]: ['.csv'],
+        [MimeType.XML]: ['.xml', '.scml'],
+        [MimeType.SVG]: ['.svg'],
+        [MimeType.ZIP]: ['.c3p']
     }
 
-    static getFileType(fileName: string): MIMEFileType | null {
-        let _mimeType: MIMEFileType | null = null;
-        for (const [mimeType, extensions] of Object.entries(this.Collection)) {
+    static getFileType(fileName: string): MimeType | null {
+        let _mimeType: MimeType | null = null;
+        for (const [mimeType, extensions] of Object.entries(this.#collection)) {
             extensions.forEach(ex => {
                 if (fileName.endsWith(ex)) {
-                    _mimeType = mimeType as MIMEFileType;
+                    _mimeType = mimeType as MimeType;
                 }
             })
         }

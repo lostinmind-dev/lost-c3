@@ -2,7 +2,7 @@ import '../cli/global.ts';
 // deno-lint-ignore-file no-explicit-any
 import { Colors } from "../deps.ts";
 
-export class Logger {
+export abstract class Logger {
     private static readonly DefaultLineLength = 20;
     
     static Line(length?: number) {

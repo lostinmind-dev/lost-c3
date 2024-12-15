@@ -1,6 +1,7 @@
 import DenoJson from '../deno.json' with { type: "json" };
 import { Colors, join, Logger } from "../deps.ts";
 import type { AddonType } from "../lib/config.ts";
+import { LostAddonProject } from "../lib/lost.ts";
 import { Paths } from "../shared/paths.ts";
 
 export async function downloadAddonBase(addonType: AddonType) {
@@ -30,7 +31,8 @@ export async function downloadAddonBase(addonType: AddonType) {
 }
     
 
-export default async function checkAddonBaseExists(addonType: AddonType) {
+export default async function checkAddonBaseExists() {
+    const addonType = LostAddonProject.addon._config.type;
     
     try {
         const dirStat = await Deno.stat(Paths.ProjectFiles.AddonBase[addonType]);
