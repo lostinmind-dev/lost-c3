@@ -13,12 +13,11 @@ import type { Parameter } from "../entities/parameter.ts";
 import { LostAddonProject } from "../lost.ts";
 
 export abstract class AcesManager {
-    static #categories = LostAddonProject.addon._categories;
 
     static create(): AcesJSON {
         const aces: AcesJSON = {} as AcesJSON;
 
-        this.#categories.forEach(c => {
+        LostAddonProject.addon._categories.forEach(c => {
             aces[c._id] = this.#createCategory(c);
         });
 

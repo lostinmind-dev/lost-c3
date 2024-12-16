@@ -1,16 +1,18 @@
+import type { RemoteScript, RuntimeScript } from "../shared/types.ts";
 import type { LostConfig } from "./config.ts";
-
-import { PluginProperty, Property, type AddonPropertyOptions } from "./entities/plugin-property.ts";
+import { PluginProperty, type BehaviorPropertyType } from './entities/plugin-property.ts';
 import { Addon } from "./addon.ts";
-import { Colors, join, Logger } from "../deps.ts";
+import { Logger } from "../shared/logger.ts";
 import { isDirectoryExists, isFileExists } from "../shared/misc.ts";
 import { Paths } from "../shared/paths.ts";
-import { RemoteScriptType, RuntimeScriptType } from "../shared/types.ts";
+import { Colors, join } from "../deps.ts";
 
-export class Behavior extends Addon<'behavior', any, any> {
-    constructor(config: LostConfig<'behavior'>) {
-        super('behavior', config);
+export class Behavior extends Addon<'behavior', any, any, any> {
+
+    constructor(config: LostConfig<'behavior', any>) {
+        super(config);
     }
+
     /**
      * Creates plugin property.
      * @param id A string with a unique identifier for this property.
@@ -20,7 +22,7 @@ export class Behavior extends Addon<'behavior', any, any> {
     addProperty(
         id: string,
         name: string,
-        opts: AddonPropertyOptions<'behavior', any>
+        opts: BehaviorPropertyType
     ): this
     /**
      * Creates plugin property.
@@ -33,7 +35,7 @@ export class Behavior extends Addon<'behavior', any, any> {
         id: string,
         name: string,
         description: string,
-        opts: AddonPropertyOptions<'behavior', any>
+        opts: BehaviorPropertyType
     ): this
     /**
      * Creates plugin property.
@@ -45,12 +47,12 @@ export class Behavior extends Addon<'behavior', any, any> {
     addProperty(
         id: string,
         name: string,
-        descriptionOrOpts: string | AddonPropertyOptions<'behavior', any>,
-        opts?: AddonPropertyOptions<'behavior', any>
+        descriptionOrOpts: string | BehaviorPropertyType,
+        opts?: BehaviorPropertyType
     ) {
         if (!this.#isPluginPropertyExists(id)) {
             let description: string = 'There is no any description yet...';
-            let options: AddonPropertyOptions<'behavior', any>;
+            let options: BehaviorPropertyType;
             if (typeof descriptionOrOpts === 'string' && opts) {
                 description = descriptionOrOpts;
                 options = opts;
@@ -65,8 +67,8 @@ export class Behavior extends Addon<'behavior', any, any> {
                 id.length > 0 &&
                 name.length > 0
             ) {
-                this.pluginProperties.push(
-                    new PluginProperty<'behavior', any>(id, name, description, options)
+                this._properties.push(
+                    new PluginProperty<'behavior', any, any, any>(id, name, description, options)
                 );
             } else if (id.length === 0) {
                 Logger.Error('build', `Plugin property id can't be empty.`, 'Please specify your property Id.')
@@ -84,7 +86,7 @@ export class Behavior extends Addon<'behavior', any, any> {
 
     /**
      * Creates a new group in the Properties Bar.
-     * @description That method using *addPluginProperty* with **Property**.**Group** type in opts object.
+     * @description That method using *addProperty* with **Property**.**Group** type in opts object.
      * @param id A string with a unique identifier for this property.
      * @param name The name of the group.
      */
@@ -94,6 +96,7 @@ export class Behavior extends Addon<'behavior', any, any> {
                 id.length > 0 &&
                 name.length > 0
             ) {
+                //@ts-ignore
                 this.addProperty(id, name, { type: Property.Group });
             }  else if (id.length === 0) {
                 Logger.Error('build', `Group id can't be empty.`, 'Please specify your group Id.')
@@ -117,7 +120,7 @@ export class Behavior extends Addon<'behavior', any, any> {
      * The script is not minified on export.
      * @param scripts Runtime script file info.
      */
-    setRuntimeScripts(...scripts: RuntimeScriptType[]): this {
+    setRuntimeScripts(...scripts: RuntimeScript[]): this {
         scripts.forEach(async script => {
             switch (script.type) {
                 case 'file':
@@ -127,7 +130,7 @@ export class Behavior extends Addon<'behavior', any, any> {
                     ) {
                         if (await isFileExists(join(Paths.ProjectFolders.Scripts, script.path))) {
                             Logger.Info(`Added runtime script file: "${Colors.dim(script.path)}"`)
-                            this.runtimeScripts.push(script);
+                            this._runtimeScripts.push(script);
                         } else {
                             Logger.Error(
                                 'build', `Failed to add runtime script with path: (${script.path})`, 'File not found'
@@ -144,7 +147,7 @@ export class Behavior extends Addon<'behavior', any, any> {
                 case 'directory':
                     if (await isDirectoryExists(join(Paths.ProjectFolders.Scripts, script.path))) {
                         Logger.Info(`Added runtime scripts directory: "${Colors.dim(script.path)}"`)
-                        this.runtimeScripts.push(script);
+                        this._runtimeScripts.push(script);
                     } else {
                         Logger.Error(
                             'build', `Failed to add runtime scripts directory with path: (${script.path})`, 'Directory not found'
@@ -164,7 +167,7 @@ export class Behavior extends Addon<'behavior', any, any> {
      * @description On the modern web this will often be blocked from secure sites as mixed content.
      * ***You must either use secure HTTPS, or a same-protocol URL.***
      */
-    addRemoteScripts(...scripts: RemoteScriptType[]): this {
+    addRemoteScripts(...scripts: RemoteScript[]): this {
         /**
          * Check to https link
          */
@@ -172,7 +175,7 @@ export class Behavior extends Addon<'behavior', any, any> {
             if (script.url.includes('https')) {
                 if (script.url.endsWith('.js')) {
                     Logger.Log(`🌐 Added remoted script with url: ${Colors.dim(script.url)}`)
-                    this.remoteScripts.push(script);
+                    this._remoteScripts.push(script);
                 } else {
                     Logger.Error('build', `Failed to add remote script with url: (${script.url})`, 'Your url must ends with ".js" script extension.')
                     Deno.exit(1);
@@ -190,7 +193,7 @@ export class Behavior extends Addon<'behavior', any, any> {
      * @param id Plugin property Id.
      */
     #isPluginPropertyExists(id: string): boolean {
-        const isExist = this.pluginProperties.find(p => p._id === id);
+        const isExist = this._properties.find(p => p._id === id);
         return (isExist) ? true : false;
     }
 }

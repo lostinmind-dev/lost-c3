@@ -1,7 +1,7 @@
 /** All available types of Lost config. */
-export type LostConfig<A extends AddonType> =
-    A extends 'plugin' ? PluginConfig :
-    A extends 'behavior' ? BehaviorConfig : never
+export type LostConfig<A, P> =
+    A extends 'plugin' ? PluginConfig<P> :
+    A extends 'behavior' ? IBehaviorConfig : never
 ;
 
 /** Type of addon. */
@@ -18,6 +18,11 @@ export type AddonPluginType =
 type LostConfigBase<A> = {
     /** Type of addon */
     readonly type: A;
+    /**
+      * An object name that will applied after plugin was installed/added to project.
+      * @example 'MyPlugin'
+      */
+    readonly objectName: string;
     /**
      * The unique ID of the addon.
      * @description This is not displayed and is only used internally.
@@ -68,38 +73,6 @@ type LostConfigBase<A> = {
     readonly helpUrl: {
         EN: string;
     }
-}
-
-type PluginCategory =
-    | 'data-and-storage'
-    | 'form-controls'
-    | 'general'
-    | 'input'
-    | 'media'
-    | 'monetisation'
-    | 'platform-specific'
-    | 'web'
-    | 'other'
-;
-
-interface PluginConfigBase<A, P> extends LostConfigBase<A> {
-    /**
-      * An object name that will applied after plugin was installed/added to project.
-      * @example 'MyPlugin'
-      */
-    readonly objectName: string;
-    /**
-     * Set the plugin type.
-     * @description This can be "object" or "world".
-     * The world typeh represents a plugin that appears in the Layout View, whereas the object type represents a hidden plugin, similar to the Audio plugin (a single-global type) or Dictionary.
-     * World type plugins must derive from SDK.IWorldInstanceBase instead of SDK.IInstanceBase and implement a Draw() method.
-     */
-    readonly pluginType: P;
-    /**
-        * The category for the plugin when displaying it in the Create New Object Type dialog.
-        * @example 'general'
-        */
-    readonly category: PluginCategory;
     /**
      * *Optional*. Default is ***True***.
      * A boolean indicating whether the addon supports Construct's worker mode, where the entire runtime is hosted in a Web Worker instead of the main thread.
@@ -134,14 +107,42 @@ interface PluginConfigBase<A, P> extends LostConfigBase<A> {
     readonly canBeBundled?: boolean;
 }
 
+type PluginCategory =
+    | 'data-and-storage'
+    | 'form-controls'
+    | 'general'
+    | 'input'
+    | 'media'
+    | 'monetisation'
+    | 'platform-specific'
+    | 'web'
+    | 'other'
+    | '3d'
+;
+
+interface IPluginConfigBase<P> extends LostConfigBase<'plugin'> {
+    /**
+     * Set the plugin type.
+     * @description This can be "object" or "world".
+     * The world typeh represents a plugin that appears in the Layout View, whereas the object type represents a hidden plugin, similar to the Audio plugin (a single-global type) or Dictionary.
+     * World type plugins must derive from SDK.IWorldInstanceBase instead of SDK.IInstanceBase and implement a Draw() method.
+     */
+    readonly pluginType: P;
+    /**
+        * The category for the plugin when displaying it in the Create New Object Type dialog.
+        * @example 'general'
+        */
+    readonly category: PluginCategory;
+}
+
 /** Object represents configs for Plugin addon type. */
-type PluginConfig = 
-    | ObjectPluginConfig
-    | WorldPluginConfig
+export type PluginConfig<P> =
+    P extends 'object' ? IObjectPluginConfig :
+    P extends 'world' ? IWorldPluginConfig : never
 ;
 
 /** Object represents config for Object Plugin addon. */
-interface ObjectPluginConfig extends PluginConfigBase<'plugin', 'object'> {
+interface IObjectPluginConfig extends IPluginConfigBase<'object'> {
     /**
      * *Optional*. Default is ***False***. Pass true to set the plugin to be a single-global type.
      * @description The plugin type must be "object". Single-global plugins can only be added once to a project, and they then have a single permanent global instance available throughout the project. 
@@ -150,7 +151,7 @@ interface ObjectPluginConfig extends PluginConfigBase<'plugin', 'object'> {
     readonly isSingleGlobal?: boolean;
 }
 
-interface WorldPluginConfig extends PluginConfigBase<'plugin', 'world'> {
+interface IWorldPluginConfig extends IPluginConfigBase<'world'> {
     /**
      * *Optional*. Default is ***True***. Pass true to enable resizing instances in the Layout View.
      */
@@ -213,9 +214,8 @@ type BehaviorCategory =
     | 'other'
 ;
 
-
 /** Object represents config for Behavior addon type. */
-interface BehaviorConfig extends LostConfigBase<'behavior'> {
+export interface IBehaviorConfig extends LostConfigBase<'behavior'> {
     /**
       * An object name that will applied after plugin was installed/added to project.
       * @example 'MyPlugin'

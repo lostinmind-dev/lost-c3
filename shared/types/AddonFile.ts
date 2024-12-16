@@ -32,7 +32,7 @@ export type AddonFile =
     | IAddonDomSideScriptFile
     ;
 
-type AddonFileType =
+export type AddonFileType =
     | 'icon'
     | 'image'
     | 'file'
@@ -54,18 +54,26 @@ type AddonFileBase = {
     readonly path: string;
 }
 
+export enum AddonFileDependencyType {
+    CopyToOutput = 'copy-to-output',
+    ExternalCSS = 'external-css',
+    ExternalDomScript ='external-dom-script',
+    ExternalRuntimeScript = 'external-runtime-script'
+}
+
 /**
  * File
  */
+
 export interface ICopyToOutputAddonFile extends AddonFileBase {
     readonly type: 'file';
     readonly mimeType: MimeType;
-    readonly dependencyType: 'copy-to-output';
+    readonly dependencyType: AddonFileDependencyType.CopyToOutput;
 }
 
 export interface IExternalCSSAddonFile extends AddonFileBase {
     readonly type: 'file';
-    readonly dependencyType: 'external-css';
+    readonly dependencyType: AddonFileDependencyType.ExternalCSS;
 }
 
 /**
@@ -78,14 +86,11 @@ interface IAddonScriptFileBase extends AddonFileBase {
 };
 
 /** Script */
-type AddonScriptDependencyType =
-    | 'external-dom-script'
-    | 'external-runtime-script'
-    ;
+
 
 export interface IAddonScriptFile extends IAddonScriptFileBase {
     readonly type: 'script';
-    readonly dependencyType: AddonScriptDependencyType;
+    readonly dependencyType: AddonFileDependencyType;
     readonly scriptType?: 'module';
 }
 
@@ -103,7 +108,7 @@ interface IAddonDomSideScriptFile extends IAddonScriptFileBase {
 /**
  * Icon
  */
-type AddonIconFileName =
+export type AddonIconFileName =
     | 'icon.svg'
     | 'icon.png'
 
@@ -116,6 +121,9 @@ export interface IAddonIconFile extends AddonFileBase {
 /**
  * Image
  */
-interface IAddonImageFile extends AddonFileBase {
+export type AddonImageFileName = 'default.png';
+
+export interface IAddonImageFile extends AddonFileBase {
     readonly type: 'image';
+    readonly name: AddonImageFileName;
 }

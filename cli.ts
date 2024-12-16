@@ -2,17 +2,15 @@ import DenoJson from './deno.json' with { type: "json" };
 import { Colors, join, Logger, parseArgs } from './deps.ts';
 import { Paths } from './shared/paths.ts';
 import { dedent } from "./shared/misc.ts";
-import { downloadAddonBase } from "./cli/check-addon-base-exists.ts";
-import { AddonFileManager } from "./lib/managers/addon-file-manager.ts";
 
-import Build from './cli/main.ts';
-import Serve from './cli/serve-addon.ts';
 import { PackageBundler } from "./bundler/package-manager.ts";
+import { LostAddonProject } from "./lib/lost.ts";
+import { AddonBareBonesType } from "./shared/types/index.ts";
 
 
 let rebuildTimeout: number | undefined;
 
-async function BuildAndWatch() {
+async function BuildAndWatch(minify: boolean) {
     const watcher = Deno.watchFs([
         Paths.ProjectFolders.Addon,
         Paths.ProjectFolders.Editor,
@@ -24,7 +22,10 @@ async function BuildAndWatch() {
         '\n👀', Colors.blue('Watching for file changes...\n')
     );
 
-    await Build({ watch: true });
+    await LostAddonProject.build({
+        watch: true,
+        minify
+    });
 
     for await (const event of watcher) {
         if (event.kind === 'modify') {
@@ -40,7 +41,10 @@ async function BuildAndWatch() {
                     }
 
                     rebuildTimeout = setTimeout(async () => {
-                        await Build({ watch: true });
+                        await LostAddonProject.build({
+                            watch: true,
+                            minify
+                        });
                     }, 500);
                 }
             }
@@ -68,11 +72,11 @@ async function main() {
                     flags['format'] &&
                     (flags['format'] === 'esm' || flags['format'] === 'cjs' || flags['format'] === 'iife')
                 ) {
-                        await PackageBundler.bundle(
-                            flags.package,
-                            flags['minify'] || false,
-                            flags['format'] || 'esm'
-                        );
+                    await PackageBundler.bundle(
+                        flags.package,
+                        flags['minify'] || false,
+                        flags['format'] || 'esm'
+                    );
                 } else {
                     await PackageBundler.bundle(
                         flags.package,
@@ -112,22 +116,20 @@ async function main() {
             break;
         case 'build':
             if (flags.watch) {
-                await BuildAndWatch();
+                await BuildAndWatch(flags.minify || false);
             } else {
-                if (flags.minify) {
-                    AddonFileManager.minify = true;
-                } else {
-                    AddonFileManager.minify = false;
-                }
-                await Build({});
+                await LostAddonProject.build({
+                    watch: false,
+                    minify: flags.minify || false
+                });
             }
             break;
         case 'serve':
             if (flags.port) {
                 const port = Number(flags['port']);
-                Serve(port);
+                LostAddonProject.serve(port);
             } else {
-                Serve(65432);
+                LostAddonProject.serve(65432);
             }
             break;
         case 'types':
@@ -170,11 +172,11 @@ async function createBareBones(type: AddonBareBonesType) {
         type === 'plugin' ||
         type === 'drawing-plugin'
     ) {
-        await downloadAddonBase('plugin');
+        await LostAddonProject.downloadAddonBase('plugin');
     }
 
     if (type === 'behavior') {
-        await downloadAddonBase('behavior');
+        await LostAddonProject.downloadAddonBase('behavior');
     }
 }
 

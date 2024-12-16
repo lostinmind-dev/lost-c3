@@ -1,6 +1,5 @@
-import type { AddonType } from "../config.ts";
+import { AddonPluginType, AddonType } from "../config.ts";
 
-/** Object that represents all types of plugin property. */
 export enum Property {
     Integer = 'integer',
     Float = 'float',
@@ -18,30 +17,17 @@ export enum Property {
     // ProjectFile = 'projectfile'
 }
 
-export type EditorInstanceType = 
-    | SDK.IInstanceBase
-    | SDK.IWorldInstanceBase
-    | SDK.IBehaviorInstanceBase
-;
-
-export type EditorType =
-    | SDK.ITypeBase
-    | SDK.IBehaviorTypeBase
-
-/**
- * @class Represents plugin property info.
- */
-export class PluginProperty<A, I, T extends SDK.ITypeBase = SDK.ITypeBase> {
+export class PluginProperty<A, P, I, T> {
     readonly _id: string;
     readonly _name: string;
     readonly _description: string;
-    readonly _opts: AddonPropertyOptions<A, I, T>;
-    
+    readonly _opts: AddonProperty<A, P, I, T>;
+
     constructor(
-        id: string,
-        name: string,
-        description: string,
-        opts: AddonPropertyOptions<A, I, T>
+        readonly id: string,
+        readonly name: string,
+        readonly description: string,
+        readonly opts: AddonProperty<A, P, I, T>
     ) {
         this._id = id;
         this._name = name;
@@ -57,81 +43,87 @@ export class PluginProperty<A, I, T extends SDK.ITypeBase = SDK.ITypeBase> {
 
         if (opts.type === Property.Color) {
             if (opts.initialValue) {
-                opts.initialValue = this.normalizeRGB(opts.initialValue);
+                opts.initialValue = this.#normalizeRgb(opts.initialValue);
             }
         }
 
         this._opts = opts;
     }
-    
-    private normalizeRGB(colors: [number, number, number]): [number, number, number] {
+
+    #normalizeRgb(rgb: [number, number, number]): [number, number, number] {
         if (
-            colors.length !== 3 || 
-            colors.some(c => typeof c !== "number" || c < 0 || c > 255)
+            rgb.length !== 3 ||
+            rgb.some(c => typeof c !== "number" || c < 0 || c > 255)
         ) {
             return [0, 0, 0];
         }
-        return [colors[0] / 255, colors[1] / 255, colors[2] / 255];
+        return [rgb[0] / 255, rgb[1] / 255, rgb[2] / 255];
     }
-
 }
 
-export type AddonPropertyOptions<A, I, T extends SDK.ITypeBase = SDK.ITypeBase> =
-    A extends 'plugin' ? PluginPropertyOptions<I, T> :
-    A extends 'behavior' ? BehaviorPropertyOptions : never;
-
-type BaseAddonPropertyOptions =
-    | IntegerProperty
-    | FloatProperty
-    | PercentProperty
-    | TextProperty
-    | LongTextProperty
-    | CheckProperty
-    | FontProperty
-    | ComboProperty
-    | GroupProperty
+export type AddonProperty<A, P, I, T> =
+    A extends 'plugin' ? PluginPropertyType<P, I, T> :
+    A extends 'behavior' ? BehaviorPropertyType : never
 ;
 
-type ObjectPluginPropertyOptions<I extends SDK.IInstanceBase, T extends SDK.ITypeBase> =
-    | ColorProperty
-    | ObjectProperty
-    | InfoProperty<I>
-    | BaseAddonPropertyOptions
-    | LinkPropertyOnceForType<T>
+export type PluginPropertyType<P, I, T> =
+    P extends 'object' ? ObjectPluginProperty<I, T> :
+    P extends 'world' ? WorldPluginProperty<I, T> : never
 ;
 
-type WorldPluginPropertyOptions<I extends SDK.IWorldInstanceBase, T extends SDK.ITypeBase> =
-    // | ProjectFileProperty /** Test */
-    | ColorProperty
-    | ObjectProperty
-    | InfoProperty<I>
-    | BaseAddonPropertyOptions
-    | LinkPropertyForEachInstance<I>
-    | LinkPropertyOnceForType<T>
+export type BehaviorPropertyType =
+    | IIntegerProperty
+    | IFloatProperty
+    | IPercentProperty
+    | ITextProperty
+    | ILongTextProperty
+    | ICheckProperty
+    | IFontProperty
+    | IComboProperty
+    | IColorProperty
+    | IObjectProperty
+    | IGroupProperty
 ;
 
-type PluginPropertyOptions<I, T extends SDK.ITypeBase> =
-    I extends SDK.IWorldInstanceBase ? WorldPluginPropertyOptions<I, T> :
-    I extends SDK.IInstanceBase ? ObjectPluginPropertyOptions<I, T> : never;
+type ObjectPluginProperty<I, T> =
+    | IIntegerProperty
+    | IFloatProperty
+    | IPercentProperty
+    | ITextProperty
+    | ILongTextProperty
+    | ICheckProperty
+    | IFontProperty
+    | IComboProperty
+    | IColorProperty
+    | IObjectProperty
+    | IGroupProperty
+    | IInfoProperty<I>
+    | ILinkPropertyOnceForType<T>
+;
 
-type BehaviorPropertyOptions = BaseAddonPropertyOptions;
+type WorldPluginProperty<I, T> =
+    | IIntegerProperty
+    | IFloatProperty
+    | IPercentProperty
+    | ITextProperty
+    | ILongTextProperty
+    | ICheckProperty
+    | IFontProperty
+    | IComboProperty
+    | IColorProperty
+    | IObjectProperty
+    | IGroupProperty
+    | IInfoProperty<I>
+    | ILinkPropertyForEachInstance<I>
+    | ILinkPropertyOnceForType<T>
+;
 
-/** Base properties for any plugin property. */
-type PropertyOptionsBase = {
-    /**
-     * Type of plugin property.
-     */
-    type: Property;
+type PropertyBase = {
+    readonly type: Property;
 }
 
-// interface ProjectFileProperty extends PropertyOptionsBase {
-//     type: Property.ProjectFile,
-//     filter: '.svg'
-// }
-
-/** Object represents 'integer' plugin property */
-interface IntegerProperty extends PropertyOptionsBase {
-    type: Property.Integer;
+interface IIntegerProperty extends PropertyBase {
+    readonly type: Property.Integer;
     /**
      * *Optional*. An integer number property, always rounded to a whole number.
      */
@@ -139,16 +131,16 @@ interface IntegerProperty extends PropertyOptionsBase {
     /**
      * *Optional*. Specify a minimum value for a numeric property.
      */
-    min?: number;
+    readonly min?: number;
     /**
      * *Optional*. Specify a maximum value for a numeric property.
      */
-    max?: number;
+    readonly max?: number;
 }
 
 /** Object represents 'float' plugin property */
-interface FloatProperty extends PropertyOptionsBase {
-    type: Property.Float;
+interface IFloatProperty extends PropertyBase {
+    readonly type: Property.Float;
     /**
      * *Optional*. A floating-point number property.
      */
@@ -156,16 +148,16 @@ interface FloatProperty extends PropertyOptionsBase {
     /**
      * *Optional*. Specify a minimum value for a numeric property.
      */
-    min?: number;
+    readonly min?: number;
     /**
      * *Optional*. Specify a maximum value for a numeric property.
      */
-    max?: number;
+    readonly max?: number;
 }
 
 /** Object represents 'percent' plugin property */
-interface PercentProperty extends PropertyOptionsBase {
-    type: Property.Percent;
+interface IPercentProperty extends PropertyBase {
+    readonly type: Property.Percent;
     /**
      * *Optional*. A floating-point number in the range **[0-1]** represented as a percentage.
      * @description For example if the user enters 50%, the property will be set to a value of 0.5.
@@ -174,8 +166,8 @@ interface PercentProperty extends PropertyOptionsBase {
 }
 
 /** Object represents 'text' plugin property */
-interface TextProperty extends PropertyOptionsBase {
-    type: Property.Text;
+interface ITextProperty extends PropertyBase {
+    readonly type: Property.Text;
     /**
      * *Optional*. A field the user can enter a string in to.
      */
@@ -183,8 +175,8 @@ interface TextProperty extends PropertyOptionsBase {
 }
 
 /** Object represents 'longtext' plugin property */
-interface LongTextProperty extends PropertyOptionsBase {
-    type: Property.LongText;
+interface ILongTextProperty extends PropertyBase {
+    readonly type: Property.LongText;
     /**
      * *Optional*. The same as "text", but a button with an ellipsis ("...") appears on the right side of the field.
      * @description The user can click this button to open a dialog to edit a long string more conveniently.
@@ -194,8 +186,8 @@ interface LongTextProperty extends PropertyOptionsBase {
 }
 
 /** Object represents 'check' plugin property */
-interface CheckProperty extends PropertyOptionsBase {
-    type: Property.Checkbox;
+interface ICheckProperty extends PropertyBase {
+    readonly type: Property.Checkbox;
     /**
      * *Optional*. A checkbox property.
      */
@@ -203,8 +195,8 @@ interface CheckProperty extends PropertyOptionsBase {
 }
 
 /** Object represents 'font' plugin property */
-interface FontProperty extends PropertyOptionsBase {
-    type: Property.Font;
+interface IFontProperty extends PropertyBase {
+    readonly type: Property.Font;
     /**
      * A field which displays the name of a font and provides a button to open a font picker dialog.
      * @description The property is set to a string of the name of the font.
@@ -213,13 +205,13 @@ interface FontProperty extends PropertyOptionsBase {
 }
 
 /** Object represents 'combo' plugin property */
-interface ComboProperty extends PropertyOptionsBase {
-    type: Property.Combo;
+interface IComboProperty extends PropertyBase {
+    readonly type: Property.Combo;
     /**
      * Must be used to specify the available items.
      * @example [["item_one", "Item 1"], ["item_two", "Item 2"]]
      */
-    items: [string, string][];
+    readonly items: [string, string][];
     /**
      * A dropdown list property.
      * @description The property is set to the zero-based index of the chosen item.
@@ -229,8 +221,8 @@ interface ComboProperty extends PropertyOptionsBase {
 }
 
 /** Object represents 'color' plugin property */
-interface ColorProperty extends PropertyOptionsBase {
-    type: Property.Color;
+interface IColorProperty extends PropertyBase {
+    readonly type: Property.Color;
     /**
      * *Optional*. A color picker property.
      * Must be an RGB array of numbers.
@@ -240,44 +232,37 @@ interface ColorProperty extends PropertyOptionsBase {
 }
 
 /** Object represents 'object' plugin property */
-interface ObjectProperty extends PropertyOptionsBase {
-    type: Property.Object;
+interface IObjectProperty extends PropertyBase {
+    readonly type: Property.Object;
     /**
      * *Optional*. An object picker property allowing the user to pick an object class. 
      * @description At runtime, this passes a SID (Serialization ID) for the chosen object class, or -1 if none was picked. 
      * Use the runtime method GetObjectClassBySID to look up the corresponding ObjectClass.
      * @param allowedPluginIds An array of plugin ID strings to filter the object picker by. This can also contain the special string "<world>" to allow any world-type plugin.
      */
-    allowedPluginIds?: string[];
+    readonly allowedPluginIds?: string[];
 }
 
 /** Object represents 'group' plugin property */
-interface GroupProperty extends PropertyOptionsBase {
+interface IGroupProperty extends PropertyBase {
     /**
      * Creates a new group in the Properties Bar.
      */
-    type: Property.Group;
+    readonly type: Property.Group;
 }
 
 /** Object represents 'info' plugin property */
-interface InfoProperty<I extends EditorInstanceType> extends PropertyOptionsBase {
-    type: Property.Info;
+interface IInfoProperty<I> extends PropertyBase {
+    readonly type: Property.Info;
     /**
      * Creates a read-only string that cannot be edited.
      */
-    callback: (inst: I) => string;
-}
-
-/** Object represents base for 'link' plugin property */
-interface LinkPropertyBase extends PropertyOptionsBase {
-    type: Property.Link;
-    /**  *Optional*. Sets the text of the clickable link. */
-    linkText?: string;
+    readonly callback: (inst: I) => string;
 }
 
 /** Object represents 'link' plugin property with 'for-each-instance' callback type */
-interface LinkPropertyForEachInstance<I extends SDK.IWorldInstanceBase> extends LinkPropertyBase {
-    type: Property.Link;
+interface ILinkPropertyForEachInstance<I> extends PropertyBase {
+    readonly type: Property.Link;
     /**
      * Specifies how the link callback function is used.
      * @example 'for-each-instance'
@@ -285,19 +270,23 @@ interface LinkPropertyForEachInstance<I extends SDK.IWorldInstanceBase> extends 
      * The callback parameter is an instance of your addon (deriving from SDK.IWorldInstanceBase).
      * This is useful for per-instance modifications, such as a link to make all instances their original size. 
      */
-    callbackType: 'for-each-instance';
-    callback: (inst: I) => void;
+    readonly callbackType: 'for-each-instance';
+    readonly callback: (inst: I) => void;
+    /**  *Optional*. Sets the text of the clickable link. */
+    linkText?: string;
 }
 
 /** Object represents 'link' plugin property with 'once-for-type' callback type */
-interface LinkPropertyOnceForType<T extends SDK.ITypeBase> extends LinkPropertyBase {
-    type: Property.Link;
+interface ILinkPropertyOnceForType<T> extends PropertyBase {
+    readonly type: Property.Link;
     /**
      * Specifies how the link callback function is used.
      * @description The callback is run once regardless of how many instances are selected in the Layout View.
      * The callback parameter is your addon's object type (deriving from SDK.ITypeBase).
      * This is useful for per-type modifications, such as a link to edit the object image.
      */
-    callbackType: 'once-for-type';
-    callback: (type: T) => void;
+    readonly callbackType: 'once-for-type';
+    readonly callback: (type: T) => void;
+    /**  *Optional*. Sets the text of the clickable link. */
+    linkText?: string;
 }

@@ -1,11 +1,11 @@
 import type { Addon } from "./addon.ts";
-import type { AddonType, LostConfig } from "./config.ts";
+import type { AddonPluginType, AddonType, IBehaviorConfig, LostConfig, PluginConfig } from "./config.ts";
 
 
-export function defineConfig<T extends AddonType>(config: LostConfig<T>) {
+export function defineConfig<A extends AddonType, P extends AddonPluginType = AddonPluginType>(config: LostConfig<A, P>) {
     return config;
 }
 
-export function defineAddon<T extends Addon<AddonType, any, any>>(addon: T) {
+export function defineAddon(addon: Addon<any, any, any, any>) {
     return addon;
 }

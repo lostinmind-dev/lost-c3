@@ -1,4 +1,3 @@
-import '../cli/global.ts';
 // deno-lint-ignore-file no-explicit-any
 import { Colors } from "../deps.ts";
 
@@ -68,7 +67,6 @@ export abstract class Logger {
     };
 
     static Error(step: 'build' | 'serve' | 'cli' | 'bundle', errorMessage: string, ...data: any[]) {
-        isBuildError = true;
         this.Line();
         switch (step) {
             case 'cli':

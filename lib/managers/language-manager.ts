@@ -12,21 +12,17 @@ import type { PluginProperty } from "../entities/plugin-property.ts";
 import { LostAddonProject } from "../lost.ts";
 
 export abstract class LanguageManager {
-    static #addonConfig = LostAddonProject.addon._config;
-    static #categories = LostAddonProject.addon._categories;
-    static #properties = LostAddonProject.addon._properties;
-
     static create(): LanguageJSON {
 
         const json: LanguageJSON = {
             "languageTag": 'en-US',
-            "fileDescription": `Strings for ${this.#addonConfig.addonName} addon.`,
+            "fileDescription": `Strings for ${LostAddonProject.addon._config.addonName} addon.`,
             "text": {}
         } as LanguageJSON;
 
         let addonType: 'plugins' | 'behaviors';
 
-        switch (this.#addonConfig.type) {
+        switch (LostAddonProject.addon._config.type) {
             case "plugin":
                 addonType = 'plugins'
                 json['text']['plugins'] = {};
@@ -36,7 +32,7 @@ export abstract class LanguageManager {
                 json['text']['behaviors'] = {};
                 break;
         }
-        json['text'][addonType][this.#addonConfig.addonId.toLocaleLowerCase()] = {
+        json['text'][addonType][LostAddonProject.addon._config.addonId.toLocaleLowerCase()] = {
             'name': '',
             'description': '',
             'help-url': '',
@@ -46,11 +42,11 @@ export abstract class LanguageManager {
             'conditions': {},
             'expressions': {}
         }
-        const deep = json['text'][addonType][this.#addonConfig.addonId.toLocaleLowerCase()];
+        const deep = json['text'][addonType][LostAddonProject.addon._config.addonId.toLocaleLowerCase()];
 
-        deep['name'] = this.#addonConfig.objectName;
-        deep['description'] = this.#addonConfig.addonDescription;
-        deep['help-url'] = this.#addonConfig.helpUrl.EN;
+        deep['name'] = LostAddonProject.addon._config.objectName;
+        deep['description'] = LostAddonProject.addon._config.addonDescription;
+        deep['help-url'] = LostAddonProject.addon._config.helpUrl.EN;
         deep['properties'] = this.#createProperties();
         deep['aceCategories'] = this.#createAceCategories();
 
@@ -145,7 +141,7 @@ export abstract class LanguageManager {
     }
 
     static #createActionsCollection(): LanguageActionsCollection {
-        const entities = this.#categories.map(c => c._actions).flat();
+        const entities = LostAddonProject.addon._categories.map(c => c._actions).flat();
         const collection: LanguageActionsCollection = {} as LanguageActionsCollection;
 
         entities.forEach(entity => {
@@ -156,7 +152,7 @@ export abstract class LanguageManager {
     }
 
     static #createConditionsCollection(): LanguageConditionsCollection {
-        const entities = this.#categories.map(c => c._conditions).flat();
+        const entities = LostAddonProject.addon._categories.map(c => c._conditions).flat();
         const collection: LanguageConditionsCollection = {} as LanguageConditionsCollection;
 
         entities.forEach(entity => {
@@ -167,7 +163,7 @@ export abstract class LanguageManager {
     }
 
     static #createExpressionsCollection(): LanguageExpressionsCollection {
-        const entities = this.#categories.map(c => c._expressions).flat();
+        const entities = LostAddonProject.addon._categories.map(c => c._expressions).flat();
         const collection: LanguageExpressionsCollection = {} as LanguageExpressionsCollection;
 
         entities.forEach(entity => {
@@ -181,14 +177,14 @@ export abstract class LanguageManager {
 
         const aceCategories = {} as LanguageAceCategoriesCollection;
 
-        this.#categories.forEach(category => {
+        LostAddonProject.addon._categories.forEach(category => {
             aceCategories[category._id] = category._name;
         })
 
         return aceCategories;
     }
 
-    static #createProperty(property: PluginProperty<any, any, any>): LanguageProperty {
+    static #createProperty(property: PluginProperty<any, any, any, any>): LanguageProperty {
         const languageProperty: LanguageProperty = {} as LanguageProperty;
 
         languageProperty['name'] = property._name;
@@ -213,7 +209,7 @@ export abstract class LanguageManager {
     static #createProperties(): LanguagePropertiesCollection {
         const collection: LanguagePropertiesCollection = {} as LanguagePropertiesCollection;
 
-        this.#properties.forEach(p => {
+        LostAddonProject.addon._properties.forEach(p => {
             collection[p._id] = this.#createProperty(p);
         })
 

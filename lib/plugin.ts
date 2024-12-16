@@ -1,21 +1,25 @@
-
-import type { LostConfig } from "./config.ts";
-import type { RemoteScriptType, RuntimeScriptType } from "../shared/types.ts";
-
-import { PluginProperty, Property, type AddonPropertyOptions } from "./entities/plugin-property.ts";
+import type { AddonPluginType, LostConfig } from "./config.ts";
+import type { RemoteScript, RuntimeScript } from "../shared/types.ts";
+import { PluginProperty, type PluginPropertyType } from './entities/plugin-property.ts';
 import { Addon } from "./addon.ts";
-import { Colors, join, Logger } from "../deps.ts";
+import { Logger } from "../shared/logger.ts";
 import { isDirectoryExists, isFileExists } from "../shared/misc.ts";
 import { Paths } from "../shared/paths.ts";
+import { Colors, join } from "../deps.ts";
 
+type InstanceType<P> = 
+    P extends 'object' ? SDK.IInstanceBase :
+    P extends 'world' ? SDK.IWorldInstanceBase : never
+;
 
 export class Plugin<
-    I extends SDK.IInstanceBase | SDK.IWorldInstanceBase, /** Editor instance OR base instance */
+    P extends AddonPluginType,
+    I extends InstanceType<P>,
     T extends SDK.ITypeBase
-    > extends Addon<'plugin', I, T> {
+> extends Addon<'plugin', P, I, T> {
 
-    constructor(config: LostConfig<'plugin'>) {
-        super('plugin', config);
+    constructor(config: LostConfig<'plugin', P>) {
+        super(config);
     }
 
     /**
@@ -27,7 +31,7 @@ export class Plugin<
     addProperty(
         id: string,
         name: string,
-        opts: AddonPropertyOptions<'plugin', I, T>
+        opts: PluginPropertyType<P, I, T>
     ): this
     /**
      * Creates plugin property.
@@ -40,7 +44,7 @@ export class Plugin<
         id: string,
         name: string,
         description: string,
-        opts: AddonPropertyOptions<'plugin', I, T>
+        opts: PluginPropertyType<P, I, T>
     ): this
     /**
      * Creates plugin property.
@@ -52,12 +56,12 @@ export class Plugin<
     addProperty(
         id: string,
         name: string,
-        descriptionOrOpts: string | AddonPropertyOptions<'plugin', I, T>,
-        opts?: AddonPropertyOptions<'plugin', I, T>
+        descriptionOrOpts: string | PluginPropertyType<P, I, T>,
+        opts?: PluginPropertyType<P, I, T>
     ) {
         if (!this.#isPluginPropertyExists(id)) {
             let description: string = 'There is no any description yet...';
-            let options: AddonPropertyOptions<'plugin', I, T>;
+            let options: PluginPropertyType<P, I, T>;
             if (typeof descriptionOrOpts === 'string' && opts) {
                 description = descriptionOrOpts;
                 options = opts;
@@ -72,8 +76,8 @@ export class Plugin<
                 id.length > 0 &&
                 name.length > 0
             ) {
-                this.pluginProperties.push(
-                    new PluginProperty<'plugin', I, T>(id, name, description, options)
+                this._properties.push(
+                    new PluginProperty<'plugin', P, I, T>(id, name, description, options)
                 );
             } else if (id.length === 0) {
                 Logger.Error('build', `Plugin property id can't be empty.`, 'Please specify your property Id.')
@@ -125,7 +129,7 @@ export class Plugin<
      * The script is not minified on export.
      * @param scripts Runtime script file info.
      */
-    setRuntimeScripts(...scripts: RuntimeScriptType[]): this {
+    setRuntimeScripts(...scripts: RuntimeScript[]): this {
         scripts.forEach(async script => {
             switch (script.type) {
                 case 'file':
@@ -135,7 +139,7 @@ export class Plugin<
                     ) {
                         if (await isFileExists(join(Paths.ProjectFolders.Scripts, script.path))) {
                             Logger.Info(`Added runtime script file: "${Colors.dim(script.path)}"`)
-                            this.runtimeScripts.push(script);
+                            this._runtimeScripts.push(script);
                         } else {
                             Logger.Error(
                                 'build', `Failed to add runtime script with path: (${script.path})`, 'File not found'
@@ -152,7 +156,7 @@ export class Plugin<
                 case 'directory':
                     if (await isDirectoryExists(join(Paths.ProjectFolders.Scripts, script.path))) {
                         Logger.Info(`Added runtime scripts directory: "${Colors.dim(script.path)}"`)
-                        this.runtimeScripts.push(script);
+                        this._runtimeScripts.push(script);
                     } else {
                         Logger.Error(
                             'build', `Failed to add runtime scripts directory with path: (${script.path})`, 'Directory not found'
@@ -172,7 +176,7 @@ export class Plugin<
      * @description On the modern web this will often be blocked from secure sites as mixed content.
      * ***You must either use secure HTTPS, or a same-protocol URL.***
      */
-    addRemoteScripts(...scripts: RemoteScriptType[]): this {
+    addRemoteScripts(...scripts: RemoteScript[]): this {
         /**
          * Check to https link
          */
@@ -180,7 +184,7 @@ export class Plugin<
             if (script.url.includes('https')) {
                 if (script.url.endsWith('.js')) {
                     Logger.Log(`🌐 Added remoted script with url: ${Colors.dim(script.url)}`)
-                    this.remoteScripts.push(script);
+                    this._remoteScripts.push(script);
                 } else {
                     Logger.Error('build', `Failed to add remote script with url: (${script.url})`, 'Your url must ends with ".js" script extension.')
                     Deno.exit(1);
@@ -198,7 +202,7 @@ export class Plugin<
      * @param id Plugin property Id.
      */
     #isPluginPropertyExists(id: string): boolean {
-        const isExist = this.pluginProperties.find(p => p._id === id);
+        const isExist = this._properties.find(p => p._id === id);
         return (isExist) ? true : false;
     }
 }

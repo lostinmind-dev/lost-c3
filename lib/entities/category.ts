@@ -2,7 +2,7 @@ import type { ActionEntity } from './action.ts';
 import type { ConditionEntity } from './condition.ts';
 import type { ExpressionEntity } from './expression.ts';
 
-interface ICategoryOptions {
+type CategoryOptions = {
     /**
      * *Optional*. Default is **False**. Deprecate all category Actions, Conditions, Expressions.
      * @description If True, all category Actions, Conditions, Expressions will mark as Deprecated.
@@ -33,7 +33,7 @@ export interface ICategory {
  * @param name Category name that will be displayed in action/condition picker dialog.
  * @param opts *Optional*. Custom options.
  */
-export function Category<C extends string[]>(id: C[number], name: string, opts?: ICategoryOptions) {
+export function Category<C extends string[]>(id: C[number], name: string, opts?: CategoryOptions) {
     return function (target: any, context: ClassDecoratorContext) {
         target.prototype._id = id;
         target.prototype._name = name;

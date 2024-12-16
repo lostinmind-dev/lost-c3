@@ -1,7 +1,6 @@
 // deno-lint-ignore-file no-case-declarations
-
-import { join, UglifyJS } from "../../deps.ts";
-import { dedent, findClassesInheritingFrom, serializeObjectWithFunctions } from "../../shared/misc.ts";
+import { Colors, join, Logger, UglifyJS, walk, BlobWriter, ZipWriter, TextReader } from "../../deps.ts";
+import { dedent, findClassesInheritingFrom, isDirectoryExists, serializeObjectWithFunctions } from "../../shared/misc.ts";
 import { Paths } from "../../shared/paths.ts";
 import { transpileTs } from "../../shared/transpile-ts.ts";
 import type { EntityCollection } from "../../shared/types.ts";
@@ -13,11 +12,16 @@ import { LanguageManager } from "./language-manager.ts";
 import { EditorScriptType, JsonFileType, RuntimeScriptType } from "../../shared/paths/addon-files.ts";
 import { ProjectFolders } from "../../shared/paths/project-folders.ts";
 import { LostAddonProject } from "../lost.ts";
+import { AddonFileType } from "../../shared/types/AddonFile.ts";
+import { AddonFolders } from "../../shared/paths/addon-folders.ts";
 
 export abstract class AddonFileManager {
-    static #addonConfig = LostAddonProject.addon._config;
-    static #categories = LostAddonProject.addon._categories;
-    static #properties = LostAddonProject.addon._properties;
+
+    static async clear() {
+        if (await isDirectoryExists(Paths.ProjectFolders.Build)) {
+            await Deno.remove(Paths.ProjectFolders.Build, { recursive: true });
+        }
+    }
 
     static async getFilesList(): Promise<string[]> {
         const files: string[] = [];
@@ -41,8 +45,8 @@ export abstract class AddonFileManager {
 
     static #initModuleFile() {
 
-        let fileContent: string = dedent`
-import "./${this.#addonConfig.type}.js"
+        const fileContent: string = dedent`
+import "./${LostAddonProject.addon._config.type}.js"
 import "./type.js"
 import "./instance.js"
 import "./actions.js"
@@ -55,79 +59,79 @@ import "./expressions.js"
 
     static async createRuntimeScript(type: RuntimeScriptType): Promise<void> {
         let script: string;
-        let assign: string;
-        let className: string;
+        let assign: string = '';
+        let className: string = '';
         let fileContent: string = '';
 
-        let entities: EntityCollection = {};
+        const entities: EntityCollection = {};
         switch (type) {
             case RuntimeScriptType.Module:
                 fileContent = this.#initModuleFile();
                 break;
             case RuntimeScriptType.Actions:
-                this.#categories.forEach(category => category._actions.forEach(enitity => {
+                LostAddonProject.addon._categories.forEach(category => category._actions.forEach(enitity => {
                     entities[enitity._func.name] = enitity._func;
                 }))
 
-                switch (this.#addonConfig.type) {
+                switch (LostAddonProject.addon._config.type) {
                     case "plugin":
                         fileContent = dedent`
 const C3 = globalThis.C3;
 
-C3.Plugins["${this.#addonConfig.addonId}"].Acts = ${serializeObjectWithFunctions(entities)}
+C3.Plugins["${LostAddonProject.addon._config.addonId}"].Acts = ${serializeObjectWithFunctions(entities)}
 `
                         break;
                     case "behavior":
                         fileContent = dedent`
 const C3 = globalThis.C3;
 
-C3.Behaviors["${this.#addonConfig.addonId}"].Acts = ${serializeObjectWithFunctions(entities)}
+C3.Behaviors["${LostAddonProject.addon._config.addonId}"].Acts = ${serializeObjectWithFunctions(entities)}
 `
                         break;
                 }
 
                 break;
             case RuntimeScriptType.Conditions:
-                this.#categories.forEach(category => category._conditions.forEach(enitity => {
+                LostAddonProject.addon._categories.forEach(category => category._conditions.forEach(enitity => {
                     entities[enitity._func.name] = enitity._func;
                 }))
 
-                switch (this.#addonConfig.type) {
+                switch (LostAddonProject.addon._config.type) {
                     case "plugin":
                         fileContent = dedent`
 const C3 = globalThis.C3;
 
-C3.Plugins["${this.#addonConfig.addonId}"].Cnds = ${serializeObjectWithFunctions(entities)}
+C3.Plugins["${LostAddonProject.addon._config.addonId}"].Cnds = ${serializeObjectWithFunctions(entities)}
 `
                         break;
                     case "behavior":
                         fileContent = dedent`
 const C3 = globalThis.C3;
 
-C3.Behaviors["${this.#addonConfig.addonId}"].Cnds = ${serializeObjectWithFunctions(entities)}
+C3.Behaviors["${LostAddonProject.addon._config.addonId}"].Cnds = ${serializeObjectWithFunctions(entities)}
 `
                         break;
                 }
 
                 break;
             case RuntimeScriptType.Expressions:
-                this.#categories.forEach(category => category._expressions.forEach(enitity => {
+                LostAddonProject.addon._categories.forEach(category => category._expressions.forEach(enitity => {
                     entities[enitity._func.name] = enitity._func;
                 }))
 
-                switch (this.#addonConfig.type) {
+                switch (LostAddonProject.addon._config.type) {
                     case "plugin":
                         fileContent = dedent`
 const C3 = globalThis.C3;
 
-C3.Plugins["${this.#addonConfig.addonId}"].Exps = ${serializeObjectWithFunctions(entities)}
+C3.Plugins["${LostAddonProject.addon._config.addonId}"].Exps = ${serializeObjectWithFunctions(entities)}
 `
                         break;
                     case "behavior":
                         fileContent = dedent`
 const C3 = globalThis.C3;
 
-C3.Behaviors["${this.#addonConfig.addonId}"].Exps = ${serializeObjectWithFunctions(entities)}
+C3.Behaviors["${LostAddonProject.addon._config.addonId}"].Exps = ${serializeObjectWithFunctions(entities)}
 `
                         break;
                 }
@@ -136,9 +140,9 @@ C3.Behaviors["${this.#addonConfig.addonId}"].Exps = ${serializeObjectWithFunctio
             case RuntimeScriptType.Instance:
                 script = await transpileTs(Paths.ProjectFiles.RuntimeInstance) || '';
 
-                switch (this.#addonConfig.type) {
+                switch (LostAddonProject.addon._config.type) {
                     case "plugin":
-                        switch (this.#addonConfig.pluginType) {
+                        switch (LostAddonProject.addon._config.pluginType) {
                             case "object":
                                 className = findClassesInheritingFrom(script, 'globalThis.ISDKInstanceBase');
                                 break;
@@ -146,16 +150,16 @@ C3.Behaviors["${this.#addonConfig.addonId}"].Exps = ${serializeObjectWithFunctio
                                 className = findClassesInheritingFrom(script, 'globalThis.ISDKWorldInstanceBase');
                                 break;
                         }
-                        assign = `globalThis.C3.Plugins["${this.#addonConfig.addonId}"].Instance = ${className};`;
+                        assign = `globalThis.C3.Plugins["${LostAddonProject.addon._config.addonId}"].Instance = ${className};`;
                         break;
                     case "behavior":
                         className = findClassesInheritingFrom(script, 'globalThis.ISDKBehaviorInstanceBase');
-                        assign = `globalThis.C3.Behaviors["${this.#addonConfig.addonId}"].Instance = ${className};`;
+                        assign = `globalThis.C3.Behaviors["${LostAddonProject.addon._config.addonId}"].Instance = ${className};`;
                         break;
                 }
 
                 fileContent = dedent`
-${getDefaultLost(this.#addonConfig).value}
+${getDefaultLost(LostAddonProject.addon._config).value}
 ${script}
 ${assign}
 `
@@ -164,10 +168,10 @@ ${assign}
                 script = await transpileTs(Paths.ProjectFiles.RuntimePlugin) || '';
 
                 className = findClassesInheritingFrom(script, 'globalThis.ISDKPluginBase');
-                assign = `globalThis.C3.Plugins["${this.#addonConfig.addonId}"] = ${className};`;
+                assign = `globalThis.C3.Plugins["${LostAddonProject.addon._config.addonId}"] = ${className};`;
 
                 fileContent = dedent`
-${getDefaultLost(this.#addonConfig).value}
+${getDefaultLost(LostAddonProject.addon._config).value}
 ${script}
 ${assign}
 `
@@ -176,10 +180,10 @@ ${assign}
                 script = await transpileTs(Paths.ProjectFiles.RuntimeBehavior) || '';
 
                 className = findClassesInheritingFrom(script, 'globalThis.ISDKBehaviorBase');
-                assign = `globalThis.C3.Behaviors["${this.#addonConfig.addonId}"] = ${className};`;
+                assign = `globalThis.C3.Behaviors["${LostAddonProject.addon._config.addonId}"] = ${className};`;
 
                 fileContent = dedent`
-${getDefaultLost(this.#addonConfig).value}
+${getDefaultLost(LostAddonProject.addon._config).value}
 ${script}
 ${assign}
 `
@@ -187,19 +191,19 @@ ${assign}
             case RuntimeScriptType.Type:
                 script = await transpileTs(Paths.ProjectFiles.RuntimeType) || '';
 
-                switch (this.#addonConfig.type) {
+                switch (LostAddonProject.addon._config.type) {
                     case "plugin":
                         className = findClassesInheritingFrom(script, 'globalThis.ISDKObjectTypeBase');
-                        assign = `globalThis.C3.Plugins["${this.#addonConfig.addonId}"].Type = ${className};`;
+                        assign = `globalThis.C3.Plugins["${LostAddonProject.addon._config.addonId}"].Type = ${className};`;
                         break;
                     case "behavior":
                         className = findClassesInheritingFrom(script, 'globalThis.ISDKBehaviorTypeBase');
-                        assign = `globalThis.C3.Behaviors["${this.#addonConfig.addonId}"].Type = ${className};`;
+                        assign = `globalThis.C3.Behaviors["${LostAddonProject.addon._config.addonId}"].Type = ${className};`;
                         break;
                 }
 
                 fileContent = dedent`
-${getDefaultLost(this.#addonConfig).value}
+${getDefaultLost(LostAddonProject.addon._config).value}
 ${script}
 ${assign}
 `
@@ -212,8 +216,8 @@ ${assign}
 
     static async createEditorScript(type: EditorScriptType): Promise<void> {
         let script: string;
-        let assign: string;
-        let className: string;
+        let assign: string = '';
+        let className: string = '';
         let fileContent: string = '';
 
         const methods: { [key: string]: Function } = {};
@@ -223,7 +227,7 @@ ${assign}
             type === EditorScriptType.Plugin ||
             type === EditorScriptType.Behavior
         ) {
-            this.#properties.forEach(p => {
+            LostAddonProject.addon._properties.forEach(p => {
                 if (
                     p._opts.type === Property.Info ||
                     p._opts.type === Property.Link
@@ -235,13 +239,13 @@ ${assign}
             methodsAsString = Object.entries(methods)
                 .map(([key, value]) => dedent`  ${key}: ${value.toString()}`)
                 .join(',\n');
-            fileContent = await Deno.readTextFile(Paths.ProjectFiles.AddonBase[this.#addonConfig.type]);
+            fileContent = await Deno.readTextFile(Paths.ProjectFiles.getAddonBasePath(LostAddonProject.addon._config.type));
 
             fileContent = dedent`
 const _lostMethods = {
     ${methodsAsString}
 };
-const _lostData = ${JSON.stringify(lostData, null, 4)};
+const _lostData = ${LostAddonProject.getLostAddonData()};
 ${fileContent}
 `;
 
@@ -250,9 +254,9 @@ ${fileContent}
         if (type === EditorScriptType.Instance) {
             script = await transpileTs(Paths.ProjectFiles.EditorInstance) || '';
 
-            switch (this.#addonConfig.type) {
+            switch (LostAddonProject.addon._config.type) {
                 case "plugin":
-                    switch (this.#addonConfig.pluginType) {
+                    switch (LostAddonProject.addon._config.pluginType) {
                         case "object":
                             className = findClassesInheritingFrom(script, 'SDK.IInstanceBase');
                             break;
@@ -260,16 +264,16 @@ ${fileContent}
                             className = findClassesInheritingFrom(script, 'SDK.IWorldInstanceBase');
                             break;
                     }
-                    assign = `globalThis.SDK.Plugins["${this.#addonConfig.addonId}"].Instance = ${className};`;
+                    assign = `globalThis.SDK.Plugins["${LostAddonProject.addon._config.addonId}"].Instance = ${className};`;
                     break;
                 case "behavior":
                     className = findClassesInheritingFrom(script, 'SDK.IBehaviorInstanceBase');
-                    assign = `globalThis.SDK.Behaviors["${this.#addonConfig.addonId}"].Instance = ${className};`;
+                    assign = `globalThis.SDK.Behaviors["${LostAddonProject.addon._config.addonId}"].Instance = ${className};`;
                     break;
             }
 
             fileContent = dedent`
-${getDefaultLost(this.#addonConfig).value}
+${getDefaultLost(LostAddonProject.addon._config).value}
 ${script}
 setTimeout(() => {
     ${assign}
@@ -280,7 +284,7 @@ setTimeout(() => {
         if (type === EditorScriptType.Type) {
             script = await transpileTs(Paths.ProjectFiles.EditorType) || '';
 
-            switch (this.#addonConfig.type) {
+            switch (LostAddonProject.addon._config.type) {
                 case "plugin":
                     className = findClassesInheritingFrom(script, 'SDK.ITypeBase');
                     break;
@@ -289,17 +293,17 @@ setTimeout(() => {
                     break;
             }
 
-            switch (this.#addonConfig.type) {
+            switch (LostAddonProject.addon._config.type) {
                 case "plugin":
-                    assign = `globalThis.SDK.Plugins["${this.#addonConfig.addonId}"].Type = ${className};`;
+                    assign = `globalThis.SDK.Plugins["${LostAddonProject.addon._config.addonId}"].Type = ${className};`;
                     break;
                 case "behavior":
-                    assign = `globalThis.SDK.Behaviors["${this.#addonConfig.addonId}"].Type = ${className};`;
+                    assign = `globalThis.SDK.Behaviors["${LostAddonProject.addon._config.addonId}"].Type = ${className};`;
                     break;
             }
 
             fileContent = dedent`
-${getDefaultLost(this.#addonConfig).value}
+${getDefaultLost(LostAddonProject.addon._config).value}
 ${script}
 setTimeout(() => {
     ${assign}
@@ -357,6 +361,79 @@ setTimeout(() => {
         }
 
         await Deno.writeTextFile(join(path), content);
+    }
+
+    static async createZip() {
+        Logger.LogBetweenLines(Colors.bgMagenta('Bundling addon...'));
+
+        const zipWriter = new ZipWriter(new BlobWriter('application/zip'));
+        const addonFilePath = join(Paths.ProjectFolders.Builds, `${LostAddonProject.addon._config.addonId}_${LostAddonProject.addon._config.version}`)
+
+        for await (const entry of walk(Paths.ProjectFolders.Build)) {
+            const { isFile, path } = entry;
+            if (isFile) {
+                const data = await Deno.readTextFile(path);
+                const relativePath = path.substring(Paths.ProjectFolders.Build.length + 1).replace(/\\/g, "/");;
+
+                zipWriter.add(relativePath, new TextReader(data))
+            }
+        }
+        const blob = await zipWriter.close();
+
+        await Deno.writeFile(`${addonFilePath}.zip`, new Uint8Array(await blob.arrayBuffer()))
+        await Deno.rename(`${addonFilePath}.zip`, `${addonFilePath}.c3addon`);
+    }
+
+    static getFilePath(fileType: AddonFileType, filePath: string, fileName: string): string {
+        let folders: string[] = [];
+        let path: string;
+
+        switch (fileType) {
+            case 'icon':
+                return LostAddonProject.iconName;
+            case 'image':
+                return LostAddonProject.defaultImageName;
+            case 'file':
+                folders = Paths.getFoldersAfterFolder(filePath, ProjectFolders.Files);
+                
+                if (folders.length > 0) {
+                    path = `${AddonFolders.Files}/${folders.join('/')}/${fileName}`
+                } else {
+                    path = `${AddonFolders.Files}/${fileName}`
+                }
+
+                return path;
+            case 'script':
+                folders = Paths.getFoldersAfterFolder(filePath, ProjectFolders.Scripts);
+
+                if (folders.length > 0) {
+                    path = `${AddonFolders.Scripts}/${folders.join('/')}/${fileName}`
+                } else {
+                    path = `${AddonFolders.Scripts}/${fileName}`
+                }
+
+                return path;
+            case 'module-script':
+                folders = Paths.getFoldersAfterFolder(filePath, ProjectFolders.Modules);
+
+                if (folders.length > 0) {
+                    path = `${AddonFolders.Runtime}/${AddonFolders.Modules}/${folders.join('/')}/${fileName}`
+                } else {
+                    path = `${AddonFolders.Runtime}/${AddonFolders.Modules}/${fileName}`
+                }
+
+                return path;
+            case 'domside-script':
+                folders = Paths.getFoldersAfterFolder(filePath, ProjectFolders.DomSide);
+
+                if (folders.length > 0) {
+                    path = `${AddonFolders.Runtime}/${AddonFolders.DomSide}/${folders.join('/')}/${fileName}`
+                } else {
+                    path = `${AddonFolders.Runtime}/${AddonFolders.DomSide}/${fileName}`
+                }
+
+                return path;
+        }
     }
 
 }
