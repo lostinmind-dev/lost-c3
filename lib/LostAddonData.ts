@@ -3,7 +3,7 @@ import { PluginProperty } from "./entities/plugin-property.ts";
 import { LostAddonProject } from "./lost.ts";
 import { AddonFileManager } from "./managers/addon-file-manager.ts";
 import type { RemoteScript } from "../shared/types.ts";
-import { AddonFileDependencyType, type AddonFileType, type MimeType} from "../shared/types/AddonFile.ts";
+import { AddonFileDependencyType, type AddonFileType, type MimeType} from "../shared/types/addon-file.ts";
 
 type LostAddonDataFile = {
     readonly type: AddonFileType;

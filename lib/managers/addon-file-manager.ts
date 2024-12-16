@@ -12,7 +12,7 @@ import { LanguageManager } from "./language-manager.ts";
 import { EditorScriptType, JsonFileType, RuntimeScriptType } from "../../shared/paths/addon-files.ts";
 import { ProjectFolders } from "../../shared/paths/project-folders.ts";
 import { LostAddonProject } from "../lost.ts";
-import { AddonFileType } from "../../shared/types/AddonFile.ts";
+import { AddonFileType } from "../../shared/types/addon-file.ts";
 import { AddonFolders } from "../../shared/paths/addon-folders.ts";
 
 export abstract class AddonFileManager {

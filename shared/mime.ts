@@ -1,4 +1,4 @@
-import { MimeType } from './types/AddonFile.ts'
+import { MimeType } from './types/addon-file.ts'
 
 type MimeFileCollection = Record<MimeType, string[]>
 

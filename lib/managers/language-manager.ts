@@ -3,7 +3,7 @@ import type {
     LanguageAction, LanguageCondition, LanguageExpression, LanguageActionsCollection,
     LanguageConditionsCollection, LanguageExpressionsCollection, LanguageAceCategoriesCollection, LanguageProperty,
     LanguageLinkProperty, LanguageComboProperty, LanguagePropertiesCollection
-} from "../../shared/json-types.ts";
+} from "../../shared/types/json/language.ts";
 import { Param } from "../entities/parameter.ts";
 import { Property } from "../entities/plugin-property.ts";
 import type { EntityType, Entity } from "../entities/entity.ts";

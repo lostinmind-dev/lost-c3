@@ -1,4 +1,4 @@
-import type { AddonJSON } from "../../shared/json-types.ts";
+import type { AddonJSON } from "../../shared/types/json/addon.ts";
 import { AddonFileManager } from "./addon-file-manager.ts";
 import { LostAddonProject } from "../lost.ts";
 

@@ -12,13 +12,9 @@ export { parseArgs } from 'jsr:@std/cli@1.0.6';
 
 export { join } from 'jsr:@std/path@1.0.8'
 
-export { Logger } from './shared/logger.ts';
-
 export { Md5 } from 'npm:ts-md5@1.3.1';
 
-export * as path from 'jsr:@std/path@1.0.6';
-
-export * as fs from 'node:fs';
+// export * as path from 'jsr:@std/path@1.0.6';
 
 export * as Colors from 'jsr:@std/fmt@1.0.2/colors';
 

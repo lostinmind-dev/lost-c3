@@ -3,7 +3,7 @@ import type {
     AcesJSON, AceParameter, AceStringParameter, AceBooleanParameter,
     AceComboParameter, AceObjectParameter, AceCategory, AceAction,
     AceCondition, AceExpression
-} from "../../shared/json-types.ts";
+} from "../../shared/types/json/aces.ts";
 import { Param } from "../entities/parameter.ts";
 import type { ActionEntity } from "../entities/action.ts";
 import type { ICategory } from "../entities/category.ts";

@@ -1,6 +1,6 @@
 import type { LostConfig } from "./config.ts";
-import type { AddonFile } from "../shared/types/AddonFile.ts";
-import type { RemoteScript, RuntimeScript } from "../shared/types.ts";
+import type { AddonFile } from "../shared/types/addon-file.ts";
+import type { RemoteScript, RuntimeScript } from "../shared/types/index.ts";
 import type { ICategory } from "./entities/category.ts";
 import type { PluginProperty } from "./entities/plugin-property.ts";
 

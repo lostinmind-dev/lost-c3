@@ -6,7 +6,7 @@ import {
     type ICopyToOutputAddonFile, type IExternalCSSAddonFile, MimeType, type AddonFile,
     type IAddonImageFile, AddonFileDependencyType, type AddonIconFileName, 
     type AddonImageFileName
-} from "../shared/types/AddonFile.ts";
+} from "../shared/types/addon-file.ts";
 import { Logger } from "../shared/logger.ts";
 import { Colors, join } from "../deps.ts";
 import type { Addon } from "./addon.ts";
