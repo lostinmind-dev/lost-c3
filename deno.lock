@@ -2,28 +2,19 @@
   "version": "4",
   "specifiers": {
     "jsr:@david/code-block-writer@13": "13.0.3",
-    "jsr:@hugoalh/underscore-path@2.0.3": "2.0.3",
     "jsr:@std/cli@1.0.6": "1.0.6",
     "jsr:@std/fmt@1.0.2": "1.0.2",
-    "jsr:@std/fs@1": "1.0.5",
+    "jsr:@std/fs@1": "1.0.6",
     "jsr:@std/path@1": "1.0.8",
-    "jsr:@std/path@1.0.6": "1.0.6",
     "jsr:@std/path@1.0.8": "1.0.8",
-    "jsr:@std/path@^1.0.7": "1.0.8",
+    "jsr:@std/path@^1.0.8": "1.0.8",
     "jsr:@ts-morph/common@0.25": "0.25.0",
     "jsr:@ts-morph/ts-morph@24.0.0": "24.0.0",
-    "jsr:@zip-js/zip-js@2.7.53": "2.7.53",
-    "npm:@types/node@*": "22.5.4",
-    "npm:ts-md5@1.3.1": "1.3.1",
-    "npm:types-package-json@*": "2.0.39",
-    "npm:uglify-js@3.19.3": "3.19.3"
+    "npm:ts-md5@1.3.1": "1.3.1"
   },
   "jsr": {
     "@david/code-block-writer@13.0.3": {
       "integrity": "f98c77d320f5957899a61bfb7a9bead7c6d83ad1515daee92dbacc861e13bb7f"
-    },
-    "@hugoalh/underscore-path@2.0.3": {
-      "integrity": "fcfc968161b6ca8d625e3060e737887f86b68118331ff1ed38fba8d18fa37a4b"
     },
     "@std/cli@1.0.6": {
       "integrity": "d22d8b38c66c666d7ad1f2a66c5b122da1704f985d3c47f01129f05abb6c5d3d"
@@ -31,17 +22,11 @@
     "@std/fmt@1.0.2": {
       "integrity": "87e9dfcdd3ca7c066e0c3c657c1f987c82888eb8103a3a3baa62684ffeb0f7a7"
     },
-    "@std/fs@1.0.5": {
-      "integrity": "41806ad6823d0b5f275f9849a2640d87e4ef67c51ee1b8fb02426f55e02fd44e",
+    "@std/fs@1.0.6": {
+      "integrity": "42b56e1e41b75583a21d5a37f6a6a27de9f510bcd36c0c85791d685ca0b85fa2",
       "dependencies": [
-        "jsr:@std/path@^1.0.7"
+        "jsr:@std/path@^1.0.8"
       ]
-    },
-    "@std/path@1.0.6": {
-      "integrity": "ab2c55f902b380cf28e0eec501b4906e4c1960d13f00e11cfbcd21de15f18fed"
-    },
-    "@std/path@1.0.7": {
-      "integrity": "76a689e07f0e15dcc6002ec39d0866797e7156629212b28f27179b8a5c3b33a1"
     },
     "@std/path@1.0.8": {
       "integrity": "548fa456bb6a04d3c1a1e7477986b6cffbce95102d0bb447c67c4ee70e0364be"
@@ -59,35 +44,11 @@
         "jsr:@david/code-block-writer",
         "jsr:@ts-morph/common"
       ]
-    },
-    "@zip-js/zip-js@2.7.53": {
-      "integrity": "acea5bd8e01feb3fe4c242cfbde7d33dd5e006549a4eb1d15283bc0c778ed672"
     }
   },
   "npm": {
-    "@types/node@22.5.4": {
-      "integrity": "sha512-FDuKUJQm/ju9fT/SeX/6+gBzoPzlVCzfzmGkwKvRHQVxi4BntVbyIwf6a4Xn62mrvndLiml6z/UBXIdEVjQLXg==",
-      "dependencies": [
-        "undici-types"
-      ]
-    },
     "ts-md5@1.3.1": {
       "integrity": "sha512-DiwiXfwvcTeZ5wCE0z+2A9EseZsztaiZtGrtSaY5JOD7ekPnR/GoIVD5gXZAlK9Na9Kvpo9Waz5rW64WKAWApg=="
-    },
-    "types-package-json@2.0.39": {
-      "integrity": "sha512-c8ua5W1Uu6x7LAwtwSGCl46cHmj+r2eAA+lXR1CluIZotu9V03ZHcGB9wKRZE2oIAX5IzMP/rxDV9g9ikCg9Nw=="
-    },
-    "uglify-js@3.19.3": {
-      "integrity": "sha512-v3Xu+yuwBXisp6QYTcH4UbH+xYJXqnq2m/LtQVWKWzYc1iehYnLixoQDN9FH6/j9/oybfd6W9Ghwkl8+UMKTKQ=="
-    },
-    "undici-types@6.19.8": {
-      "integrity": "sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw=="
     }
-  },
-  "remote": {
-    "https://deno.land/x/denoflate@1.2.1/mod.ts": "f5628e44b80b3d80ed525afa2ba0f12408e3849db817d47a883b801f9ce69dd6",
-    "https://deno.land/x/denoflate@1.2.1/pkg/denoflate.js": "b9f9ad9457d3f12f28b1fb35c555f57443427f74decb403113d67364e4f2caf4",
-    "https://deno.land/x/denoflate@1.2.1/pkg/denoflate_bg.wasm.js": "d581956245407a2115a3d7e8d85a9641c032940a8e810acbd59ca86afd34d44d",
-    "https://raw.githubusercontent.com/esbuild/deno-esbuild/refs/heads/main/mod.js": "15b51f08198c373555700a695b6c6630a86f2c254938e81be7711eb6d4edc74e"
   }
 }

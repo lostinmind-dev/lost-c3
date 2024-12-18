@@ -1,9 +1,34 @@
-import { MimeType } from './types/addon-file.ts'
+export enum MimeType {
+    TS = 'text/x.typescript',
+    HTML = 'text/html',
+    JS = 'application/javascript',
+    JSON = 'application/json',
+    CSS = 'text/css',
+    WASM = 'application/wasm',
+    PNG = 'image/png',
+    JPEG = 'image/jpeg',
+    WEBP = 'image/webp',
+    AVIF = 'image/avif',
+    WEBM = 'video/webm',
+    AUDIO_MP4 = 'audio/mp4',
+    MPEG = 'audio/mpeg',
+    OGG = 'audio/ogg',
+    VIDEO_MP4 = 'video/mp4',
+    FONT_WOFF = 'application/font-woff',
+    WOFF2 = 'font/woff2',
+    TXT = 'text/plain',
+    CSV = 'text/csv',
+    XML = 'text/xml',
+    SVG = 'image/svg+xml',
+    ZIP = 'application/zip',
+    GIF = 'image/gif'
+}
 
-type MimeFileCollection = Record<MimeType, string[]>
+type MimeTypesCollection = Record<MimeType, string[]>
 
-export abstract class MIME {
-    static readonly #collection: MimeFileCollection = {
+export abstract class Mime {
+    static readonly #collection: MimeTypesCollection = {
+        [MimeType.TS]: ['.ts'],
         [MimeType.HTML]: ['.html'],
         [MimeType.JS]: ['.js'],
         [MimeType.JSON]: ['.json', '.scon'],
@@ -24,19 +49,27 @@ export abstract class MIME {
         [MimeType.CSV]: ['.csv'],
         [MimeType.XML]: ['.xml', '.scml'],
         [MimeType.SVG]: ['.svg'],
-        [MimeType.ZIP]: ['.c3p']
+        [MimeType.ZIP]: ['.c3p'],
+        [MimeType.GIF]: ['.gif']
     }
 
     static getFileType(fileName: string): MimeType | null {
         let _mimeType: MimeType | null = null;
         for (const [mimeType, extensions] of Object.entries(this.#collection)) {
             extensions.forEach(ex => {
-                if (fileName.endsWith(ex)) {
+                if (
+                    fileName.endsWith(ex) &&
+                    !fileName.endsWith('.d.ts')
+                ) {
                     _mimeType = mimeType as MimeType;
                 }
             })
         }
 
         return _mimeType;
+    }
+
+    static getCollection(): MimeTypesCollection {
+        return this.#collection;
     }
 }

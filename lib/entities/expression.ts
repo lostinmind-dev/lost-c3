@@ -1,18 +1,18 @@
-import { Entity, type EntityFuncReturnType, type EntityOptions, EntityType } from './entity.ts';
+import { Entity, type EntityOptions } from './entity.ts';
 
 /**
  * @class represents Expression entity.
  */
-export class ExpressionEntity extends Entity<EntityType.Expression> {
+export class ExpressionEntity extends Entity<'expression'> {
     readonly _opts?: IExpressionOptions;
     constructor(
         id: string,
         name: string,
         description: string,
-        func: (this: any, ...args: any[]) => EntityFuncReturnType<EntityType.Expression>,
+        func: (this: any, ...args: any[]) => void,
         opts?: IExpressionOptions
     ) {
-        super(EntityType.Expression, id, name, description, func, opts?.isDeprecated || false, '', opts?.params);
+        super('expression', id, name, description, func, opts?.isDeprecated || false, '', opts?.params);
         this._opts = opts;
     }
 }
@@ -51,22 +51,19 @@ export function Expression(
             let description: string = 'There is no any description yet...';
             let options: IExpressionOptions | undefined;
 
-            // Обработка аргументов
             if (typeof descriptionOrOpts === 'string') {
-                description = descriptionOrOpts; // Если второй аргумент строка, это описание
+                description = descriptionOrOpts;
                 if (opts && typeof opts === 'object') {
-                    options = opts; // Если передан третий аргумент, это опции
+                    options = opts;
                 }
             } else if (descriptionOrOpts && typeof descriptionOrOpts === 'object') {
-                options = descriptionOrOpts; // Если второй аргумент объект, это опции
+                options = descriptionOrOpts;
             }
 
-            // Инициализация массива выражений
             if (!this.constructor.prototype._expressions) {
                 this.constructor.prototype._expressions = [];
             }
 
-            // Добавление нового выражения
             this.constructor.prototype._expressions.push(
                 new ExpressionEntity(id, name, description, value, options)
             );

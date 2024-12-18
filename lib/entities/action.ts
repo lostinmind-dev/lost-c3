@@ -1,9 +1,9 @@
-import { Entity, type EntityFuncReturnType, type EntityOptions, EntityType } from "./entity.ts";
+import { Entity, type EntityOptions } from "./entity.ts";
 
 /**
  * @class represents Action entity.
  */
-export class ActionEntity extends Entity<EntityType.Action> {
+export class ActionEntity extends Entity<'action'> {
     readonly _opts?: IActionOptions;
 
     constructor(
@@ -11,10 +11,10 @@ export class ActionEntity extends Entity<EntityType.Action> {
         name: string,
         displayText: string,
         description: string,
-        func: (this: any, ...args: any[]) => EntityFuncReturnType<EntityType.Action>,
+        func: (this: any, ...args: any[]) => void,
         opts?: IActionOptions
     ) {
-        super(EntityType.Action, id, name, description, func, opts?.isDeprecated || false, displayText, opts?.params);
+        super('action', id, name, description, func, opts?.isDeprecated || false, displayText, opts?.params);
         this._opts = opts;
 
     }
@@ -49,22 +49,19 @@ export function Action(
             let description = 'There is no any description yet...';
             let options: IActionOptions | undefined;
 
-            // Обработка необязательных параметров
             if (typeof descriptionOrOpts === 'string') {
-                description = descriptionOrOpts; // Если третий параметр строка, это описание
+                description = descriptionOrOpts;
                 if (opts && typeof opts === 'object') {
-                    options = opts; // Четвёртый параметр — это опции
+                    options = opts;
                 }
             } else if (descriptionOrOpts && typeof descriptionOrOpts === 'object') {
-                options = descriptionOrOpts; // Если третий параметр объект, это опции
+                options = descriptionOrOpts;
             }
 
-            // Инициализация массива действий
             if (!this.constructor.prototype._actions) {
                 this.constructor.prototype._actions = [];
             }
 
-            // Добавление нового действия
             this.constructor.prototype._actions.push(
                 new ActionEntity(id, name, displayText, description, value, options)
             );

@@ -1,19 +1,11 @@
 import { bold, italic } from '../misc/text-formatting.ts';
-import type { ExpressionParamOptions, Parameter, ParamOptions } from './parameter.ts';
+import type { Parameter } from './parameter.ts';
 
-export enum EntityType {
-    Action = 'action',
-    Condition = 'condition',
-    Expression = 'expression'
-}
-
-interface EntityFuncReturnTypeMap {
-    [EntityType.Action]: void;
-    [EntityType.Condition]: boolean;
-    [EntityType.Expression]: number | string;
-}
-
-export type EntityFuncReturnType<E extends EntityType> = EntityFuncReturnTypeMap[E];
+export type EntityType =
+    | 'action'
+    | 'condition'
+    | 'expression'
+    ;
 
 export abstract class Entity<E extends EntityType> {
     readonly _type: E;
@@ -22,8 +14,8 @@ export abstract class Entity<E extends EntityType> {
     _displayText: string;
     readonly _description: string;
     readonly _params: Parameter[];
-    readonly _func: (this: any, ...args: any[]) => EntityFuncReturnType<E>;
-    
+    readonly _func: (this: any, ...args: any[]) => void;
+
     readonly _isDeprecated: boolean;
 
     constructor(
@@ -31,7 +23,7 @@ export abstract class Entity<E extends EntityType> {
         id: string,
         name: string,
         description: string,
-        func: (this: any, ...args: any[]) => EntityFuncReturnType<E>,
+        func: (this: any, ...args: any[]) => void,
         isDeprecated: boolean,
         displayText?: string,
         params?: Parameter[]
@@ -47,8 +39,8 @@ export abstract class Entity<E extends EntityType> {
         this._params = params || [];
 
         if (
-            this._type === EntityType.Action ||
-            this._type === EntityType.Condition
+            this._type === 'action' ||
+            this._type === 'condition'
         ) {
             this._checkDisplayText();
         }
@@ -75,7 +67,7 @@ export abstract class Entity<E extends EntityType> {
     private _isDisplayTextCorrect(displayText: string): boolean {
         for (let i = 0; i < this._params.length; i++) {
             if (!displayText.includes(`{${i}}`))
-            return false;
+                return false;
         }
         return true;
     }
@@ -94,7 +86,7 @@ export abstract class Entity<E extends EntityType> {
             }
         }
     }
-}  
+}
 
 /** Object represents base options for each entity type */
 export type EntityOptions = {
@@ -112,13 +104,3 @@ export type EntityOptions = {
      */
     readonly highlight?: boolean;
 }
-
-/** Map of Parameter options for evert entity type. */
-interface EntityParamOptionsMap {
-    [EntityType.Action]: ParamOptions;
-    [EntityType.Condition]: ParamOptions;
-    [EntityType.Expression]: ExpressionParamOptions;
-}
-
-/** Seperated parameter options for every entity type. */
-export type EntityParamOptions<T extends EntityType> = EntityParamOptionsMap[T];

@@ -1,18 +1,18 @@
-import { Entity, type EntityFuncReturnType, type EntityOptions, EntityType } from './entity.ts';
+import { Entity, type EntityOptions } from './entity.ts';
 /**
  * @class represents Condition entity.
  */
-export class ConditionEntity extends Entity<EntityType.Condition> {
+export class ConditionEntity extends Entity<'condition'> {
     readonly _opts?: IConditionOptions;
     constructor(
         id: string,
         name: string,
         displayText: string,
         description: string,
-        func: (this: any, ...args: any[]) => EntityFuncReturnType<EntityType.Condition>,
+        func: (this: any, ...args: any[]) => void,
         opts?: IConditionOptions
     ) {
-        super(EntityType.Condition, id, name, description, func, opts?.isDeprecated || false, displayText, opts?.params);
+        super('condition', id, name, description, func, opts?.isDeprecated || false, displayText, opts?.params);
         this._opts = opts;
     }
 }
@@ -75,14 +75,13 @@ export function Condition(
             let description = 'There is no any description yet...';
             let options: IConditionOptions | undefined;
 
-            // Обработка аргументов
             if (typeof descriptionOrOpts === 'string') {
-                description = descriptionOrOpts; // Если третий аргумент — строка, это описание
+                description = descriptionOrOpts;
                 if (opts && typeof opts === 'object') {
-                    options = opts; // Четвёртый аргумент — опции
+                    options = opts;
                 }
             } else if (descriptionOrOpts && typeof descriptionOrOpts === 'object') {
-                options = descriptionOrOpts; // Если третий аргумент — объект, это опции
+                options = descriptionOrOpts;
             }
 
             if (!this.constructor.prototype._conditions) {

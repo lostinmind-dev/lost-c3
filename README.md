@@ -3,11 +3,11 @@
 <div align="center">
   <h3>
     Lost for easy making Construct 3 Addons. <br />
-    v3.2.3
+    v4.0.0
   </h3>
 </div>
 
-**Lost** is a framework for easy making Construct 3 addons using
+**Lost** is a framework for easy making Construct 3 addons (Plugins & Behaviors) using
 **[Deno (JavaScript runtime)](https://deno.com)** that was created by
 lostinmind.
 
@@ -18,7 +18,6 @@ lostinmind.
 - **[💪 Advantages](#-advantages)**
 - **[🚀 Quickstart](#-quickstart)**
 - **[🔌 Creating ***`Plugin`*** addon](#-creating-plugin-addon)**
-- **[🎛️ Creating ***`Behavior`*** addon](#️-creating-behavior-addon)**
 - **[🏗️ Building addon](#️-building-addon)**
 - **[🧪 Testing addon](#-testing-addons-in-developer-mode)**
 
@@ -84,28 +83,29 @@ lost create --plugin    # Creates a bare-bones project for 'plugin' addon
 
 ### 🧱 File structure
 ```bash
-├── Addon/                      # Addon runtime classes folder
+├── Addon/ 
 │   ├── Categories/             # Categories folder
-│   ├── DomSide/                # Addon DOM side scripts folder
-│   ├── Files/                  # Addon files folder
-│   ├── Scripts/                # Addon scripts folder
+│   ├── Runtime/                # Addon runtime classes folder
+│       ├── Instance.ts
+│       ├── Plugin.ts
+│       └── Type.ts
+│   ├── Editor/                 # Addon editor classes folder
+│       ├── Instance.ts
+│       └── Type.ts
 │   ├── Modules/                # Addon modules folder
-│   ├── Types/                  # Addon scripts folder
-│       └── global.d.ts         # Declaration file for your purposes
-│   ├── icon.svg                # Your .svg OR .png addon icon
-│   ├── Instance.ts             # Addon runtime Instance class
-│   ├── Plugin.ts               # Addon runtime Plugin class
-│   └── Type.ts                 # Addon runtime Type class
-├── Builds/                     # Builds folder
+│   ├── Scripts/                # Addon scripts folder
+│   └── Files/                  # Addon files folder
+├── Builds/
 │   ├── Source/                 # Final Construct 3 addon folder
 │       └── ...
 │   └── AddonId_Version.c3addon # Final .c3addon file
-├── Editor/                     # Builds folder
-│   ├── Instance.ts             # Editor Instance class
-│   └── Type.ts                 # Editor Type class
+├── Types/
+│   ├── construct.d.ts
+│   └── properties.d.ts
+├── icon.svg                    # Your '.svg' OR '.png' addon icon
 ├── deno.json                   # deno.json file for Deno enviroment
 ├── addon.ts                    # Main addon file
-├── lost.config.ts              # Addon config file
+├── lost.config.ts              # Lost config file
 ```
 
 ### ⚙️ Config setup
@@ -114,7 +114,7 @@ Let's setup _`lost.config.ts`_ config file at first.
 ```typescript
 import { defineConfig } from "jsr:@lost-c3/lib";
 
-export default defineConfig<'plugin'>({
+export default defineConfig({
     /**
      * Set addon type
      */
@@ -158,9 +158,7 @@ export default defineConfig<'plugin'>({
     author: 'lostinmind.',
     websiteUrl: `https://addon.com`,
     docsUrl: `https://docs.addon.com`,
-    helpUrl: {
-        EN: 'https://myaddon.com/help/en'
-    }
+    helpUrl: 'https://myaddon.com/help/en'
 })
 ```
 
@@ -169,17 +167,13 @@ Let's setup _`addon.ts`_ file at second.
 
 ```typescript
 import { defineAddon, Plugin, Property } from 'jsr:@lost-c3/lib';
-import type { EditorInstance } from "@Editor/Instance.ts";
-import type { EditorType } from "@Editor/Type.ts";
 import config from "./lost.config.ts";
 
 export default defineAddon(
-    new Plugin<EditorInstance, EditorType>(config)
-        .addFilesToOutput()
-
+    new Plugin<'object'>(config)
         .setRuntimeScripts()
 
-        .addRemoteScripts('https://cdn/index.js')
+        .setRemoteScripts('https://cdn/index.js')
 
         /** @Properties  */
         .addProperty('integer', 'Integer', { type: Property.Integer })
@@ -193,7 +187,10 @@ export default defineAddon(
             type: Property.Combo,
             items: [['item1', 'item2']]
         })
-        .addProperty('color', 'Color', { type: Property.Color, initialValue: [255, 210, 155] })
+        .addProperty('color', 'Color', { 
+            type: Property.Color,
+            initialValue: [255, 210, 155]
+        })
         .createGroup('group', 'Awesome Group')
             .addProperty('info', 'Info', {
                 type: Property.Info,
@@ -569,18 +566,16 @@ To use any script you should copy OR create _**script.js**_ OR _**script.ts**_ f
 
 > [!NOTE]
 > If you want to load your script with type **external-runtime-script**, you
-> should call `setRuntimeScripts(path)` in your Addon object in _**`addon.ts`**_ file.
+> should configure it with `setRuntimeScripts()` method in your Addon object in _**`addon.ts`**_ file.
 
 *Example*
 
 ```typescript
 import { Plugin, Property } from 'jsr:@lost-c3/lib';
-import type { EditorInstance } from "@Editor/Instance.ts";
-import type { EditorType } from "@Editor/Type.ts";
 import config from "./lost.config.ts";
 
 export default defineAddon(
-    new Plugin<EditorInstance, EditorType>(config)
+    new Plugin<'object'>(config)
         .setRuntimeScripts('myscript1.ts', 'main/myscript.ts')
 )
 ```

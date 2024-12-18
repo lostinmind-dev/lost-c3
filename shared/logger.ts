@@ -2,7 +2,7 @@
 import { Colors } from "../deps.ts";
 
 export abstract class Logger {
-    private static readonly DefaultLineLength = 20;
+    static readonly #DefaultLineLength = 20;
     
     static Line(length?: number) {
         const line = this.GetLineString(length);
@@ -10,7 +10,7 @@ export abstract class Logger {
     };
 
     static GetLineString(length?: number) {
-        const enteredLenght = (length) ? length : this.DefaultLineLength;
+        const enteredLenght = (length) ? length : this.#DefaultLineLength;
         let line = '';
         for (let i = 0; i < enteredLenght; i++) {
             line += '----'
@@ -66,38 +66,13 @@ export abstract class Logger {
         })
     };
 
-    static Error(step: 'build' | 'serve' | 'cli' | 'bundle', errorMessage: string, ...data: any[]) {
+    static Error(type: 'serve' |'build' | 'cli' | 'bundle', errorMessage: string, ...data: any[]) {
         this.Line();
-        switch (step) {
-            case 'cli':
-                console.log('⛔', Colors.bold(Colors.red('Lost CLI error.')));
-                this.Info(Colors.italic(errorMessage));
-                data.forEach(entry => {
-                    this.Info(entry)
-                })
-                break;
-            case 'build':
-                console.log('⛔', Colors.bold(Colors.red('Addon build error.')));
-                this.Info(Colors.italic(errorMessage));
-                data.forEach(entry => {
-                    this.Info(entry)
-                })
-                break;
-            case 'serve':
-                console.log('⛔', Colors.bold(Colors.red('Lost serve error.')));
-                this.Info(Colors.italic(errorMessage));
-                data.forEach(entry => {
-                    this.Info(entry)
-                })
-                break;
-            case 'bundle':
-                console.log('⛔', Colors.bold(Colors.red('Lost bundle error.')));
-                this.Info(Colors.italic(errorMessage));
-                data.forEach(entry => {
-                    this.Info(entry)
-                })
-                break;
-        }
+        console.log('⛔', Colors.bold(Colors.red(`Lost [${type}] error.`)));
+        this.Info(Colors.italic(errorMessage));
+        data.forEach(entry => {
+            this.Info(entry)
+        })
         this.Line();
     };
 

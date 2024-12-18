@@ -1,24 +1,20 @@
 import { Md5 } from "../../deps.ts";
-import { Paths } from "../../shared/paths.ts";
-import { Addon } from "../addon.ts";
-import type { EntityParamOptions, EntityType } from './entity.ts';
-
+import { Addon } from "../addon/index.ts";
 
 /**
  * @class represents ACE's parameter info.
  */
-export class Parameter<E extends EntityType = EntityType> {
-    static addonId: string = '';
+export class Parameter {
     readonly _id: string;
     readonly _name: string;
     readonly _description: string;
-    readonly _opts: EntityParamOptions<E>;
-    
+    readonly _opts: ParameterOptions;
+
     constructor(
         id: string,
         name: string,
         description: string,
-        opts: EntityParamOptions<E>
+        opts: ParameterOptions
     ) {
         this._id = id;
         this._name = name;
@@ -27,10 +23,8 @@ export class Parameter<E extends EntityType = EntityType> {
 
         if (opts.type === Param.String) {
             if (opts.autocompleteId) {
-                (async () => {
-                    const hash = Md5.hashStr(Parameter.addonId + opts.autocompleteId);
-                    opts.autocompleteId = hash;
-                })()
+                const hash = Md5.hashStr(Addon.config.addonId + opts.autocompleteId);
+                opts.autocompleteId = hash;
             }
         }
         if (opts.type === Param.Combo) {
@@ -67,44 +61,38 @@ export enum Param {
 }
 
 /** All available ACE's parameter options  */
-export type ParamOptions = 
-    | NumberParam
-    | StringParam
-    | AnyParam
-    | BooleanParam
-    | ComboParam
-    | CmpParam
-    | ObjectParam
-    | ObjectNameParam
-    | LayerParam
-    | LayoutParam
-    | KeybParam
-    | InstanceVarParam
-    | InstanceVarBoolParam
-    | EventVarParam
-    | EventVarBoolParam
-    | AnimationParam
-    | ObjInstanceVarParam
-;
+export type ParameterOptions =
+    | INumberParameter
+    | IStringParameter
+    | IAnyParameter
+    | IBooleanParameter
+    | IComboParameter
+    | ICmpParameter
+    | IObjectParameter
+    | IObjectNameParameter
+    | ILayerParameter
+    | ILayoutParameter
+    | IKeybParameter
+    | IInstanceVarParameter
+    | IInstanceVarBoolParameter
+    | IEventVarParameter
+    | IEventVarBoolParameter
+    | IAnimationParameter
+    | IObjInstanceVarParameter
+    ;
 
-/** All available expression parameter options  */
-export type ExpressionParamOptions = 
-    NumberParam |
-    StringParam |
-    AnyParam
-;
 
 /** Base properties for any ACE's parameter. */
-type ParamOptionsBase = {
+type ParameterBase = {
     /**
      * Type of parameter.
      */
-    type: Param;
+    readonly type: Param;
 }
 
 /** Object represents 'number' parameter */
-interface NumberParam extends ParamOptionsBase {
-    type: Param.Number;
+interface INumberParameter extends ParameterBase {
+    readonly type: Param.Number;
     /**
      * *Optional*. A number parameter
      */
@@ -112,8 +100,8 @@ interface NumberParam extends ParamOptionsBase {
 }
 
 /** Object represents 'string' parameter */
-interface StringParam extends ParamOptionsBase {
-    type: Param.String;
+interface IStringParameter extends ParameterBase {
+    readonly type: Param.String;
     /**
      * *Optional*. A string parameter.
      */
@@ -125,8 +113,8 @@ interface StringParam extends ParamOptionsBase {
 }
 
 /** Object represents 'any' parameter */
-interface AnyParam extends ParamOptionsBase {
-    type: Param.Any;
+interface IAnyParameter extends ParameterBase {
+    readonly type: Param.Any;
     /**
      * *Optional*. Either a number or a string.
      */
@@ -134,8 +122,8 @@ interface AnyParam extends ParamOptionsBase {
 }
 
 /** Object represents 'boolean' parameter */
-interface BooleanParam extends ParamOptionsBase {
-    type: Param.Boolean;
+interface IBooleanParameter extends ParameterBase {
+    readonly type: Param.Boolean;
     /**
      * *Optional*. A boolean parameter, displayed as a checkbox
      */
@@ -143,13 +131,13 @@ interface BooleanParam extends ParamOptionsBase {
 }
 
 /** Object represents 'combo' parameter */
-interface ComboParam extends ParamOptionsBase {
-    type: Param.Combo;
+interface IComboParameter extends ParameterBase {
+    readonly type: Param.Combo;
     /**
      * Must be used to specify the available items.
      * @example [["item_one", "Item 1"], ["item_two", "Item 2"]]
      */
-    items: [string, string][];
+    readonly items: [string, string][];
     /**
      * *Optional*. A dropdown list. Items must be specified with the "items" property.
      */
@@ -157,107 +145,107 @@ interface ComboParam extends ParamOptionsBase {
 }
 
 /** Object represents 'cmp' parameter */
-interface CmpParam extends ParamOptionsBase {
+interface ICmpParameter extends ParameterBase {
     /**
      * A dropdown list with comparison options like "equal to", "less than" etc.
      */
-    type: Param.Cmp;
+    readonly type: Param.Cmp;
 }
 
 /** Object represents 'object' parameter */
-interface ObjectParam extends ParamOptionsBase {
+interface IObjectParameter extends ParameterBase {
     /**
      * An object picker.
      * @description The types of plugin to show can be filtered using an optional "allowedPluginIds" property.
      */
-    type: Param.Object;
+    readonly type: Param.Object;
     /**
      * *Optional*. An array of plugin IDs allowed to be shown by the object picker.
      * @description For example, use ["Sprite"] to only allow the object parameter to select a Sprite.
      * @example ["Sprite"]
      */
-    allowedPluginIds?: string[];
+    readonly allowedPluginIds?: string[];
 }
 
 /** Object represents 'objectname' parameter */
-interface ObjectNameParam extends ParamOptionsBase {
+interface IObjectNameParameter extends ParameterBase {
     /**
      * A string parameter which is interpreted as an object name
      */
-    type: Param.ObjectName;
+    readonly type: Param.ObjectName;
 }
 
 /** Object represents 'layer' parameter */
-interface LayerParam extends ParamOptionsBase {
+interface ILayerParameter extends ParameterBase {
     /**
      * A string parameter which is interpreted as a layer name
      */
-    type: Param.Layer;
+    readonly type: Param.Layer;
 }
 
 /** Object represents 'layout' parameter */
-interface LayoutParam extends ParamOptionsBase {
+interface ILayoutParameter extends ParameterBase {
     /**
      * A dropdown list with every layout in the project
      */
-    type: Param.Layout;
+    readonly type: Param.Layout;
 }
 
 /** Object represents 'keyb' parameter */
-interface KeybParam extends ParamOptionsBase {
+interface IKeybParameter extends ParameterBase {
     /**
      * A keyboard key picker
      */
-    type: Param.Keyb;
+    readonly type: Param.Keyb;
 }
 
 /** Object represents 'instancevar' parameter */
-interface InstanceVarParam extends ParamOptionsBase {
+interface IInstanceVarParameter extends ParameterBase {
     /**
      * A dropdown list with the non-boolean instance variables the object has
      */
-    type: Param.InstanceVar;
+    readonly type: Param.InstanceVar;
 }
 
 /** Object represents 'instancevarbool' parameter */
-interface InstanceVarBoolParam extends ParamOptionsBase {
+interface IInstanceVarBoolParameter extends ParameterBase {
     /**
      * A dropdown list with the boolean instance variables the object has
      */
-    type: Param.InstanceVarBool;
+    readonly type: Param.InstanceVarBool;
 }
 
 /** Object represents 'eventvar' parameter */
-interface EventVarParam extends ParamOptionsBase {
+interface IEventVarParameter extends ParameterBase {
     /**
      * A dropdown list with non-boolean event variables in scope
      */
-    type: Param.EventVar;
+    readonly type: Param.EventVar;
 }
 
 /** Object represents 'eventvarbool' parameter */
-interface EventVarBoolParam extends ParamOptionsBase {
+interface IEventVarBoolParameter extends ParameterBase {
     /**
      * A dropdown list with boolean event variables in scope
      */
-    type: Param.EventVarBool;
+    readonly type: Param.EventVarBool;
 }
 
 /** Object represents 'animation' parameter */
-interface AnimationParam extends ParamOptionsBase {
+interface IAnimationParameter extends ParameterBase {
     /**
      * A string parameter which is interpreted as an animation name in the object
      */
-    type: Param.Animation;
+    readonly type: Param.Animation;
 }
 
 /** Object represents 'objinstancevar' parameter */
-interface ObjInstanceVarParam extends ParamOptionsBase {
+interface IObjInstanceVarParameter extends ParameterBase {
     /**
      * A dropdown list with non-boolean instance variables available in a prior 'object' parameter.
      * @requires An Param.Object type parameter.
      */
-    type: Param.ObjInstanceVar;
+    readonly type: Param.ObjInstanceVar;
 }
 
 /**
@@ -266,7 +254,7 @@ interface ObjInstanceVarParam extends ParamOptionsBase {
  * @param name The name that appears in the action/condition/expression parameters dialog.
  * @param opts Parameter options.
  */
-export function addParam(id: string, name: string, opts: EntityParamOptions<EntityType>): Parameter;
+export function addParam(id: string, name: string, opts: ParameterOptions): Parameter;
 /**
  * Adds parameter to action/condition/expression entity.
  * @param id The unique identifier for the parameter.
@@ -274,7 +262,7 @@ export function addParam(id: string, name: string, opts: EntityParamOptions<Enti
  * @param description Optional. The parameter description.
  * @param opts Parameter options.
  */
-export function addParam(id: string, name: string, description: string, opts: EntityParamOptions<EntityType>): Parameter;
+export function addParam(id: string, name: string, description: string, opts: ParameterOptions): Parameter;
 /**
  * Adds parameter to action/condition/expression entity.
  * @param id The unique identifier for the parameter.
@@ -285,11 +273,11 @@ export function addParam(id: string, name: string, description: string, opts: En
 export function addParam(
     id: string,
     name: string,
-    descriptionOrOpts: string | EntityParamOptions<EntityType>,
-    opts?: EntityParamOptions<EntityType>
+    descriptionOrOpts: string | ParameterOptions,
+    opts?: ParameterOptions
 ): Parameter {
     let description: string = 'There is no any description yet...';
-    let options: EntityParamOptions<EntityType>;
+    let options: ParameterOptions;
 
     if (typeof descriptionOrOpts === 'string' && opts) {
         // Если переданы описание и опции

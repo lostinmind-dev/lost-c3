@@ -1,6 +1,5 @@
-import { AddonPluginType, AddonType } from "../config.ts";
-
 export enum Property {
+    /** Parameter dewsc */
     Integer = 'integer',
     Float = 'float',
     Percent = 'percent',
@@ -17,21 +16,19 @@ export enum Property {
     // ProjectFile = 'projectfile'
 }
 
-export class PluginProperty<A, P, I, T> {
-    readonly _id: string;
-    readonly _name: string;
-    readonly _description: string;
-    readonly _opts: AddonProperty<A, P, I, T>;
+export class PluginProperty<
+    A = any,
+    P = any,
+    I = any,
+    T = any
+> {
 
     constructor(
         readonly id: string,
         readonly name: string,
         readonly description: string,
-        readonly opts: AddonProperty<A, P, I, T>
+        readonly opts: AddonPropertyOptions<A, P, I, T>
     ) {
-        this._id = id;
-        this._name = name;
-        this._description = description;
 
         if (
             opts.type === Property.Link
@@ -46,8 +43,6 @@ export class PluginProperty<A, P, I, T> {
                 opts.initialValue = this.#normalizeRgb(opts.initialValue);
             }
         }
-
-        this._opts = opts;
     }
 
     #normalizeRgb(rgb: [number, number, number]): [number, number, number] {
@@ -61,68 +56,70 @@ export class PluginProperty<A, P, I, T> {
     }
 }
 
-export type AddonProperty<A, P, I, T> =
-    A extends 'plugin' ? PluginPropertyType<P, I, T> :
-    A extends 'behavior' ? BehaviorPropertyType : never
-;
+export type AddonPropertyOptions<
+    A = any,
+    P = any,
+    I = any,
+    T = any
+> =
+    A extends 'plugin' ? PluginPropertyOptions<P, I, T> :
+    A extends 'behavior' ? BehaviorPropertyOptions : never
+    ;
 
-export type PluginPropertyType<P, I, T> =
-    P extends 'object' ? ObjectPluginProperty<I, T> :
-    P extends 'world' ? WorldPluginProperty<I, T> : never
-;
 
-export type BehaviorPropertyType =
-    | IIntegerProperty
-    | IFloatProperty
-    | IPercentProperty
-    | ITextProperty
-    | ILongTextProperty
-    | ICheckProperty
-    | IFontProperty
-    | IComboProperty
-    | IColorProperty
-    | IObjectProperty
-    | IGroupProperty
-;
+export type PluginPropertyOptions<P, I, T> =
+    P extends 'object' ? ObjectPluginPropertyOptions<I, T> :
+    P extends 'world' ? WorldPluginPropertyOptions<I, T> : never
+    ;
 
-type ObjectPluginProperty<I, T> =
-    | IIntegerProperty
-    | IFloatProperty
-    | IPercentProperty
-    | ITextProperty
-    | ILongTextProperty
-    | ICheckProperty
-    | IFontProperty
-    | IComboProperty
-    | IColorProperty
-    | IObjectProperty
-    | IGroupProperty
-    | IInfoProperty<I>
-    | ILinkPropertyOnceForType<T>
-;
+export type BehaviorPropertyOptions =
+    | IntegerPropertyOptions
+    | FloatPropertyOptions
+    | PercentPropertyOptions
+    | TextPropertyOptions
+    | LongTextPropertyOptions
+    | CheckPropertyOptions
+    | FontPropertyOptions
+    | ComboPropertyOptions
+    | ColorPropertyOptions
+    | ObjectPropertyOptions
+    | GroupPropertyOptions
+    ;
 
-type WorldPluginProperty<I, T> =
-    | IIntegerProperty
-    | IFloatProperty
-    | IPercentProperty
-    | ITextProperty
-    | ILongTextProperty
-    | ICheckProperty
-    | IFontProperty
-    | IComboProperty
-    | IColorProperty
-    | IObjectProperty
-    | IGroupProperty
-    | IInfoProperty<I>
-    | ILinkPropertyForEachInstance<I>
-    | ILinkPropertyOnceForType<T>
-;
+type ObjectPluginPropertyOptions<I, T> =
+    | IntegerPropertyOptions
+    | FloatPropertyOptions
+    | PercentPropertyOptions
+    | TextPropertyOptions
+    | LongTextPropertyOptions
+    | CheckPropertyOptions
+    | FontPropertyOptions
+    | ComboPropertyOptions
+    | ColorPropertyOptions
+    | ObjectPropertyOptions
+    | GroupPropertyOptions
+    | InfoPropertyOptions<I>
+    | LinkPropertyOnceForTypeOptions<T>
+    ;
 
-type PropertyBase = {
-    readonly type: Property;
-}
+type WorldPluginPropertyOptions<I, T> =
+    | IntegerPropertyOptions
+    | FloatPropertyOptions
+    | PercentPropertyOptions
+    | TextPropertyOptions
+    | LongTextPropertyOptions
+    | CheckPropertyOptions
+    | FontPropertyOptions
+    | ComboPropertyOptions
+    | ColorPropertyOptions
+    | ObjectPropertyOptions
+    | GroupPropertyOptions
+    | InfoPropertyOptions<I>
+    | LinkPropertyForEachInstance<I>
+    | LinkPropertyOnceForTypeOptions<T>
+    ;
 
-interface IIntegerProperty extends PropertyBase {
+type IntegerPropertyOptions = {
     readonly type: Property.Integer;
     /**
      * *Optional*. An integer number property, always rounded to a whole number.
@@ -139,7 +136,7 @@ interface IIntegerProperty extends PropertyBase {
 }
 
 /** Object represents 'float' plugin property */
-interface IFloatProperty extends PropertyBase {
+type FloatPropertyOptions = {
     readonly type: Property.Float;
     /**
      * *Optional*. A floating-point number property.
@@ -156,7 +153,7 @@ interface IFloatProperty extends PropertyBase {
 }
 
 /** Object represents 'percent' plugin property */
-interface IPercentProperty extends PropertyBase {
+type PercentPropertyOptions = {
     readonly type: Property.Percent;
     /**
      * *Optional*. A floating-point number in the range **[0-1]** represented as a percentage.
@@ -166,7 +163,7 @@ interface IPercentProperty extends PropertyBase {
 }
 
 /** Object represents 'text' plugin property */
-interface ITextProperty extends PropertyBase {
+type TextPropertyOptions = {
     readonly type: Property.Text;
     /**
      * *Optional*. A field the user can enter a string in to.
@@ -175,7 +172,7 @@ interface ITextProperty extends PropertyBase {
 }
 
 /** Object represents 'longtext' plugin property */
-interface ILongTextProperty extends PropertyBase {
+type LongTextPropertyOptions = {
     readonly type: Property.LongText;
     /**
      * *Optional*. The same as "text", but a button with an ellipsis ("...") appears on the right side of the field.
@@ -186,7 +183,7 @@ interface ILongTextProperty extends PropertyBase {
 }
 
 /** Object represents 'check' plugin property */
-interface ICheckProperty extends PropertyBase {
+type CheckPropertyOptions = {
     readonly type: Property.Checkbox;
     /**
      * *Optional*. A checkbox property.
@@ -195,7 +192,7 @@ interface ICheckProperty extends PropertyBase {
 }
 
 /** Object represents 'font' plugin property */
-interface IFontProperty extends PropertyBase {
+type FontPropertyOptions = {
     readonly type: Property.Font;
     /**
      * A field which displays the name of a font and provides a button to open a font picker dialog.
@@ -205,7 +202,7 @@ interface IFontProperty extends PropertyBase {
 }
 
 /** Object represents 'combo' plugin property */
-interface IComboProperty extends PropertyBase {
+type ComboPropertyOptions = {
     readonly type: Property.Combo;
     /**
      * Must be used to specify the available items.
@@ -221,7 +218,7 @@ interface IComboProperty extends PropertyBase {
 }
 
 /** Object represents 'color' plugin property */
-interface IColorProperty extends PropertyBase {
+type ColorPropertyOptions = {
     readonly type: Property.Color;
     /**
      * *Optional*. A color picker property.
@@ -232,7 +229,7 @@ interface IColorProperty extends PropertyBase {
 }
 
 /** Object represents 'object' plugin property */
-interface IObjectProperty extends PropertyBase {
+type ObjectPropertyOptions = {
     readonly type: Property.Object;
     /**
      * *Optional*. An object picker property allowing the user to pick an object class. 
@@ -244,7 +241,7 @@ interface IObjectProperty extends PropertyBase {
 }
 
 /** Object represents 'group' plugin property */
-interface IGroupProperty extends PropertyBase {
+type GroupPropertyOptions = {
     /**
      * Creates a new group in the Properties Bar.
      */
@@ -252,7 +249,7 @@ interface IGroupProperty extends PropertyBase {
 }
 
 /** Object represents 'info' plugin property */
-interface IInfoProperty<I> extends PropertyBase {
+type InfoPropertyOptions<I> = {
     readonly type: Property.Info;
     /**
      * Creates a read-only string that cannot be edited.
@@ -261,7 +258,7 @@ interface IInfoProperty<I> extends PropertyBase {
 }
 
 /** Object represents 'link' plugin property with 'for-each-instance' callback type */
-interface ILinkPropertyForEachInstance<I> extends PropertyBase {
+type LinkPropertyForEachInstance<I> = {
     readonly type: Property.Link;
     /**
      * Specifies how the link callback function is used.
@@ -277,7 +274,7 @@ interface ILinkPropertyForEachInstance<I> extends PropertyBase {
 }
 
 /** Object represents 'link' plugin property with 'once-for-type' callback type */
-interface ILinkPropertyOnceForType<T> extends PropertyBase {
+type LinkPropertyOnceForTypeOptions<T> = {
     readonly type: Property.Link;
     /**
      * Specifies how the link callback function is used.
