@@ -14,7 +14,6 @@ type StartOptions = {
 export abstract class AddonBuilder {
     static isBuildError: boolean = false;
     static isBuilding: boolean = false;
-    static Addon: typeof Addon;
 
     /** Starts build system */
     static async start(opts?: StartOptions) {
@@ -24,21 +23,25 @@ export abstract class AddonBuilder {
             Logger.Clear();
 
             try {
+                // await (new Deno.Command('deno', {
+                //     args: ['run', `${Paths.AddonModuleFile}`]
+                // }).output())
                 await import(`${Paths.AddonModuleFile}?t=${Date.now()}`);
-                // await import(`${Paths.LostConfigFile}?t=${Date.now()}`);
             } catch (_e) {
                 Logger.Error('build', `Main addon module file ${Colors.bold(Colors.dim(ProjectPaths.AddonModuleFile))} not found!`);
                 Deno.exit(1);
             }
 
-            this.Addon = await Addon.load();
-            
+            await Addon.load();
+
+            // console.log(Addon)
+
             Paths.updateBuildPath(
-                `${this.Addon.config.addonId}_${this.Addon.config.version}`
+                `${Addon.config.addonId}_${Addon.config.version}`
             );
             
             if (!this.isBuildError) {
-                await LostProject.checkAddonBaseExists(this.Addon.config.type);
+                await LostProject.checkAddonBaseExists(Addon.config.type);
 
                 await AddonFileManager.clear();
 
@@ -51,7 +54,7 @@ export abstract class AddonBuilder {
 
                 const elapsedTime = (performance.now()) - startTime;
                 Logger.LogBetweenLines(
-                    '✅', `Addon [${Colors.yellow(this.Addon.config.addonId)}] has been ${Colors.green('successfully')} built`,
+                    '✅', `Addon [${Colors.yellow(Addon.config.addonId)}] has been ${Colors.green('successfully')} built`,
                     '\n⏱️ ', `Addon build time: ${Colors.bold(Colors.yellow(String(elapsedTime.toFixed(2))))} ms!`
                 );
 
@@ -84,17 +87,17 @@ export abstract class AddonBuilder {
         await AddonFileManager.createEditorScript('instance.js');
 
 
-        if (this.Addon.config.type === 'plugin') {
+        if (Addon.config.type === 'plugin') {
             await AddonFileManager.createEditorScript('plugin.js');
             await AddonFileManager.createRuntimeScript('plugin.js');
         }
 
-        if (this.Addon.config.type === 'behavior') {
+        if (Addon.config.type === 'behavior') {
             await AddonFileManager.createEditorScript('behavior.js');
             await AddonFileManager.createRuntimeScript('behavior.js');
         }
 
-        if (this.Addon.filesCollection.modules.length > 0) {
+        if (Addon.filesCollection.modules.length > 0) {
             await AddonFileManager.createRuntimeScript('main.js');
         }
 
@@ -111,9 +114,9 @@ export abstract class AddonBuilder {
 
     /** Creates all user files */
     static async #createUserFiles() {
-        const files = this.Addon.filesCollection.files;
-        const modules = this.Addon.filesCollection.modules;
-        const scripts = this.Addon.filesCollection.scripts;
+        const files = Addon.filesCollection.files;
+        const modules = Addon.filesCollection.modules;
+        const scripts = Addon.filesCollection.scripts;
 
         for await (const file of files) {
             if (file.localPath && file.localName) {
@@ -154,7 +157,7 @@ export abstract class AddonBuilder {
             Color = '[number, number, number]',
             Unknown = 'unknown'
         }
-        const properties = this.Addon.properties;
+        const properties = Addon.properties;
 
         if (properties.length > 0) {
             let content = `declare type PluginProperties = [`;

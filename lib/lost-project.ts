@@ -80,7 +80,6 @@ export abstract class LostProject {
 
     /** Starting addon build */
     static async build() {
-
         if (!this.buildOptions.watch) {
             await AddonBuilder.start();
             await AddonFileManager.createZip();

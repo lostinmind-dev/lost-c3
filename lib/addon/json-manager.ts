@@ -26,9 +26,9 @@ export abstract class AddonMetadataManager {
 
     static async create(): Promise<string> {
         const config = Addon.config;
-        const editorScripts = await AddonFileManager.getEditorScriptsList();
+        const editorScripts = AddonFileManager.getEditorScriptsList();
         const fileList = await AddonFileManager.getFilesList();
-
+        
         const json: AddonJSON = {
             "supports-worker-mode": (config.supportWorkerMode) ? config.supportWorkerMode : undefined,
             "min-construct-version": (config.minConstructVersion) ? config.minConstructVersion : undefined,
@@ -221,6 +221,7 @@ export abstract class LanguageManager {
         const categories = Addon.categories;
         const properties = Addon.properties;
         const config = Addon.config;
+
         const json: LanguageJSON = {
             "languageTag": 'en-US',
             "fileDescription": `Strings for ${config.addonName} addon.`,

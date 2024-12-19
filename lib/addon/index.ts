@@ -38,34 +38,49 @@ type EditorScriptsType =
     ;
 export abstract class Addon<A extends AddonType = any, P = any> {
 
-    static config: LostConfig;
-    static categories: ICategory[];
-    static properties: PluginProperty[];
-    static filesCollection: AddonFilesCollection;
-    static remoteScripts: Set<RemoteScript>;
-    static runtimeScripts: Set<RuntimeScript>;
+    static config: LostConfig = {} as LostConfig;
+    static categories: ICategory[] = [];
+    static properties: PluginProperty[] = [];
+    static filesCollection: AddonFilesCollection = {
+        icon: {} as AddonFile<'icon'>,
+        defaultImage: null,
+        scripts: [],
+        modules: [],
+        files: []
+    };
+    static remoteScripts: Set<RemoteScript> = new Set();
+    static runtimeScripts: Set<RuntimeScript> = new Set();
     static editorScripts: {
         modules: EditorScriptsType,
         scripts: EditorScriptsType
+    } = {
+        modules: null,
+        scripts: null
     };
 
     constructor(config: LostConfig) {
+        Addon.#reset();
         Addon.config = config;
-        Addon.categories = [];
-        Addon.properties = [];
-        Addon.remoteScripts = new Set();
-        Addon.runtimeScripts = new Set();
-        Addon.editorScripts = {
-            modules: null,
-            scripts: null
-        };
-        Addon.filesCollection = {
+    }
+
+    static #reset() {
+        this.config = {} as LostConfig;
+        
+        this.categories = [];
+        this.properties = [];
+        this.filesCollection = {
             icon: {} as AddonFile<'icon'>,
             defaultImage: null,
             scripts: [],
             modules: [],
             files: []
-        };
+        }
+        this.remoteScripts = new Set();
+        this.runtimeScripts = new Set();
+        this.editorScripts = {
+            modules: null,
+            scripts: null
+        }
     }
 
     /**
@@ -968,4 +983,5 @@ export abstract class Addon<A extends AddonType = any, P = any> {
 
         return data;
     }
+
 }

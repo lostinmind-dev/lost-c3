@@ -83,23 +83,23 @@ lost create --plugin    # Creates a bare-bones project for 'plugin' addon
 
 ### 🧱 File structure
 ```bash
-├── Addon/ 
-│   ├── Categories/             # Categories folder
-│   ├── Runtime/                # Addon runtime classes folder
+├── addon/ 
+│   ├── categories/             # Categories folder
+│   ├── runtime/                # Addon runtime classes folder
+│       ├── instance.ts
+│       ├── plugin.ts
+│       └── type.ts
+│   ├── editor/                 # Addon editor classes folder
 │       ├── Instance.ts
-│       ├── Plugin.ts
 │       └── Type.ts
-│   ├── Editor/                 # Addon editor classes folder
-│       ├── Instance.ts
-│       └── Type.ts
-│   ├── Modules/                # Addon modules folder
-│   ├── Scripts/                # Addon scripts folder
-│   └── Files/                  # Addon files folder
-├── Builds/
-│   ├── Source/                 # Final Construct 3 addon folder
+│   ├── modules/                # Addon modules folder
+│   ├── scripts/                # Addon scripts folder
+│   └── files/                  # Addon files folder
+├── builds/
+│   ├── source/                 # Final Construct 3 addon folder
 │       └── ...
 │   └── AddonId_Version.c3addon # Final .c3addon file
-├── Types/
+├── types/
 │   ├── construct.d.ts
 │   └── properties.d.ts
 ├── icon.svg                    # Your '.svg' OR '.png' addon icon
