@@ -15,7 +15,7 @@ type TreeName =
 
 
 export abstract class Links {
-    static readonly #tree: TreeName = 'master'
+    static readonly #tree: TreeName = '4.0.0'
     static readonly PayPal = 'https://www.paypal.com/paypalme/daklnn';
     static readonly Boosty = ''
     static readonly GitHub = 'https://github.com/lostinmind-dev/lost-c3';
