@@ -18,7 +18,7 @@ export { Condition } from './lib/entities/condition.ts';
 export { Expression } from './lib/entities/expression.ts';
 export { 
     addParam, 
-    Param 
+    Param as Parameter
 } from './lib/entities/parameter.ts';
 
 /**

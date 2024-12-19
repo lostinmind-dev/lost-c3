@@ -10,39 +10,75 @@ import { dedent } from "./shared/misc.ts";
 abstract class LostHelper {
 
     static printHelp() {
-        Logger.Info(Colors.bold('Usage: lost <command> [options]'));
+        Logger.Clear();
+        /** */ Logger.Line();
+
+        Logger.Log(
+            `Usage: ${Colors.italic('lost')} ${Colors.yellow('<command>')} ${Colors.bold('[options]')}`
+        );
 
         Logger.Log('✅', Colors.bold("Valid commands:"));
-        Logger.Log(`  ${Colors.yellow('version')}`);
+
+        Logger.Log(
+            `  ${Colors.yellow('version')}`,
+            Colors.italic('   Prints information about current installed Lost CLI.')
+        );
+
+        /** */ Logger.Line();
 
         Logger.Log(`  ${Colors.yellow('create')}`);
         this.printCreate();
 
-        Logger.Log(`  ${Colors.yellow('bundle')}`, Colors.italic('   Runs creating bundle for NPM package.'));
+        /** */ Logger.Line();
+
+        Logger.Log(
+            `  ${Colors.yellow('bundle')}`,
+            Colors.italic('   Runs bundling NPM package.')
+        );
         this.printBundle();
+
+        /** */ Logger.Line();
 
         Logger.Log(`  ${Colors.yellow('build')}`);
         this.printBuild();
-        Logger.Log(`  ${Colors.yellow('serve')}`);
+
+        /** */ Logger.Line();
+
+        Logger.Log(`  ${Colors.yellow('clear-builds')}`);
+        this.printClearBuilds();
+
+        /** */ Logger.Line();
+
+        Logger.Log(
+            `  ${Colors.yellow('serve')}`,
+            Colors.italic('   Runs addon web server with entered OR default port (65432)')
+        );
         this.printServe();
 
-        Logger.Log(`  ${Colors.yellow('update')}`, Colors.italic('   Updates Lost files.'));
+        /** */ Logger.Line();
+
+        Logger.Log(`  ${Colors.yellow('update')}`);
         this.printUpdate();
     }
 
     static printVersion() {
         Logger.LogBetweenLines(dedent`
-        👾 ${Colors.bold(`Lost ➜  ${Colors.yellow(DenoJSON.version)} by ${Colors.italic(Colors.magenta('lostinmind.'))}`)}
-        ${Logger.GetLineString()}
-        🌐 ${Colors.bold(`[GitHub] ${Links.GitHub}`)}
-        🌐 ${Colors.bold(`[JSR] ${Links.JSR}`)}
-        💵 ${Colors.bold(`[Support project] ${Links.PayPal}`)}
-    `)
+            👾 ${Colors.bold(`Lost ➜  ${Colors.yellow(DenoJSON.version)} by ${Colors.italic(Colors.magenta('lostinmind.'))}`)}
+            ${Logger.GetLineString()}
+            🌐 ${Colors.bold(`[GitHub] ${Links.GitHub}`)}
+            📦 ${Colors.bold(`[JSR] ${Links.JSR}`)}
+            💵 ${Colors.bold(`[Support project] ${Links.PayPal}`)}
+        `)
+            ;
+
+        Logger.Log(Colors.brightMagenta(`~ Enter ${Colors.bold(Colors.bgWhite('"lost help"'))} to show available commands`))
     }
 
     static printBundle() {
         Logger.Log('   ⚙️', Colors.gray('  --package "{package_name}"'));
-        Logger.Log('   ⚙️', Colors.gray('  --format "{esm | cjs | iife}"'));
+        Logger.Log('   ⚙️', Colors.gray('  --format "esm"'));
+        Logger.Log('   ⚙️', Colors.gray('  --format "cjs"'));
+        Logger.Log('   ⚙️', Colors.gray('  --format "iife"'));
         Logger.Log('   ⚙️', Colors.gray('  --minify, -m'), Colors.italic('  ESBuild minification.'));
     }
 
@@ -66,6 +102,11 @@ abstract class LostHelper {
         Logger.Log('   ⚙️', Colors.gray('  --type "behavior"'), Colors.italic('   Creates a bare-bones for "Behavior" addon type.'));
     }
 
+    static printClearBuilds() {
+        Logger.Log('   ⚙️', Colors.gray('  --target "all"'), Colors.italic('   Deletes all addon builds folders.'));
+        Logger.Log('   ⚙️', Colors.gray('  --target "except-current"'), Colors.italic('   Deletes all addon builds folders except current (by addon version).'));
+    }
+
 }
 
 async function main() {
@@ -76,7 +117,9 @@ async function main() {
             /** Serve flags */
             'port',
             /** Bundle flags */
-            'package', 'format'
+            'package', 'format',
+            /** Clear flags */
+            'target'
         ],
         boolean: [
             /** Build flags */
@@ -91,15 +134,25 @@ async function main() {
     const command = String(_[0]) as LostCLICommand;
 
     switch (command) {
+        case 'clear-builds':
+            if (
+                flags['target'] &&
+                (flags['target'] === 'all' || flags['target'] === 'except-current')
+            ) {
+                await LostProject.clearBuilds(flags['target']);
+            } else {
+                LostHelper.printClearBuilds();
+            }
+            break;
         case "version":
             LostHelper.printVersion();
             break;
         case "create":
             if (
                 flags['type'] &&
-                flags['type'] === 'plugin' ||
-                flags['type'] === 'drawing-plugin' ||
-                flags['type'] === 'behavior'
+                (flags['type'] === 'plugin' ||
+                    flags['type'] === 'drawing-plugin' ||
+                    flags['type'] === 'behavior')
             ) {
                 await LostProject.create({
                     bareBonesType: flags['type'] as AddonBareBonesType,
@@ -144,9 +197,9 @@ async function main() {
             if (flags['package']) {
                 if (
                     flags['format'] &&
-                    flags['format'] === 'esm' ||
-                    flags['format'] === 'iife' ||
-                    flags['format'] === 'cjs'
+                    (flags['format'] === 'esm' ||
+                        flags['format'] === 'iife' ||
+                        flags['format'] === 'cjs')
                 ) {
                     LostBundler.bundle({
                         name: flags['package'],
@@ -157,7 +210,7 @@ async function main() {
                     LostBundler.bundle({
                         name: flags['package'],
                         minify: flags['minify']
-                    })    
+                    })
                 }
             } else {
                 Logger.Log(
@@ -166,8 +219,11 @@ async function main() {
                 LostHelper.printBundle();
             }
             break;
-        default:
+        case "help":
             LostHelper.printHelp();
+            break;
+        default:
+            LostHelper.printVersion();
             break;
     }
 }

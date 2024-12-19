@@ -50,6 +50,11 @@ type AddonBaseMetadata = {
     readonly timestamp: number;
 }
 
+type ClearBuildsTarget =
+    | 'all' 
+    | 'except-current'
+;
+
 export abstract class LostProject {
     static buildOptions: BuildOptions = {
         watch: false,
@@ -116,9 +121,12 @@ export abstract class LostProject {
     }
 
     /** Starting server with addon files */
-    static serve(opts: ServeOptions) {
-        Logger.Line();
-        Logger.Log('🌐', 'Starting addon server...');
+    static async serve(opts: ServeOptions) {
+        const config = await this.getLostConfig();
+
+        Paths.updateBuildPath(
+            `${config.addonId}_${config.version}`
+        );
 
         const getContentType = (filePath: string): string | undefined => {
             const extension = filePath.split('.').pop();
@@ -137,7 +145,7 @@ export abstract class LostProject {
         }
 
         const handler = async (req: Request): Promise<Response> => {
-
+            Logger.Clear();
             try {
                 const url = new URL(req.url);
                 // let filePath = url.pathname;
@@ -159,6 +167,7 @@ export abstract class LostProject {
                 Logger.Log(
                     `📃 Sent file from path: "${Colors.yellow(url.pathname)}"`
                 )
+                Logger.Info(`${Colors.magenta(Colors.bold(`--> http://localhost:${opts.port}/addon.json <--`))}`);
                 return new Response(file, {
                     status: 200,
                     headers: {
@@ -174,10 +183,17 @@ export abstract class LostProject {
         Deno.serve({
             port: opts.port,
             onListen() {
+                Logger.Clear();
+                //${Colors.magenta(Colors.bold(`--> http://localhost:${opts.port}/addon.json <--`))}
                 Logger.Log(
-                    '✅',
-                    `${Colors.bold('Server running!')} ${Colors.magenta(Colors.bold(`--> http://localhost:${opts.port}/addon.json <--`))}`
+                    '🌐', `${Colors.bold('Development server started!')}`
                 )
+                Logger.Info(`${Colors.magenta(Colors.bold(`--> http://localhost:${opts.port}/addon.json <--`))}`)
+                /** */ Logger.Line();
+                Logger.Log(Colors.italic(`1. Click on "Menu" > "View" > "Addon manager"`));
+                Logger.Log(Colors.italic(`2. Click on "Add dev addon". `));
+                /** */ Logger.Line();
+                Logger.Info(`How to enable Developer Mode:\nhttps://www.construct.net/br/make-games/manuals/addon-sdk/guide/using-developer-mode`);
             }
         }, handler)
     }
@@ -205,7 +221,7 @@ export abstract class LostProject {
                 const config: LostConfig = (await import(Paths.LostConfigFile)).default;
                 await this.downloadAddonBase(config.type);
             } catch (_e) {
-                Logger.Error('cli', `Can't update addon base, ${ProjectPaths.LostConfigFile} file not found`);
+                Logger.Error('cli', `Can't update addon base, "${ProjectPaths.LostConfigFile}" file not found`);
             }
         }
         if (opts.constructTypes) {
@@ -237,7 +253,7 @@ export abstract class LostProject {
         await Deno.writeTextFile(Paths.AddonBaseMetadataFile, JSON.stringify(metadata, null, 4));
         await Deno.writeTextFile(join(Paths.AddonBaseFile), fileContent);
 
-        Logger.Success(Colors.bold(`${Colors.green('Successfully')} installed addon base!`));
+        Logger.Success(Colors.bold(`${Colors.green('Successfully')} installed addon base`));
     }
 
     /** Installing *construct.d.ts* file with global types */
@@ -253,7 +269,7 @@ export abstract class LostProject {
             const fileContent = await response.text();
             await Deno.writeTextFile(Paths.ConstructTypesFile, fileContent);
 
-            Logger.Success(Colors.bold(`${Colors.green('Successfully')} installed construct types!`));
+            Logger.Success(Colors.bold(`${Colors.green('Successfully')} installed construct types`));
         } catch (e) {
             Logger.Error('cli', 'Error while installing construct types file', `Error: ${e}`);
             Deno.exit(1);
@@ -273,6 +289,36 @@ export abstract class LostProject {
             }
         } else {
             this.downloadAddonBase(addonType);
+        }
+    }
+
+    /** Deleted all addon builds folders from *builds* folder */
+    static async clearBuilds(target: ClearBuildsTarget) {
+        Logger.Log(`🗑 Deleting addon builds folders ...`);
+        const config = await this.getLostConfig();
+
+        for await (const entry of Deno.readDir(Paths.Builds)) {
+            if (entry.isDirectory) {
+                if (target === 'all') {
+                    await Deno.remove(join(Paths.Builds, entry.name), { recursive: true });
+                } else if (target === 'except-current') {
+                    if (entry.name !== `${config.addonId}_${config.version}`) {
+                        await Deno.remove(join(Paths.Builds, entry.name), { recursive: true });
+                    }
+                }
+            }
+        }
+
+        Logger.Success(Colors.bold(`${Colors.green('Successfully')} deleted all addon builds`));
+    }
+
+    static async getLostConfig() {
+        try {
+            const config: LostConfig = (await import(Paths.LostConfigFile)).default;
+            return config;
+        } catch {
+            Logger.Error('cli', `"${ProjectPaths.LostConfigFile}" file not found`);
+            Deno.exit(1);
         }
     }
 }

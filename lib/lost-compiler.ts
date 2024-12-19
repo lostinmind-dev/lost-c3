@@ -2,7 +2,6 @@
 import { Project, Node, ModuleKind, ScriptTarget, Colors } from "../deps.ts";
 import { Property } from "../lib/entities/plugin-property.ts";
 import type { DenoJson } from "../shared/deno-json.ts";
-import { Logger } from "../shared/logger.ts";
 
 type AddonScriptType =
     | 'runtime'
@@ -93,14 +92,14 @@ export abstract class LostCompiler {
         if (foundImport) {
             newImportText = foundImport
                 .replace(/\.ts$/, '.js')
-                .replace(/\/Modules\//, '/modules/')
+                .replace(/\/modules\//, '/modules/')
                 // .replace(/\/Scripts\//, '/scripts/')
             ;
 
             if (addonScriptType && addonScriptType === 'editor') {
-                newImportText = newImportText.replace(/\/Addon\//, '/');
+                newImportText = newImportText.replace(/\/addon\//, '/');
             } else if (addonScriptType === 'runtime') {
-                newImportText = newImportText.replace(/\/Addon\//, './');
+                newImportText = newImportText.replace(/\/addon\//, './');
             }
 
         } else {
@@ -110,11 +109,11 @@ export abstract class LostCompiler {
 
             if (addonScriptType && addonScriptType === 'editor') {
                 newImportText = newImportText
-                    .replace(/.\/Modules\//, '/modules/')
+                    .replace(/.\/modules\//, '/modules/')
                     // .replace(/.\/Scripts\//, '/scripts/')
             } else if (addonScriptType === 'runtime') {
                 newImportText = newImportText
-                    .replace(/\/Modules\//, '/modules/')
+                    .replace(/\/modules\//, '/modules/')
                     // .replace(/\/Scripts\//, '/scripts/')
             }
         }

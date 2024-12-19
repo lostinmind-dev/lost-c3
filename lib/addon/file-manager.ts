@@ -111,7 +111,9 @@ export abstract class AddonFileManager {
                 if (entry.isDirectory) {
                     await readDir(join(path, entry.name));
                 } else if (entry.isFile) {
-                    const filePath = join(...Paths.getFoldersAfterFolder(path, ProjectFolders.Source), entry.name).replace(/\\/g, '/');
+                    /** Only one *source* folder */
+                    const filePath = join(...Paths.getFoldersAfterFolder(path, Paths.getBuildFolderName()), entry.name).replace(/\\/g, '/');
+
                     if (!files.includes(filePath)) {
                         files.push(filePath);
                     }

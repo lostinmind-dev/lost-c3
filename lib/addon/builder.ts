@@ -25,13 +25,18 @@ export abstract class AddonBuilder {
 
             try {
                 await import(`${Paths.AddonModuleFile}?t=${Date.now()}`);
+                // await import(`${Paths.LostConfigFile}?t=${Date.now()}`);
             } catch (_e) {
                 Logger.Error('build', `Main addon module file ${Colors.bold(Colors.dim(ProjectPaths.AddonModuleFile))} not found!`);
                 Deno.exit(1);
             }
 
             this.Addon = await Addon.load();
-
+            
+            Paths.updateBuildPath(
+                `${this.Addon.config.addonId}_${this.Addon.config.version}`
+            );
+            
             if (!this.isBuildError) {
                 await LostProject.checkAddonBaseExists(this.Addon.config.type);
 
