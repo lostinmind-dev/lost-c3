@@ -166,14 +166,23 @@ export default defineConfig({
 Let's setup _`addon.ts`_ file at second.
 
 ```typescript
-import { defineAddon, Plugin, Property } from 'jsr:@lost-c3/lib';
+import { Plugin, Property, defineAddon } from 'jsr:@lost-c3/lib';
 import config from "./lost.config.ts";
 
 export default defineAddon(
-    new Plugin<'object'>(config)
-        .setRuntimeScripts()
+    new Plugin<'object' | 'world'>(config)
+        .loadEditorScripts('modules')
+        .loadEditorScripts('scripts', [
+            { path: 'editorScript.ts' }
+        ])
+        .setRuntimeScripts(
+            { type: 'directory', path: 'runtimeScriptsFolder' }
+            { type: 'file', path: 'myRuntimeScript.ts' }
+        )
 
-        .setRemoteScripts('https://cdn/index.js')
+        .setRemoteScripts(
+            { url: 'https://myserve.net/index.js', type: 'module' }
+        )
 
         /** @Properties  */
         .addProperty('integer', 'Integer', { type: Property.Integer })

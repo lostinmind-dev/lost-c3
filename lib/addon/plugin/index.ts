@@ -1,5 +1,5 @@
 import type { AddonPluginType, AddonType } from "../../types/index.ts";
-import type { LostConfig, PluginConfig } from "../../lost-config.ts";
+import type { LostConfig } from "../../lost-config.ts";
 import { Addon } from "../index.ts";
 
 

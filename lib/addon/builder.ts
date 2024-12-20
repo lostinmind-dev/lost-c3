@@ -24,6 +24,7 @@ export abstract class AddonBuilder {
 
             try {
                 const instance = (await import(`${Paths.AddonModuleFile}?t=${Date.now()}`)).default as (Addon);
+                Addon.reset();
                 await Addon.load(instance);
 
             } catch (_e) {

@@ -19,4 +19,6 @@ export { join } from 'jsr:@std/path@1.0.8';
 
 export { Md5 } from 'npm:ts-md5@1.3.1';
 
-export * as UglifyJS from 'npm:uglify-js@3.19.3';
+import type { UglifyJSType } from './shared/uglify-js-type.ts';
+import * as uglifyjs from 'npm:uglify-js@3.19.3';
+export const UglifyJS: UglifyJSType = uglifyjs;

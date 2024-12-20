@@ -48,16 +48,15 @@ export abstract class Addon<A extends AddonType = any, P = any> {
             modules: null,
             scripts: null
         };
-        Addon.reset();
     }
 
     /**
  * Adds editor scripts to *addon.json* file
- * @param target Folder where the script is
- * @param scripts 
+ * @param target Folder where the script exists
+ * @param scripts *Optional* If empty, all scripts from *target* folder will be loaded in editor.
  * @returns 
  */
-    setEditorScripts(target: EditorScriptsTarget, scripts?: EditorScript[]): this {
+    loadEditorScripts(target: EditorScriptsTarget, scripts?: EditorScript[]): this {
         switch (target) {
             case "scripts":
                 if (!scripts || scripts.length === 0) {

@@ -1,4 +1,5 @@
 import type { AddonBareBonesType, AddonType } from "./types/index.ts";
+import type { DenoJson } from "../shared/deno-json.ts";
 import { cloneRepo, isFileExists } from "../shared/misc.ts";
 import { Links } from "../shared/links.ts";
 import { Logger } from "../shared/logger.ts";
@@ -9,7 +10,6 @@ import { AddonBuilder } from "./addon/builder.ts";
 import { AddonFileManager } from "./addon/file-manager.ts";
 import type { LostConfig } from "./lost-config.ts";
 import { LostCompiler } from "./lost-compiler.ts";
-import type { DenoJson } from "../shared/deno-json.ts";
 
 let rebuildTimeout: number | undefined;
 
@@ -23,6 +23,8 @@ type BuildOptions = {
 type ServeOptions = {
     /** Server port */
     readonly port: number;
+    /** Open browser on start */
+    readonly openBrowser?: boolean;
 }
 
 export type CreateOptions = {
@@ -182,6 +184,8 @@ export abstract class LostProject {
         Deno.serve({
             port: opts.port,
             onListen() {
+                LostProject.#openBrowser();
+
                 Logger.Clear();
                 //${Colors.magenta(Colors.bold(`--> http://localhost:${opts.port}/addon.json <--`))}
                 Logger.Log(
@@ -311,6 +315,7 @@ export abstract class LostProject {
         Logger.Success(Colors.bold(`${Colors.green('Successfully')} deleted all addon builds`));
     }
 
+    /** @returns {LostConfig} */
     static async getLostConfig() {
         try {
             const config: LostConfig = (await import(Paths.LostConfigFile)).default;
@@ -319,5 +324,12 @@ export abstract class LostProject {
             Logger.Error('cli', `"${ProjectPaths.LostConfigFile}" file not found`);
             Deno.exit(1);
         }
+    }
+
+    /**
+     * Opens Construct Editor's page
+     * @link https://editor.construct.net/
+     */
+    static #openBrowser() {
     }
 }
