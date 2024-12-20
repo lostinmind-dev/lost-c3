@@ -1,22 +1,17 @@
 // deno-lint-ignore-file no-case-declarations
 import type { LostConfig } from "../lost-config.ts";
-import type { AddonType, EditorScript, LostData, LostDataFile, RemoteScript, RuntimeScript } from "../types/index.ts";
+import type { AddonType, EditorInstanceType, EditorScript, EditorScriptsCollection, EditorScriptsTarget, LostData, LostDataFile, RemoteScript, RuntimeScript } from "../types/index.ts";
 import { type AddonPropertyOptions, PluginProperty, Property } from "../entities/plugin-property.ts";
 import type { AddonFile } from "../types/addon-file.ts";
 import { Logger } from "../../shared/logger.ts";
 import { Colors, join } from "../../deps.ts";
 import { isDirectoryExists, isFileExists } from "../../shared/misc.ts";
-import { Paths, ProjectFolders } from "../../shared/paths.ts";
+import { Paths } from "../../shared/paths.ts";
 import type { ICategory } from "../entities/category.ts";
 import { Mime, MimeType } from "../../shared/mime.ts";
 import { AddonFileDependencyType } from "../types/addon-file.ts";
 import { LostProject } from "../lost-project.ts";
 import { AddonBuilder } from "./builder.ts";
-
-type InstanceType<P> =
-    P extends 'object' ? SDK.IInstanceBase :
-    P extends 'world' ? SDK.IWorldInstanceBase : never
-    ;
 
 type AddonFilesCollection = {
     icon: AddonFile<'icon'>;
@@ -26,83 +21,56 @@ type AddonFilesCollection = {
     readonly files: AddonFile<'file'>[];
 }
 
-type EditorScriptsTarget =
-    | 'scripts'
-    | 'modules'
-    ;
-
-type EditorScriptsType =
-    | Set<EditorScript>
-    | 'all'
-    | null
-    ;
 export abstract class Addon<A extends AddonType = any, P = any> {
-
-    static config: LostConfig = {} as LostConfig;
-    static categories: ICategory[] = [];
-    static properties: PluginProperty[] = [];
-    static filesCollection: AddonFilesCollection = {
+    
+    protected readonly config: LostConfig<A, P>;
+    protected readonly properties: PluginProperty[];
+    protected readonly remoteScripts: Set<RemoteScript>;
+    protected readonly runtimeScripts: Set<RuntimeScript>;
+    protected readonly editorScripts: EditorScriptsCollection;
+    
+    static instance: Addon;
+    static readonly categories: ICategory[] = [];
+    static readonly filesCollection: AddonFilesCollection = {
         icon: {} as AddonFile<'icon'>,
         defaultImage: null,
         scripts: [],
         modules: [],
         files: []
     };
-    static remoteScripts: Set<RemoteScript> = new Set();
-    static runtimeScripts: Set<RuntimeScript> = new Set();
-    static editorScripts: {
-        modules: EditorScriptsType,
-        scripts: EditorScriptsType
-    } = {
-        modules: null,
-        scripts: null
-    };
 
-    constructor(config: LostConfig) {
-        Addon.#reset();
-        Addon.config = config;
-    }
-
-    static #reset() {
-        this.config = {} as LostConfig;
-        
-        this.categories = [];
+    constructor(config: LostConfig<A, P>) {
+        this.config = config;
         this.properties = [];
-        this.filesCollection = {
-            icon: {} as AddonFile<'icon'>,
-            defaultImage: null,
-            scripts: [],
-            modules: [],
-            files: []
-        }
         this.remoteScripts = new Set();
         this.runtimeScripts = new Set();
         this.editorScripts = {
             modules: null,
             scripts: null
-        }
+        };
+        Addon.reset();
     }
 
     /**
-     * Adds editor scripts to *addon.json* file
-     * @param target Folder where the script is
-     * @param scripts 
-     * @returns 
-     */
+ * Adds editor scripts to *addon.json* file
+ * @param target Folder where the script is
+ * @param scripts 
+ * @returns 
+ */
     setEditorScripts(target: EditorScriptsTarget, scripts?: EditorScript[]): this {
         switch (target) {
             case "scripts":
                 if (!scripts || scripts.length === 0) {
-                    Addon.editorScripts.scripts = 'all';
+                    this.editorScripts.scripts = 'all';
                 } else {
-                    Addon.editorScripts.scripts = new Set(scripts);
+                    this.editorScripts.scripts = new Set(scripts);
                 }
                 break;
             case "modules":
                 if (!scripts || scripts.length === 0) {
-                    Addon.editorScripts.modules = 'all';
+                    this.editorScripts.modules = 'all';
                 } else {
-                    Addon.editorScripts.modules = new Set(scripts);
+                    this.editorScripts.modules = new Set(scripts);
                 }
                 break;
         }
@@ -124,7 +92,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
             if (script.url.includes('https')) {
                 if (script.url.endsWith('.js')) {
                     // Logger.Log(`🌐 Added remoted script with url: ${Colors.dim(script.url)}`)
-                    Addon.remoteScripts.add(script);
+                    this.remoteScripts.add(script);
                 } else {
                     Logger.Error('build', `Failed to add remote script with url: (${script.url})`, 'Your url must ends with ".js" script extension.')
                     Deno.exit(1);
@@ -150,7 +118,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
          * Search file by entered path
          */
         for (const script of scripts) {
-            Addon.runtimeScripts.add(script);
+            this.runtimeScripts.add(script);
         }
 
         return this;
@@ -163,7 +131,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
      * @param name The name of the group.
      */
     createGroup<C extends string[]>(id: C[number], name: string): this {
-        if (!Addon.#isPropertyExists(id)) {
+        if (!this.isPropertyExists(id)) {
             if (
                 id.length > 0 &&
                 name.length > 0
@@ -191,7 +159,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
      * @param name The name of the property.
      * @param opts 
      */
-    addProperty<I extends InstanceType<P> = any, T extends SDK.ITypeBase = any>(
+    addProperty<I extends EditorInstanceType<P> = any, T extends SDK.ITypeBase = any>(
         id: string,
         name: string,
         opts: AddonPropertyOptions<A, P, I, T>
@@ -203,7 +171,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
      * @param description *Optional*. The property description.
      * @param opts Plugin property options.
      */
-    addProperty<I extends InstanceType<P> = any, T extends SDK.ITypeBase = any>(
+    addProperty<I extends EditorInstanceType<P> = any, T extends SDK.ITypeBase = any>(
         id: string,
         name: string,
         description: string,
@@ -216,13 +184,13 @@ export abstract class Addon<A extends AddonType = any, P = any> {
      * @param descriptionOrOpts The property description **OR** Plugin property options.
      * @param opts Plugin property options.
      */
-    addProperty<I extends InstanceType<P> = any, T extends SDK.ITypeBase = any>(
+    addProperty<I extends EditorInstanceType<P> = any, T extends SDK.ITypeBase = any>(
         id: string,
         name: string,
         descriptionOrOpts: string | AddonPropertyOptions<A, P, I, T>,
         opts?: AddonPropertyOptions<A, P, I, T>
     ) {
-        if (!Addon.#isPropertyExists(id)) {
+        if (!this.isPropertyExists(id)) {
             let description: string = 'There is no any description yet...';
             let options: AddonPropertyOptions<A, P, I, T>;
             if (typeof descriptionOrOpts === 'string' && opts) {
@@ -239,7 +207,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
                 id.length > 0 &&
                 name.length > 0
             ) {
-                Addon.properties.push(
+                this.properties.push(
                     new PluginProperty(id, name, description, options)
                 );
             } else if (id.length === 0) {
@@ -256,13 +224,14 @@ export abstract class Addon<A extends AddonType = any, P = any> {
         }
     }
 
-    static #isPropertyExists(id: string): boolean {
+    isPropertyExists(id: string): boolean {
         const isExists = this.properties.find(p => p.id === id);
         return (isExists) ? true : false;
     }
 
     /** Loads addon */
-    static async load(): Promise<typeof Addon> {
+    static async load(instance: Addon) {
+        this.instance = instance;
         await this.#loadIcon();
         if (this.#isWorldPluginType()) this.#loadDefaultImage();
         await this.#loadFiles();
@@ -293,7 +262,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
                         path: Paths.Root,
                         iconType: Mime.getFileType(entry.name) as (MimeType.PNG | MimeType.SVG)
                     })
-    
+
                     iconFound = true;
                 }
             }
@@ -816,12 +785,13 @@ export abstract class Addon<A extends AddonType = any, P = any> {
         }
     }
 
+
     /** @returns *true* if addon type is *plugin* and *pluginType* is *world* */
     static #isWorldPluginType(): boolean {
         if (
-            this.config &&
-            this.config.type === 'plugin' &&
-            this.config.pluginType === 'world'
+            this.instance.config &&
+            this.instance.config.type === 'plugin' &&
+            this.instance.config.pluginType === 'world'
         ) {
             return true;
         } else {
@@ -836,7 +806,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
     static async #getScriptDependencyType(filePath: string, fileName: string) {
         let dependencyType = AddonFileDependencyType.ExternalDomScript;
         /** Check for script path in *runtimeScripts* */
-        for (const script of this.runtimeScripts) {
+        for (const script of this.instance.runtimeScripts) {
 
             if (script.type === 'file') {
                 if (await isFileExists(join(filePath, fileName))) {
@@ -856,7 +826,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
                         'build', `Failed to add runtime script with path: (${script.path})`, 'File not found'
                     );
                     Deno.exit(1);
-                }  
+                }
             } else if (script.type === 'directory') {
                 if (await isDirectoryExists(join(Paths.AddonScripts, script.path))) {
                     const readDir = async (path: string) => {
@@ -896,12 +866,12 @@ export abstract class Addon<A extends AddonType = any, P = any> {
         /** Check for script path in *editorScripts* */
         if (
             type === 'script' &&
-            this.editorScripts.scripts
+            this.instance.editorScripts.scripts
         ) {
-            if (this.editorScripts.scripts === 'all') {
+            if (this.instance.editorScripts.scripts === 'all') {
                 return true;
             } else {
-                for (const script of this.editorScripts.scripts) {
+                for (const script of this.instance.editorScripts.scripts) {
                     let convertedPath: string = `${fileName}`;
 
                     const folders = Paths.getFoldersAfterFolder(filePath, Paths.AddonScripts);
@@ -914,12 +884,12 @@ export abstract class Addon<A extends AddonType = any, P = any> {
             }
         } else if (
             type === 'module-script' &&
-            this.editorScripts.modules
+            this.instance.editorScripts.modules
         ) {
-            if (this.editorScripts.modules === 'all') {
+            if (this.instance.editorScripts.modules === 'all') {
                 return true;
             } else {
-                for (const script of this.editorScripts.modules) {
+                for (const script of this.instance.editorScripts.modules) {
                     let convertedPath: string = `${fileName}`;
 
                     const folders = Paths.getFoldersAfterFolder(filePath, Paths.AddonModules);
@@ -974,9 +944,9 @@ export abstract class Addon<A extends AddonType = any, P = any> {
                 name: this.filesCollection.icon.name,
                 iconType: this.filesCollection.icon.iconType
             },
-            config: this.config,
-            remoteScripts: [...this.remoteScripts],
-            properties: this.properties,
+            config: this.instance.config,
+            remoteScripts: [...this.instance.remoteScripts],
+            properties: this.instance.properties,
             files: addonFiles
         }
 
@@ -984,4 +954,36 @@ export abstract class Addon<A extends AddonType = any, P = any> {
         return data;
     }
 
+    /** @returns Lost config for addon */
+    static getConfig() {
+        return this.instance.config;
+    }
+
+    /** @returns {PluginProperty[]} */
+    static getProperties() {
+        return this.instance.properties;
+    }
+
+    /** Resets file collection */
+    static #resetFiles() {
+        //@ts-ignore
+        this.filesCollection = {
+            icon: {} as AddonFile<'icon'>,
+            defaultImage: null,
+            scripts: [],
+            modules: [],
+            files: []
+        };
+    }
+
+    /** Resets categories collection */
+    static #resetCategories() {
+        //@ts-ignore
+        this.categories = [];
+    }
+
+    static reset() {
+        this.#resetFiles();
+        this.#resetCategories();
+    }
 }

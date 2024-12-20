@@ -217,7 +217,7 @@ export abstract class LostProject {
     static async update(opts: UpdateOptions) {
         if (opts.addonBase) {
             try {
-                const config: LostConfig = (await import(Paths.LostConfigFile)).default;
+                const config = await this.getLostConfig();
                 await this.downloadAddonBase(config.type);
             } catch (_e) {
                 Logger.Error('cli', `Can't update addon base, "${ProjectPaths.LostConfigFile}" file not found`);

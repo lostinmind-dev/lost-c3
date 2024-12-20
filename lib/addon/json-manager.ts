@@ -25,7 +25,7 @@ import { Addon } from "./index.ts";
 export abstract class AddonMetadataManager {
 
     static async create(): Promise<string> {
-        const config = Addon.config;
+        const config = Addon.getConfig();
         const editorScripts = AddonFileManager.getEditorScriptsList();
         const fileList = await AddonFileManager.getFilesList();
         
@@ -219,8 +219,8 @@ export abstract class LanguageManager {
 
     static create(): string {
         const categories = Addon.categories;
-        const properties = Addon.properties;
-        const config = Addon.config;
+        const properties = Addon.getProperties();
+        const config = Addon.getConfig();
 
         const json: LanguageJSON = {
             "languageTag": 'en-US',

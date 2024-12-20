@@ -41,6 +41,28 @@ export type AddonPluginType =
     | 'world'
 ;
 
+export type EditorScriptsTarget =
+    | 'scripts'
+    | 'modules'
+    ;
+
+export type EditorInstanceType<P> =
+    P extends 'object' ? SDK.IInstanceBase :
+    P extends 'world' ? SDK.IWorldInstanceBase : never
+    ;
+
+
+export type EditorScriptsType =
+    | Set<EditorScript>
+    | 'all'
+    | null
+;
+
+export type EditorScriptsCollection = {
+    modules: EditorScriptsType,
+    scripts: EditorScriptsType
+}
+
 export type EditorScript = {
     /**
      * Path to a target file/directory.

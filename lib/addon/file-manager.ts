@@ -44,11 +44,12 @@ export abstract class AddonFileManager {
 
 
     static getEditorScriptsList(): string[] {
+        const config = Addon.getConfig();
         const scripts = Addon.filesCollection.scripts;
         const modules = Addon.filesCollection.modules;
 
         const files: string[] = [
-            `${Addon.config.type}.js`,
+            `${config.type}.js`,
             'type.js',
             'instance.js'
         ];
@@ -85,8 +86,9 @@ export abstract class AddonFileManager {
     }
 
     static async getFilesList(): Promise<string[]> {
+        const config = Addon.getConfig();
         const requiredFiles: string[] = [
-            `c3runtime/${Addon.config.type}.js`,
+            `c3runtime/${config.type}.js`,
             'c3runtime/type.js',
             'c3runtime/instance.js',
             'c3runtime/conditions.js',
@@ -96,7 +98,7 @@ export abstract class AddonFileManager {
             'aces.json',
             'addon.json',
             'instance.js',
-            `${Addon.config.type}.js`,
+            `${config.type}.js`,
             'type.js'
         ];
 
@@ -268,10 +270,11 @@ export abstract class AddonFileManager {
     }
 
     static async createZip() {
+        const config = Addon.getConfig();
         Logger.LogBetweenLines(Colors.bgMagenta('Bundling addon...'));
 
         const zipWriter = new ZipWriter(new BlobWriter('application/zip'));
-        const addonFilePath = join(Paths.Builds, `${Addon.config.addonId}_${Addon.config.version}`)
+        const addonFilePath = join(Paths.Builds, `${config.addonId}_${config.version}`)
 
         for await (const entry of walk(Paths.Build)) {
             const { isFile, path } = entry;
@@ -313,10 +316,11 @@ enum RuntimeInheritedClass {
 abstract class EditorFilesManager {
 
     static async createPlugin() {
+        const properties = Addon.getProperties();
         const initialContent = await Deno.readTextFile(Paths.AddonBaseFile);
         const methods: FunctionsCollection = {} as FunctionsCollection;
 
-        Addon.properties.forEach(p => {
+        properties.forEach(p => {
             if (
                 p.opts.type === Property.Link ||
                 p.opts.type === Property.Info
@@ -344,10 +348,11 @@ abstract class EditorFilesManager {
     }
 
     static async createBehavior() {
+        const properties = Addon.getProperties();
         const initialContent = await Deno.readTextFile(Paths.AddonBaseFile);
         const methods: FunctionsCollection = {} as FunctionsCollection;
 
-        Addon.properties.forEach(p => {
+        properties.forEach(p => {
             if (
                 p.opts.type === Property.Link ||
                 p.opts.type === Property.Info
@@ -374,10 +379,12 @@ abstract class EditorFilesManager {
     }
 
     static async createInstance() {
-        const type = Addon.config.type;
+        const config = Addon.getConfig();
+
+        const type = config.type;
         let pluginType: AddonPluginType = 'object';
         if (type === 'plugin') {
-            pluginType = Addon.config.pluginType;
+            pluginType = config.pluginType;
         }
 
         const intialContent = LostCompiler.compile(Paths.EditorIntanceFile, 'editor') || '';
@@ -389,17 +396,19 @@ abstract class EditorFilesManager {
 
         const content = dedent`
             const Lost = ${JSON.stringify({
-            addonId: Addon.config.addonId
+            addonId: config.addonId
         })};` + '\n' +
             intialContent +
-            `globalThis.SDK.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${Addon.config.addonId}"].Instance = ${className};
+            `globalThis.SDK.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Instance = ${className};
         `;
 
         await AddonFileManager.createFile(join(Paths.Build, 'instance.js'), content);
     }
 
     static async createType() {
-        const type = Addon.config.type;
+        const config = Addon.getConfig();
+
+        const type = config.type;
         const intialContent = LostCompiler.compile(Paths.EditorTypeFile, 'editor') || '';
         const className = findClassesInheritingFrom(intialContent,
             (type === 'plugin') ? EditorInheritedClass.PluginType :
@@ -408,10 +417,10 @@ abstract class EditorFilesManager {
 
         const content = dedent`
             const Lost = ${JSON.stringify({
-            addonId: Addon.config.addonId
+            addonId: config.addonId
         })};` + '\n' +
             intialContent +
-            `globalThis.SDK.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${Addon.config.addonId}"].Type = ${className};
+            `globalThis.SDK.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Type = ${className};
         `;
 
         await AddonFileManager.createFile(join(Paths.Build, 'type.js'), content);
@@ -422,8 +431,9 @@ abstract class EditorFilesManager {
 abstract class RuntimeFilesManager {
 
     static async createMain() {
+        const config = Addon.getConfig();
         const content = dedent`
-            import "./${Addon.config.type}.js"
+            import "./${config.type}.js"
             import "./type.js"
             import "./instance.js"
             import "./actions.js"
@@ -435,40 +445,43 @@ abstract class RuntimeFilesManager {
     }
 
     static async createPlugin() {
+        const config = Addon.getConfig();
         const intialContent = LostCompiler.compile(Paths.RuntimePluginFile, 'runtime') || '';
         const className = findClassesInheritingFrom(intialContent, RuntimeInheritedClass.Plugin);
 
         const content = dedent`
             const Lost = ${JSON.stringify({
-            addonId: Addon.config.addonId
+            addonId: config.addonId
         })};` + '\n' +
             intialContent +
-            `globalThis.C3.Plugins["${Addon.config.addonId}"] = ${className};
+            `globalThis.C3.Plugins["${config.addonId}"] = ${className};
         `;
 
         await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'plugin.js'), content);
     }
 
     static async createBehavior() {
+                const config = Addon.getConfig();
         const intialContent = LostCompiler.compile(Paths.RuntimeBehaviorFile, 'runtime') || '';
         const className = findClassesInheritingFrom(intialContent, RuntimeInheritedClass.Behavior);
 
         const content = dedent`
             const Lost = ${JSON.stringify({
-            addonId: Addon.config.addonId
+            addonId: config.addonId
         })};` + '\n' +
             intialContent +
-            `globalThis.C3.Behaviors["${Addon.config.addonId}"] = ${className};
+            `globalThis.C3.Behaviors["${config.addonId}"] = ${className};
         `;
 
         await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'behavior.js'), content);
     }
 
     static async createInstance() {
-        const type = Addon.config.type;
+                const config = Addon.getConfig();
+        const type = config.type;
         let pluginType: AddonPluginType = 'object';
         if (type === 'plugin') {
-            pluginType = Addon.config.pluginType;
+            pluginType = config.pluginType;
         }
 
         const intialContent = LostCompiler.compile(Paths.RuntimeInstanceFile, 'runtime') || '';
@@ -480,17 +493,18 @@ abstract class RuntimeFilesManager {
 
         const content = dedent`
             const Lost = ${JSON.stringify({
-            addonId: Addon.config.addonId
+            addonId: config.addonId
         })};` + '\n' +
             intialContent +
-            `globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${Addon.config.addonId}"].Instance = ${className};
+            `globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Instance = ${className};
         `;
 
         await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'instance.js'), content);
     }
 
     static async createType() {
-        const type = Addon.config.type;
+                const config = Addon.getConfig();
+        const type = config.type;
         const intialContent = LostCompiler.compile(Paths.RuntimeTypeFile, 'runtime') || '';
         const className = findClassesInheritingFrom(intialContent,
             (type === 'plugin') ? RuntimeInheritedClass.PluginType :
@@ -499,17 +513,18 @@ abstract class RuntimeFilesManager {
 
         const content = dedent`
             const Lost = ${JSON.stringify({
-            addonId: Addon.config.addonId
+            addonId: config.addonId
         })};` + '\n' +
             intialContent +
-            `globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${Addon.config.addonId}"].Type = ${className};
+            `globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Type = ${className};
         `;
 
         await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'type.js'), content);
     }
 
     static async createConditions() {
-        const type = Addon.config.type;
+        const config = Addon.getConfig();
+        const type = config.type;
         const entities: FunctionsCollection = {} as FunctionsCollection;
         const conditions = Addon.categories.map(c => c._conditions).flat();
 
@@ -518,14 +533,15 @@ abstract class RuntimeFilesManager {
         });
 
         const content = dedent`
-            globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${Addon.config.addonId}"].Cnds = ${serializeEntities(entities)};
+            globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Cnds = ${serializeEntities(entities)};
         `;
 
         await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'conditions.js'), content);
     }
 
     static async createActions() {
-        const type = Addon.config.type;
+        const config = Addon.getConfig();
+        const type = config.type;
         const entities: FunctionsCollection = {} as FunctionsCollection;
         const actions = Addon.categories.map(c => c._actions).flat();
 
@@ -534,14 +550,15 @@ abstract class RuntimeFilesManager {
         });
 
         const content = dedent`
-            globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${Addon.config.addonId}"].Acts = ${serializeEntities(entities)};
+            globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Acts = ${serializeEntities(entities)};
         `;
 
         await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'actions.js'), content);
     }
 
     static async createExpressions() {
-        const type = Addon.config.type;
+        const config = Addon.getConfig();
+        const type = config.type;
         const entities: FunctionsCollection = {} as FunctionsCollection;
         const expressions = Addon.categories.map(c => c._expressions).flat();
 
@@ -550,7 +567,7 @@ abstract class RuntimeFilesManager {
         });
 
         const content = dedent`
-            globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${Addon.config.addonId}"].Exps = ${serializeEntities(entities)};
+            globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Exps = ${serializeEntities(entities)};
         `;
 
         await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'expressions.js'), content);

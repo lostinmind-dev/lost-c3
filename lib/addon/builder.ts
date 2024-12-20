@@ -23,25 +23,22 @@ export abstract class AddonBuilder {
             Logger.Clear();
 
             try {
-                // await (new Deno.Command('deno', {
-                //     args: ['run', `${Paths.AddonModuleFile}`]
-                // }).output())
-                await import(`${Paths.AddonModuleFile}?t=${Date.now()}`);
+                const instance = (await import(`${Paths.AddonModuleFile}?t=${Date.now()}`)).default as (Addon);
+                await Addon.load(instance);
+
             } catch (_e) {
                 Logger.Error('build', `Main addon module file ${Colors.bold(Colors.dim(ProjectPaths.AddonModuleFile))} not found!`);
                 Deno.exit(1);
             }
 
-            await Addon.load();
-
-            // console.log(Addon)
+            const config = Addon.getConfig();
 
             Paths.updateBuildPath(
-                `${Addon.config.addonId}_${Addon.config.version}`
+                `${config.addonId}_${config.version}`
             );
             
             if (!this.isBuildError) {
-                await LostProject.checkAddonBaseExists(Addon.config.type);
+                await LostProject.checkAddonBaseExists(config.type);
 
                 await AddonFileManager.clear();
 
@@ -54,7 +51,7 @@ export abstract class AddonBuilder {
 
                 const elapsedTime = (performance.now()) - startTime;
                 Logger.LogBetweenLines(
-                    '✅', `Addon [${Colors.yellow(Addon.config.addonId)}] has been ${Colors.green('successfully')} built`,
+                    '✅', `Addon [${Colors.yellow(config.addonId)}] has been ${Colors.green('successfully')} built`,
                     '\n⏱️ ', `Addon build time: ${Colors.bold(Colors.yellow(String(elapsedTime.toFixed(2))))} ms!`
                 );
 
@@ -77,6 +74,8 @@ export abstract class AddonBuilder {
 
     /** Creates all addon files */
     static async #createAddonFiles() {
+        const config = Addon.getConfig();
+
         await AddonFileManager.createFolders();
 
         await AddonFileManager.createIcon();
@@ -87,12 +86,12 @@ export abstract class AddonBuilder {
         await AddonFileManager.createEditorScript('instance.js');
 
 
-        if (Addon.config.type === 'plugin') {
+        if (config.type === 'plugin') {
             await AddonFileManager.createEditorScript('plugin.js');
             await AddonFileManager.createRuntimeScript('plugin.js');
         }
 
-        if (Addon.config.type === 'behavior') {
+        if (config.type === 'behavior') {
             await AddonFileManager.createEditorScript('behavior.js');
             await AddonFileManager.createRuntimeScript('behavior.js');
         }
@@ -157,7 +156,7 @@ export abstract class AddonBuilder {
             Color = '[number, number, number]',
             Unknown = 'unknown'
         }
-        const properties = Addon.properties;
+        const properties = Addon.getProperties();
 
         if (properties.length > 0) {
             let content = `declare type PluginProperties = [`;

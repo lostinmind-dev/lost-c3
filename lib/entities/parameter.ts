@@ -23,7 +23,7 @@ export class Parameter {
 
         if (opts.type === Param.String) {
             if (opts.autocompleteId) {
-                const hash = Md5.hashStr(Addon.config.addonId + opts.autocompleteId);
+                const hash = Md5.hashStr(Addon.getConfig().addonId + opts.autocompleteId);
                 opts.autocompleteId = hash;
             }
         }

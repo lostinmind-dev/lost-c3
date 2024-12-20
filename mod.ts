@@ -24,4 +24,7 @@ export {
 /**
  * Common
  */
-export { defineConfig } from './lib/index.ts';
+export { 
+    defineConfig,
+    defineAddon
+ } from './lib/index.ts';
