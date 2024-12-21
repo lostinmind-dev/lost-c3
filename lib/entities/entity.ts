@@ -53,9 +53,9 @@ export abstract class Entity<E extends EntityType> {
 
         this._params.forEach((param, i) => {
             if (i === this._params.length - 1) {
-                _params.push(`${italic(param._name)}: ${bold(`{${i}}`)}`);
+                _params.push(`${italic(param.name)}: ${bold(`{${i}}`)}`);
             } else {
-                _params.push(`${italic(param._name)}: ${bold(`{${i}}`)}` + ', ');
+                _params.push(`${italic(param.name)}: ${bold(`{${i}}`)}` + ', ');
             }
         })
 
