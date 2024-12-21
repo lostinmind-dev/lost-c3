@@ -93,7 +93,6 @@ export abstract class LostCompiler {
         if (foundImport) {
             newImportText = foundImport
                 .replace(/\.ts$/, '.js')
-                .replace(/\/modules\//, '/modules/')
                 // .replace(/\/Scripts\//, '/scripts/')
             ;
 
@@ -102,7 +101,7 @@ export abstract class LostCompiler {
             } else if (addonScriptType === 'runtime') {
                 newImportText = newImportText.replace(/\/addon\//, './');
             } else if (addonScriptType === 'module') {
-                // newImportText = newImportText.replace
+                newImportText = newImportText.replace('./addon/modules/', './')
             }
 
         } else {
@@ -117,7 +116,6 @@ export abstract class LostCompiler {
             } else if (addonScriptType === 'runtime') {
                 newImportText = newImportText
                     .replace(/\/modules\//, '/modules/')
-                    // .replace(/\/Scripts\//, '/scripts/')
             }
         }
 

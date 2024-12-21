@@ -130,7 +130,7 @@ export abstract class AddonBuilder {
                 if (!module.isTypescript) {
                     await Deno.copyFile(join(module.path, module.name), join(module.localPath, module.localName));
                 } else {
-                    const content = LostCompiler.compile(join(module.path, module.name)) || '';
+                    const content = LostCompiler.compile(join(module.path, module.name), 'module') || '';
                     await Deno.writeTextFile(join(module.localPath, module.localName), content)
                 }
             }
