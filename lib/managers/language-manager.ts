@@ -200,6 +200,7 @@ export abstract class LanguageManager {
             const p = property as LanguageComboProperty;
             const items = pluginProperty._opts.items;
 
+            p['items'] = {};
             items.forEach(item => {
                 p['items'][item[0]] = item[1];
             })
