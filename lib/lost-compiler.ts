@@ -4,6 +4,7 @@ import { Property } from "../lib/entities/plugin-property.ts";
 import type { DenoJson } from "../shared/deno-json.ts";
 
 type AddonScriptType =
+    | 'module'
     | 'runtime'
     | 'editor'
 ;
@@ -100,6 +101,8 @@ export abstract class LostCompiler {
                 newImportText = newImportText.replace(/\/addon\//, '/');
             } else if (addonScriptType === 'runtime') {
                 newImportText = newImportText.replace(/\/addon\//, './');
+            } else if (addonScriptType === 'module') {
+                // newImportText = newImportText.replace
             }
 
         } else {

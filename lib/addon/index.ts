@@ -466,7 +466,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
                         ) {
 
                             const isParameterIdAlreadyExists = (id: string) => {
-                                const parameters = e._params.map(e => e._id).filter(e => e === id);
+                                const parameters = e._params.map(e => e.id).filter(e => e === id);
 
                                 if (parameters.length > 1) {
                                     return true;
@@ -477,9 +477,9 @@ export abstract class Addon<A extends AddonType = any, P = any> {
 
                             if (e._params.length > 0) {
                                 e._params.forEach(p => {
-                                    if (p._id.length > 0) {
-                                        if (isParameterIdAlreadyExists(p._id)) {
-                                            Logger.Error('build', `Action with id: "${e._id}" has duplicated parameters id's (${p._id})!`, 'Please change your parameter id.');
+                                    if (p.id.length > 0) {
+                                        if (isParameterIdAlreadyExists(p.id)) {
+                                            Logger.Error('build', `Action with id: "${e._id}" has duplicated parameters id's (${p.id})!`, 'Please change your parameter id.');
                                             AddonBuilder.isBuildError = true;
                                             if (!LostProject.buildOptions.watch) Deno.exit(1);
                                         }
@@ -534,7 +534,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
                         ) {
 
                             const isParameterIdAlreadyExists = (id: string) => {
-                                const parameters = e._params.map(e => e._id).filter(e => e === id);
+                                const parameters = e._params.map(e => e.id).filter(e => e === id);
 
                                 if (parameters.length > 1) {
                                     return true;
@@ -545,9 +545,9 @@ export abstract class Addon<A extends AddonType = any, P = any> {
 
                             if (e._params.length > 0) {
                                 e._params.forEach(p => {
-                                    if (p._id.length > 0) {
-                                        if (isParameterIdAlreadyExists(p._id)) {
-                                            Logger.Error('build', `Condition with id: "${e._id}" has duplicated parameters id's (${p._id})!`, 'Please change your parameter id.');
+                                    if (p.id.length > 0) {
+                                        if (isParameterIdAlreadyExists(p.id)) {
+                                            Logger.Error('build', `Condition with id: "${e._id}" has duplicated parameters id's (${p.id})!`, 'Please change your parameter id.');
                                             AddonBuilder.isBuildError = true;
                                             if (!LostProject.buildOptions.watch) Deno.exit(1);
                                         }
@@ -602,7 +602,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
                         ) {
 
                             const isParameterIdAlreadyExists = (id: string) => {
-                                const parameters = e._params.map(e => e._id).filter(e => e === id);
+                                const parameters = e._params.map(e => e.id).filter(e => e === id);
 
                                 if (parameters.length > 1) {
                                     return true;
@@ -613,9 +613,9 @@ export abstract class Addon<A extends AddonType = any, P = any> {
 
                             if (e._params.length > 0) {
                                 e._params.forEach(p => {
-                                    if (p._id.length > 0) {
-                                        if (isParameterIdAlreadyExists(p._id)) {
-                                            Logger.Error('build', `Expression with id: "${e._id}" has duplicated parameters id's (${p._id})!`, 'Please change your parameter id.');
+                                    if (p.id.length > 0) {
+                                        if (isParameterIdAlreadyExists(p.id)) {
+                                            Logger.Error('build', `Expression with id: "${e._id}" has duplicated parameters id's (${p.id})!`, 'Please change your parameter id.');
                                             AddonBuilder.isBuildError = true;
                                             if (!LostProject.buildOptions.watch) Deno.exit(1);
                                         }
@@ -776,7 +776,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
             this.#checkCategory(category);
 
             Logger.Loading(
-                `Found category [${Colors.cyan(Colors.bold((category._name)))}]`
+                `[${Colors.blue(String(this.categories.length + 1))}] Found category [${Colors.cyan(Colors.bold((category._name)))}]`
             );
 
             this.categories.push(category);

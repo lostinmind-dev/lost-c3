@@ -1,4 +1,5 @@
 // deno-lint-ignore-file
+import { Md5 } from "../../deps.ts";
 import { ActionEntity } from "../entities/action.ts";
 import { ICategory } from "../entities/category.ts";
 import { ConditionEntity } from "../entities/condition.ts";
@@ -72,26 +73,32 @@ export abstract class AcesManager {
     }
 
     static #createParameter(parameter: Parameter): AceParameter {
+        const config = Addon.getConfig();
         const aceParameter: AceParameter = {} as AceParameter;
 
-        aceParameter['id'] = parameter._id;
-        aceParameter['type'] = parameter._opts.type;
+        aceParameter['id'] = parameter.id;
+        aceParameter['type'] = parameter.opts.type;
 
-        switch (parameter._opts.type) {
+        switch (parameter.opts.type) {
             case Param.Number:
-                aceParameter['initialValue'] = (parameter._opts.initialValue) ? String(parameter._opts.initialValue) : '';
+                aceParameter['initialValue'] = (parameter.opts.initialValue) ? String(parameter.opts.initialValue) : '';
                 break;
             case Param.String:
                 const p = aceParameter as AceStringParameter;
-                p['initialValue'] = (parameter._opts.initialValue) ? `"${String(parameter._opts.initialValue)}"` : "";
-                p['autocompleteId'] = parameter._opts.autocompleteId;
+                p['initialValue'] = (parameter.opts.initialValue) ? `"${String(parameter.opts.initialValue)}"` : "";
+                
+                if (parameter.opts.autocomplete) {
+                    const hash = Md5.hashStr(config.addonId + parameter.id);
+                    p['autocompleteId'] = hash;
+                }
+
                 break;
             case Param.Any:
-                if (parameter._opts.initialValue) {
-                    if (typeof parameter._opts.initialValue === 'string') {
-                        aceParameter['initialValue'] = `"${String(parameter._opts.initialValue)}"`;
-                    } else if (typeof parameter._opts.initialValue === 'number') {
-                        aceParameter['initialValue'] = String(parameter._opts.initialValue);
+                if (parameter.opts.initialValue) {
+                    if (typeof parameter.opts.initialValue === 'string') {
+                        aceParameter['initialValue'] = `"${String(parameter.opts.initialValue)}"`;
+                    } else if (typeof parameter.opts.initialValue === 'number') {
+                        aceParameter['initialValue'] = String(parameter.opts.initialValue);
                     }
                 } else {
                     aceParameter['initialValue'] = '';
@@ -99,8 +106,8 @@ export abstract class AcesManager {
                 break;
             case Param.Boolean:
                 const b = aceParameter as AceBooleanParameter;
-                if (typeof parameter._opts.initialValue === 'boolean') {
-                    switch (parameter._opts.initialValue) {
+                if (typeof parameter.opts.initialValue === 'boolean') {
+                    switch (parameter.opts.initialValue) {
                         case true:
                             b['initialValue'] = 'true';
                             break;
@@ -114,13 +121,13 @@ export abstract class AcesManager {
                 break;
             case Param.Combo:
                 const c = aceParameter as AceComboParameter;
-                const items = parameter._opts.items.map(item => item[0]);
+                const items = parameter.opts.items.map(item => item[0]);
 
                 c['items'] = items;
 
-                if (parameter._opts.initialValue) {
-                    if (items.includes(parameter._opts.initialValue)) {
-                        c['initialValue'] = parameter._opts.initialValue;
+                if (parameter.opts.initialValue) {
+                    if (items.includes(parameter.opts.initialValue)) {
+                        c['initialValue'] = parameter.opts.initialValue;
                     } else {
                         c['initialValue'] = items[0];
                     }
@@ -131,7 +138,7 @@ export abstract class AcesManager {
             case Param.Object:
                 const o = aceParameter as AceObjectParameter;
 
-                o['allowedPluginIds'] = parameter._opts.allowedPluginIds
+                o['allowedPluginIds'] = parameter.opts.allowedPluginIds
                 break
             // case Param.ComboGrouped:
             //     const cg = aceParameter as AceComboGroupedParameter;
@@ -183,12 +190,12 @@ export abstract class AcesManager {
         aceEntity['scriptName'] = entity._func.name;
         aceEntity['highlight'] = entity._opts?.highlight;
         aceEntity['isDeprecated'] = entity._opts?.isDeprecated;
-        aceEntity['isTrigger'] = entity._opts?.isTrigger || true;
+        aceEntity['isTrigger'] = (entity._opts && typeof entity._opts.isTrigger !== 'undefined') ? entity._opts.isTrigger : true;
         aceEntity['isFakeTrigger'] = entity._opts?.isFakeTrigger;
         aceEntity['isStatic'] = entity._opts?.isStatic;
         aceEntity['isLooping'] = entity._opts?.isLooping;
-        aceEntity['isInvertible'] = entity._opts?.isInvertible || true;
-        aceEntity['isCompatibleWithTriggers'] = entity._opts?.isCompatibleWithTriggers || true;
+        aceEntity['isInvertible'] = (entity._opts && typeof entity._opts.isInvertible !== 'undefined') ? entity._opts.isInvertible : true;
+        aceEntity['isCompatibleWithTriggers'] = (entity._opts && typeof entity._opts.isCompatibleWithTriggers !== 'undefined') ? entity._opts.isCompatibleWithTriggers : true;
 
         if (entity._params.length > 0) {
             aceEntity['params'] = [...entity._params.map(p => this.#createParameter(p))];
@@ -273,7 +280,7 @@ export abstract class LanguageManager {
         const collection: AceParametersCollection = {} as AceParametersCollection;
 
         parameters.forEach(parameter => {
-            collection[parameter._id] = this.#createAceParameter(parameter);
+            collection[parameter.id] = this.#createAceParameter(parameter);
         })
 
         return collection;
@@ -282,12 +289,12 @@ export abstract class LanguageManager {
     static #createAceParameter(parameter: Parameter): LanguageAceParameter {
         const languageParameter: LanguageAceParameter = {} as LanguageAceParameter;
 
-        languageParameter['name'] = parameter._name;
-        languageParameter['desc'] = parameter._description;
+        languageParameter['name'] = parameter.name;
+        languageParameter['desc'] = parameter.description;
 
-        if (parameter._opts.type === Param.Combo) {
+        if (parameter.opts.type === Param.Combo) {
             const p = languageParameter as LanguageAceComboParameter;
-            const items = parameter._opts.items;
+            const items = parameter.opts.items;
 
             p['items'] = {};
             items.forEach(item => {
@@ -407,7 +414,8 @@ export abstract class LanguageManager {
         if (property.opts.type === Property.Combo) {
             const p = _property as LanguageComboProperty;
             const items = property.opts.items;
-
+            
+            p['items'] = {};
             items.forEach(item => {
                 p['items'][item[0]] = item[1];
             })

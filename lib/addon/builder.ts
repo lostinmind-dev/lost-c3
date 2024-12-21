@@ -6,6 +6,7 @@ import { LostProject } from "../lost-project.ts";
 import { AddonFileManager } from "./file-manager.ts";
 import { Addon } from "./index.ts";
 import { Property } from "../entities/plugin-property.ts";
+import { dedent } from "../../shared/misc.ts";
 
 type StartOptions = {
 
@@ -160,57 +161,62 @@ export abstract class AddonBuilder {
         const properties = Addon.getProperties();
 
         if (properties.length > 0) {
-            let content = `declare type PluginProperties = [`;
+            const types: string[] = [];
 
             properties.forEach((property, i) => {
-                switch (property.opts.type) {
-                    case Property.Integer:
-                        content = content + StringPropertyType.Number
-                        break;
-                    case Property.Float:
-                        content = content + StringPropertyType.Number
-                        break;
-                    case Property.Percent:
-                        content = content + StringPropertyType.Number
-                        break;
-                    case Property.Text:
-                        content = content + StringPropertyType.String
-                        break;
-                    case Property.LongText:
-                        content = content + StringPropertyType.String
-                        break;
-                    case Property.Checkbox:
-                        content = content + StringPropertyType.Boolean
-                        break;
-                    case Property.Font:
-                        content = content + StringPropertyType.String
-                        break;
-                    case Property.Combo:
-                        content = content + StringPropertyType.Number
-                        break;
-                    case Property.Color:
-                        content = content + StringPropertyType.Color
-                        break;
-                    case Property.Object:
-                        content = content + StringPropertyType.Number
-                        break;
-                    case Property.Group:
-                        content = content + StringPropertyType.Unknown
-                        break;
-                    case Property.Info:
-                        content = content + StringPropertyType.Unknown
-                        break;
-                    case Property.Link:
-                        content = content + StringPropertyType.Unknown
-                        break;
-                }
+                const type = property.opts.type;
 
-                if (i < properties.length - 1) {
-                    content = content + `, `
+                let symbol: StringPropertyType = StringPropertyType.Unknown;
+
+                if (type !== Property.Group) {
+                    switch (property.opts.type) {
+                        case Property.Integer:
+                            symbol = StringPropertyType.Number
+                            break;
+                        case Property.Float:
+                            symbol = StringPropertyType.Number
+                            break;
+                        case Property.Percent:
+                            symbol = StringPropertyType.Number
+                            break;
+                        case Property.Text:
+                            symbol = StringPropertyType.String
+                            break;
+                        case Property.LongText:
+                            symbol = StringPropertyType.String
+                            break;
+                        case Property.Checkbox:
+                            symbol = StringPropertyType.Boolean
+                            break;
+                        case Property.Font:
+                            symbol = StringPropertyType.String
+                            break;
+                        case Property.Combo:
+                            symbol = StringPropertyType.Number
+                            break;
+                        case Property.Color:
+                            symbol = StringPropertyType.Color
+                            break;
+                        case Property.Object:
+                            symbol = StringPropertyType.Number
+                            break;
+                        case Property.Info:
+                            symbol = StringPropertyType.Unknown
+                            break;
+                        case Property.Link:
+                            symbol = StringPropertyType.Unknown
+                            break;
+                    }
+
+                    types.push(symbol);
                 }
             })
 
-            content = content + `]`
+            const content = dedent`
+                declare type PluginProperties = [
+                    ${types.join(', ')}
+                ]
+            `
 
             await Deno.mkdir(Paths.AddonTypes, { recursive: true });
 

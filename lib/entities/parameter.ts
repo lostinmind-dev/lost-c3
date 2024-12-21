@@ -1,32 +1,17 @@
-import { Md5 } from "../../deps.ts";
-import { Addon } from "../addon/index.ts";
-
 /**
  * @class represents ACE's parameter info.
  */
 export class Parameter {
-    readonly _id: string;
-    readonly _name: string;
-    readonly _description: string;
-    readonly _opts: ParameterOptions;
 
     constructor(
-        id: string,
-        name: string,
-        description: string,
-        opts: ParameterOptions
+        readonly id: string,
+        readonly name: string,
+        readonly description: string,
+        readonly opts: ParameterOptions
     ) {
-        this._id = id;
-        this._name = name;
-        if (name.length === 0) this._name = id;
-        this._description = description;
 
-        if (opts.type === Param.String) {
-            if (opts.autocompleteId) {
-                const hash = Md5.hashStr(Addon.getConfig().addonId + opts.autocompleteId);
-                opts.autocompleteId = hash;
-            }
-        }
+        if (name.length === 0) this.name = id;
+
         if (opts.type === Param.Combo) {
             if (opts.initialValue) {
                 const items = opts.items.map(i => i[0]);
@@ -35,7 +20,6 @@ export class Parameter {
                 }
             }
         }
-        this._opts = opts;
     }
 }
 
@@ -109,7 +93,7 @@ interface IStringParameter extends ParameterBase {
     /**
      * *Optional*. Set to a globally unique ID and string constants with the same ID will offer autocomplete in the editor.
      */
-    autocompleteId?: string;
+    readonly autocomplete?: true;
 }
 
 /** Object represents 'any' parameter */
@@ -127,7 +111,7 @@ interface IBooleanParameter extends ParameterBase {
     /**
      * *Optional*. A boolean parameter, displayed as a checkbox
      */
-    initialValue?: boolean;
+    initialValue?: true;
 }
 
 /** Object represents 'combo' parameter */

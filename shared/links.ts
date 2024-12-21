@@ -12,8 +12,6 @@ type TreeName =
     | 'master'
     | '4.0.0'
 
-
-
 export abstract class Links {
     static readonly #tree: TreeName = '4.0.0'
     static readonly PayPal = 'https://www.paypal.com/paypalme/daklnn';
