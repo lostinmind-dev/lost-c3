@@ -6,7 +6,6 @@ import { LostProject } from "./lib/lost-project.ts";
 import { Links } from "./shared/links.ts";
 import { Logger } from "./shared/logger.ts";
 import { dedent } from "./shared/misc.ts";
-import { LostTransfer } from "./lib/transfer/index.ts";
 
 abstract class LostHelper {
 
@@ -135,9 +134,6 @@ async function main() {
     const command = String(_[0]) as LostCLICommand;
 
     switch (command) {
-        case 'transfer':
-            await LostTransfer.transfer({ sdkVersion: 2 });
-            break;
         case 'clear-builds':
             if (
                 flags['target'] &&

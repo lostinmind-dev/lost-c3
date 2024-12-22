@@ -7,5 +7,4 @@ declare type LostCLICommand =
     | 'update'
     | 'bundle'
     | 'clear-builds'
-    | 'transfer'
 ;
