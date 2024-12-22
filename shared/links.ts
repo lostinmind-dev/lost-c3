@@ -11,9 +11,10 @@ type BareBonesLinks = {
 type TreeName =
     | 'master'
     | '4.0.0'
+    | '4.1.0-(Categories-V2)'
 
 export abstract class Links {
-    static readonly #tree: TreeName = '4.0.0'
+    static readonly #tree: TreeName = '4.1.0-(Categories-V2)'
     static readonly PayPal = 'https://www.paypal.com/paypalme/daklnn';
     static readonly Boosty = ''
     static readonly GitHub = 'https://github.com/lostinmind-dev/lost-c3';
