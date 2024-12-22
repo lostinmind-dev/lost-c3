@@ -1,5 +1,5 @@
 import type { ExpressionReturnType } from "../../entities/expression.ts";
-import type { Param } from "../../entities/parameter.ts";
+import type { Parameter } from "../../entities/parameter.ts";
 
 
 export type AcesJSON = {
@@ -53,32 +53,32 @@ export type AceParameter =
 
 type AceParameterBase = {
     "id": string;
-    "type": Param;
+    "type": Parameter;
     "initialValue"?: string;
 }
 
 export type AceStringParameter = {
-    "type": Param.String;
+    "type": Parameter.String;
     "autocompleteId"?: string;
 } & AceParameterBase
 
 export type AceBooleanParameter = {
-    "type": Param.Boolean;
+    "type": Parameter.Boolean;
     "initialValue"?: 'true' | 'false';
 } & AceParameterBase
 
 export type AceComboParameter = {
-    "type": Param.Combo;
+    "type": Parameter.Combo;
     "items": string[];
 } & AceParameterBase
 
 export type AceObjectParameter = {
-    "type": Param.Object;
+    "type": Parameter.Object;
     "allowedPluginIds"?: string[];
 } & AceParameterBase
 
 export type AceComboGroupedParameter = {
-    // "type": Param.ComboGrouped;
+    // "type": Parameter.ComboGrouped;
     // "itemGroups": {
     //     id: string;
     //     items: string[];
