@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-case-declarations
 import type { LostConfig } from "../lost-config.ts";
 import type { AddonType, EditorInstanceType, EditorScript, EditorScriptsCollection, EditorScriptsTarget, LostData, LostDataFile, RemoteScript, RuntimeScript } from "../types/index.ts";
-import { type AddonPropertyOptions, PluginProperty, Property } from "../entities/plugin-property.ts";
+import { type AddonPropertyOptions, PropertyEntity, Property } from "../entities/property.ts";
 import type { AddonFile } from "../types/addon-file.ts";
 import { Logger } from "../../shared/logger.ts";
 import { Colors, join } from "../../deps.ts";
@@ -24,7 +24,7 @@ type AddonFilesCollection = {
 export abstract class Addon<A extends AddonType = any, P = any> {
     
     protected readonly config: LostConfig<A, P>;
-    protected readonly properties: PluginProperty[];
+    protected readonly properties: PropertyEntity[];
     protected readonly remoteScripts: Set<RemoteScript>;
     protected readonly runtimeScripts: Set<RuntimeScript>;
     protected readonly editorScripts: EditorScriptsCollection;
@@ -207,7 +207,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
                 name.length > 0
             ) {
                 this.properties.push(
-                    new PluginProperty(id, name, description, options)
+                    new PropertyEntity(id, name, description, options)
                 );
             } else if (id.length === 0) {
                 Logger.Error('build', `Plugin property id can't be empty.`, 'Please specify your property Id.')

@@ -1,6 +1,6 @@
 
-import { Project, Node, ModuleKind, ScriptTarget, Colors } from "../deps.ts";
-import { Property } from "../lib/entities/plugin-property.ts";
+import { Project, Node, ModuleKind, ScriptTarget } from "../deps.ts";
+import { Property } from "./entities/property.ts";
 import type { DenoJson } from "../shared/deno-json.ts";
 
 type AddonScriptType =

@@ -5,7 +5,7 @@ import { Addon } from "./index.ts";
 import Icon from "../defaults/addon-icon.ts";
 import { LostCompiler } from "../lost-compiler.ts";
 import type { AddonPluginType, CategoryLinksCollection, FunctionsCollection } from "../types/index.ts";
-import { Property } from "../entities/plugin-property.ts";
+import { Property } from "../entities/property.ts";
 import { AcesManager, AddonMetadataManager, LanguageManager } from "./json-manager.ts";
 import { Logger } from "../../shared/logger.ts";
 import { LostProject } from "../lost-project.ts";
@@ -486,8 +486,8 @@ abstract class RuntimeFilesManager {
 
         const content = dedent`
             const Lost = ${JSON.stringify({
-            addonId: config.addonId
-        })};` + '\n' +
+                addonId: config.addonId
+            })};` +
             intialContent +
             `globalThis.C3.Plugins["${config.addonId}"] = ${className};
         `;
@@ -504,8 +504,8 @@ abstract class RuntimeFilesManager {
 
         const content = dedent`
             const Lost = ${JSON.stringify({
-            addonId: config.addonId
-        })};` + '\n' +
+                addonId: config.addonId
+            })};` +
             intialContent +
             `globalThis.C3.Behaviors["${config.addonId}"] = ${className};
         `;
@@ -532,8 +532,8 @@ abstract class RuntimeFilesManager {
 
         const content = dedent`
             const Lost = ${JSON.stringify({
-            addonId: config.addonId
-        })};` + '\n' +
+                addonId: config.addonId
+            })};` +
             intialContent +
             `globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Instance = ${className};
         `;
@@ -573,7 +573,7 @@ abstract class RuntimeFilesManager {
 
         conditions.forEach(e => {
             entities[e._func.name] = new Function(`
-                ${this.#categoriesModuleName}["${e._category._lostId}"]["${e._func.name}"].bind(this)()
+                return ${this.#categoriesModuleName}["${e._category._lostId}"]["${e._func.name}"].bind(this)();
             `);
         });
 
@@ -617,7 +617,7 @@ abstract class RuntimeFilesManager {
 
         expressions.forEach(e => {
             entities[e._func.name] = new Function(`
-                ${this.#categoriesModuleName}["${e._category._lostId}"]["${e._func.name}"].bind(this)()
+                return ${this.#categoriesModuleName}["${e._category._lostId}"]["${e._func.name}"].bind(this)();
             `);
         });
 

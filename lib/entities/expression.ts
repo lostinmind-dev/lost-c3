@@ -6,6 +6,7 @@ import { Entity, type EntityOptions } from './entity.ts';
  */
 export class ExpressionEntity extends Entity<'expression'> {
     readonly _opts?: IExpressionOptions;
+
     constructor(
         category: ICategory,
         id: string,
@@ -17,6 +18,7 @@ export class ExpressionEntity extends Entity<'expression'> {
         super('expression', category, id, name, description, func, opts?.isDeprecated || false, '', opts?.params);
         this._opts = opts;
     }
+
 }
 
 /** Object that represents options for Expression entity. */

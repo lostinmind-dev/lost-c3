@@ -27,6 +27,7 @@
     },
     "publish": {
         "exclude": [
+            "lib/transfer",
             "tests",
             ".github"
         ]

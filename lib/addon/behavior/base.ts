@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-case-declarations
 import type { BehaviorConfig } from '../../lost-config.ts';
-import { Property } from '../../entities/plugin-property.ts';
+import { Property } from '../../entities/property.ts';
 
 const config = _lostData.config as BehaviorConfig;
 const icon = _lostData.icon;

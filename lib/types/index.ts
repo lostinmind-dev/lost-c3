@@ -1,5 +1,5 @@
 import type { MimeType } from "../../shared/mime.ts";
-import type { PluginProperty } from "../entities/plugin-property.ts";
+import type { PropertyEntity } from "../entities/property.ts";
 import type { LostConfig } from "../lost-config.ts";
 import type { AddonFileDependencyType, AddonFileType } from "./addon-file.ts";
 
@@ -18,7 +18,7 @@ export type LostData = {
     };
     readonly config: LostConfig;
     readonly remoteScripts: RemoteScript[];
-    readonly properties: PluginProperty[];
+    readonly properties: PropertyEntity[];
     readonly files: LostDataFile[];
 }
 

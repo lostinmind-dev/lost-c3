@@ -1,7 +1,7 @@
 // deno-lint-ignore-file
 // deno-lint-ignore-file no-fallthrough no-case-declarations
 import type { PluginConfig } from '../../lost-config.ts';
-import { Property } from '../../entities/plugin-property.ts';
+import { Property } from '../../entities/property.ts';
 
 const config = _lostData.config as PluginConfig<any>;
 const icon = _lostData.icon;

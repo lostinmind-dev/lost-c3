@@ -2,7 +2,7 @@ import type { ActionEntity } from './action.ts';
 import type { ConditionEntity } from './condition.ts';
 import type { ExpressionEntity } from './expression.ts';
 
-type CategoryOptions = {
+export type CategoryOptions = {
     /**
      * *Optional*. Default is **False**. Deprecate all category Actions, Conditions, Expressions.
      * @description If True, all category Actions, Conditions, Expressions will mark as Deprecated.

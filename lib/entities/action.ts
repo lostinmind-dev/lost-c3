@@ -1,4 +1,4 @@
-import { ICategory } from "./category.ts";
+import type { ICategory } from "./category.ts";
 import { Entity, type EntityOptions } from "./entity.ts";
 
 /**
@@ -23,7 +23,7 @@ export class ActionEntity extends Entity<'action'> {
 }
 
 /** Object that represents options for Acton entity. */
-interface IActionOptions extends EntityOptions {
+export interface IActionOptions extends EntityOptions {
     /**
      * *Optional*. Default is **False**. Set to true to mark the action as asynchronous. 
      * @description Make the action method an async function, and the system Wait for previous actions to complete action will be able to wait for the action as well.

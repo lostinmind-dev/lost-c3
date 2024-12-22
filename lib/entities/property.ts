@@ -16,7 +16,7 @@ export enum Property {
     // ProjectFile = 'projectfile'
 }
 
-export class PluginProperty<
+export class PropertyEntity<
     A = any,
     P = any,
     I = any,
@@ -31,17 +31,17 @@ export class PluginProperty<
     ) {
 
         if (
-            opts.type === Property.Link
+            opts.type === Property.Link &&
+            !opts.linkText
         ) {
-            if (!opts.linkText) {
-                opts.linkText = name;
-            }
+            opts.linkText = name;
         }
 
-        if (opts.type === Property.Color) {
-            if (opts.initialValue) {
-                opts.initialValue = this.#normalizeRgb(opts.initialValue);
-            }
+        if (
+            opts.type === Property.Color &&
+            opts.initialValue
+        ) {
+            opts.initialValue = this.#normalizeRgb(opts.initialValue);
         }
     }
 

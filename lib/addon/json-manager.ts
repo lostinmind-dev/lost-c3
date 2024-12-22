@@ -5,8 +5,8 @@ import { ICategory } from "../entities/category.ts";
 import { ConditionEntity } from "../entities/condition.ts";
 import { EntityType, Entity } from "../entities/entity.ts";
 import { ExpressionEntity } from "../entities/expression.ts";
-import { Param, Parameter } from "../entities/parameter.ts";
-import { PluginProperty, Property } from "../entities/plugin-property.ts";
+import { ParameterEntity, Parameter } from "../entities/parameter.ts";
+import { PropertyEntity, Property } from "../entities/property.ts";
 import { LostProject } from "../lost-project.ts";
 import { 
     AceAction, AceBooleanParameter, AceCategory, AceComboParameter, 
@@ -72,7 +72,7 @@ export abstract class AcesManager {
         }
     }
 
-    static #createParameter(parameter: Parameter): AceParameter {
+    static #createParameter(parameter: ParameterEntity): AceParameter {
         const config = Addon.getConfig();
         const aceParameter: AceParameter = {} as AceParameter;
 
@@ -80,10 +80,10 @@ export abstract class AcesManager {
         aceParameter['type'] = parameter.opts.type;
 
         switch (parameter.opts.type) {
-            case Param.Number:
+            case Parameter.Number:
                 aceParameter['initialValue'] = (parameter.opts.initialValue) ? String(parameter.opts.initialValue) : '';
                 break;
-            case Param.String:
+            case Parameter.String:
                 const p = aceParameter as AceStringParameter;
                 p['initialValue'] = (parameter.opts.initialValue) ? `"${String(parameter.opts.initialValue)}"` : "";
                 
@@ -93,7 +93,7 @@ export abstract class AcesManager {
                 }
 
                 break;
-            case Param.Any:
+            case Parameter.Any:
                 if (parameter.opts.initialValue) {
                     if (typeof parameter.opts.initialValue === 'string') {
                         aceParameter['initialValue'] = `"${String(parameter.opts.initialValue)}"`;
@@ -104,7 +104,7 @@ export abstract class AcesManager {
                     aceParameter['initialValue'] = '';
                 }
                 break;
-            case Param.Boolean:
+            case Parameter.Boolean:
                 const b = aceParameter as AceBooleanParameter;
                 if (typeof parameter.opts.initialValue === 'boolean') {
                     switch (parameter.opts.initialValue) {
@@ -119,7 +119,7 @@ export abstract class AcesManager {
                     b['initialValue'] = 'false';
                 }
                 break;
-            case Param.Combo:
+            case Parameter.Combo:
                 const c = aceParameter as AceComboParameter;
                 const items = parameter.opts.items.map(item => item[0]);
 
@@ -135,12 +135,12 @@ export abstract class AcesManager {
                     c['initialValue'] = items[0];
                 }
                 break;
-            case Param.Object:
+            case Parameter.Object:
                 const o = aceParameter as AceObjectParameter;
 
                 o['allowedPluginIds'] = parameter.opts.allowedPluginIds
                 break
-            // case Param.ComboGrouped:
+            // case Parameter.ComboGrouped:
             //     const cg = aceParameter as AceComboGroupedParameter;
 
             //     const itemGroups = parameter._opts.groups.map(group => {
@@ -276,7 +276,7 @@ export abstract class LanguageManager {
         }
     }
 
-    static #createAceParameters(parameters: Parameter[]): AceParametersCollection {
+    static #createAceParameters(parameters: ParameterEntity[]): AceParametersCollection {
         const collection: AceParametersCollection = {} as AceParametersCollection;
 
         parameters.forEach(parameter => {
@@ -286,13 +286,13 @@ export abstract class LanguageManager {
         return collection;
     }
 
-    static #createAceParameter(parameter: Parameter): LanguageAceParameter {
+    static #createAceParameter(parameter: ParameterEntity): LanguageAceParameter {
         const languageParameter: LanguageAceParameter = {} as LanguageAceParameter;
 
         languageParameter['name'] = parameter.name;
         languageParameter['desc'] = parameter.description;
 
-        if (parameter.opts.type === Param.Combo) {
+        if (parameter.opts.type === Parameter.Combo) {
             const p = languageParameter as LanguageAceComboParameter;
             const items = parameter.opts.items;
 
@@ -302,7 +302,7 @@ export abstract class LanguageManager {
             })
         }
 
-        // if (parameter._opts.type === Param.ComboGrouped) {
+        // if (parameter._opts.type === Parameter.ComboGrouped) {
         //     const c = languageParameter as LanguageAceComboGroupedParameter;
         //     const groups = parameter._opts.groups;
 
@@ -400,7 +400,7 @@ export abstract class LanguageManager {
         return aceCategories;
     }
 
-    static #createProperty(property: PluginProperty): LanguageProperty {
+    static #createProperty(property: PropertyEntity): LanguageProperty {
         const _property: LanguageProperty = {} as LanguageProperty;
 
         _property['name'] = property.name;
@@ -423,7 +423,7 @@ export abstract class LanguageManager {
 
         return _property;
     }
-    static #createProperties(properties: PluginProperty[]): LanguagePropertiesCollection {
+    static #createProperties(properties: PropertyEntity[]): LanguagePropertiesCollection {
         const collection: LanguagePropertiesCollection = {} as LanguagePropertiesCollection;
 
         properties.forEach(p => {

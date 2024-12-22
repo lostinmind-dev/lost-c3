@@ -5,7 +5,7 @@ import { Paths, ProjectPaths } from "../../shared/paths.ts";
 import { LostProject } from "../lost-project.ts";
 import { AddonFileManager } from "./file-manager.ts";
 import { Addon } from "./index.ts";
-import { Property } from "../entities/plugin-property.ts";
+import { Property } from "../entities/property.ts";
 import { dedent } from "../../shared/misc.ts";
 
 type StartOptions = {

@@ -1,6 +1,6 @@
 import { bold, italic } from '../misc/text-formatting.ts';
 import type { ICategory } from "./category.ts";
-import type { Parameter } from './parameter.ts';
+import type { ParameterEntity } from './parameter.ts';
 
 export type EntityType =
     | 'action'
@@ -15,7 +15,7 @@ export abstract class Entity<E extends EntityType> {
     readonly _name: string;
     _displayText: string;
     readonly _description: string;
-    readonly _params: Parameter[];
+    readonly _params: ParameterEntity[];
     readonly _func: (this: any, ...args: any[]) => void;
 
     readonly _isDeprecated: boolean;
@@ -29,7 +29,7 @@ export abstract class Entity<E extends EntityType> {
         func: (this: any, ...args: any[]) => void,
         isDeprecated: boolean,
         displayText?: string,
-        params?: Parameter[]
+        params?: ParameterEntity[]
     ) {
         this._category = category;
         this._id = id;
@@ -101,7 +101,7 @@ export type EntityOptions = {
     /**
      * *Optional*. Entity parameters.
      */
-    readonly params?: Parameter[];
+    readonly params?: ParameterEntity[];
     /**
      * *Optional*. Default is **False**.
      * Set to true to highlight the ACE in the condition/action/expression picker dialogs. 

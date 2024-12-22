@@ -4,7 +4,7 @@ export type AddonJSON = {
     "supports-worker-mode"?: boolean;
     "min-construct-version"?: string;
     "is-c3-addon": true;
-    "sdk-version": 2;
+    "sdk-version": 1 | 2;
     "type": AddonType;
     "name": string;
     "id": string;
