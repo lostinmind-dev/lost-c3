@@ -448,15 +448,22 @@ abstract class RuntimeFilesManager {
         
         
         Addon.categories.forEach(c => {
-            const pattern = /static\s*{[\s\S]*?}\s*constructor\s*\([^)]*\)\s*{[\s\S]*?}/g;
+            if (
+                c._actions.length > 0 ||
+                c._conditions.length > 0 ||
+                c._expressions.length > 0
+            ) {
 
-            let classContent = c._module.toString().replace(pattern, '');
-
-            const pattern_2 = /static\s*{\s*_initClass\(\);\s*}/g;
-
-            classContent = classContent.replace(pattern_2, '');
-
-            content = content + `export const ${c._lostId} = new ${classContent};\n`;
+                const pattern = /static\s*{[\s\S]*?}\s*constructor\s*\([^)]*\)\s*{[\s\S]*?}/g;
+    
+                let classContent = c._module.toString().replace(pattern, '');
+    
+                const pattern_2 = /static\s*{\s*_initClass\(\);\s*}/g;
+    
+                classContent = classContent.replace(pattern_2, '');
+    
+                content = content + `export const ${c._lostId} = new ${classContent};\n`;
+            }
             
         });
 
