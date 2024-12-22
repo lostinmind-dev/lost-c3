@@ -1,10 +1,10 @@
-import { BlobWriter, Colors, join, TextReader, UglifyJS, walk, ZipWriter } from "../../deps.ts";
+import { BlobWriter, Colors, join, prettier, TextReader, UglifyJS, walk, ZipWriter } from "../../deps.ts";
 import { dedent, findClassesInheritingFrom, isDirectoryExists } from "../../shared/misc.ts";
 import { BuildFolders, Paths, ProjectFolders } from "../../shared/paths.ts";
 import { Addon } from "./index.ts";
 import Icon from "../defaults/addon-icon.ts";
 import { LostCompiler } from "../lost-compiler.ts";
-import type { AddonPluginType, FunctionsCollection } from "../types/index.ts";
+import type { AddonPluginType, CategoryLinksCollection, FunctionsCollection } from "../types/index.ts";
 import { Property } from "../entities/plugin-property.ts";
 import { AcesManager, AddonMetadataManager, LanguageManager } from "./json-manager.ts";
 import { Logger } from "../../shared/logger.ts";
@@ -16,8 +16,9 @@ export type AddonRuntimeScriptName =
     | 'behavior.js'
     | 'type.js'
     | 'instance.js'
-    | 'conditions.js'
+    | 'categories.js'
     | 'actions.js'
+    | 'conditions.js'
     | 'expressions.js'
     ;
 
@@ -88,9 +89,11 @@ export abstract class AddonFileManager {
     static async getFilesList(): Promise<string[]> {
         const config = Addon.getConfig();
         const requiredFiles: string[] = [
+            'c3runtime/main.js',
             `c3runtime/${config.type}.js`,
             'c3runtime/type.js',
             'c3runtime/instance.js',
+            'c3runtime/categories.js',
             'c3runtime/conditions.js',
             'c3runtime/actions.js',
             'c3runtime/expressions.js',
@@ -101,10 +104,6 @@ export abstract class AddonFileManager {
             `${config.type}.js`,
             'type.js'
         ];
-
-        if (Addon.filesCollection.modules.length > 0) {
-            requiredFiles.unshift('c3runtime/main.js');
-        }
 
         const files: string[] = [...requiredFiles];
 
@@ -201,6 +200,18 @@ export abstract class AddonFileManager {
 
     static async createRuntimeScript(fileName: AddonRuntimeScriptName) {
         switch (fileName) {
+            case 'actions.js':
+                await RuntimeFilesManager.createActions();
+                break;
+            case 'conditions.js':
+                await RuntimeFilesManager.createConditions();
+                break;
+            case 'expressions.js':
+                await RuntimeFilesManager.createExpressions();
+                break;
+            case 'categories.js':
+                await RuntimeFilesManager.createCategories();
+                break;
             case "main.js":
                 await RuntimeFilesManager.createMain();
                 break;
@@ -215,15 +226,6 @@ export abstract class AddonFileManager {
                 break;
             case "instance.js":
                 await RuntimeFilesManager.createInstance();
-                break;
-            case "conditions.js":
-                await RuntimeFilesManager.createConditions();
-                break;
-            case "actions.js":
-                await RuntimeFilesManager.createActions();
-                break;
-            case "expressions.js":
-                await RuntimeFilesManager.createExpressions();
                 break;
         }
     }
@@ -343,8 +345,10 @@ abstract class EditorFilesManager {
         ` + '\n' + initialContent
             ;
 
+        const finalContent = await prettier.format(content, { parser: 'babel' });
 
-        await AddonFileManager.createFile(join(Paths.Build, 'plugin.js'), content);
+
+        await AddonFileManager.createFile(join(Paths.Build, 'plugin.js'), finalContent);
     }
 
     static async createBehavior() {
@@ -375,7 +379,9 @@ abstract class EditorFilesManager {
         ` + '\n' + initialContent
             ;
 
-        await AddonFileManager.createFile(join(Paths.Build, 'behavior.js'), content);
+        const finalContent = await prettier.format(content, { parser: 'babel' });
+
+        await AddonFileManager.createFile(join(Paths.Build, 'behavior.js'), finalContent);
     }
 
     static async createInstance() {
@@ -402,7 +408,9 @@ abstract class EditorFilesManager {
             `globalThis.SDK.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Instance = ${className};
         `;
 
-        await AddonFileManager.createFile(join(Paths.Build, 'instance.js'), content);
+        const finalContent = await prettier.format(content, { parser: 'babel' });
+
+        await AddonFileManager.createFile(join(Paths.Build, 'instance.js'), finalContent);
     }
 
     static async createType() {
@@ -415,20 +423,42 @@ abstract class EditorFilesManager {
                 (type === 'behavior') ? EditorInheritedClass.BehaviorType : ''
         );
 
-        const content = dedent`
+        const content = `
             const Lost = ${JSON.stringify({
-            addonId: config.addonId
-        })};` + '\n' +
-            intialContent +
-            `globalThis.SDK.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Type = ${className};
+                addonId: config.addonId
+            })};
+            ${intialContent}
+
+            globalThis.SDK.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Type = ${className};
         `;
 
-        await AddonFileManager.createFile(join(Paths.Build, 'type.js'), content);
+        const finalContent = await prettier.format(content, { parser: 'babel' });
+
+        await AddonFileManager.createFile(join(Paths.Build, 'type.js'), finalContent);
     }
 
 }
 
 abstract class RuntimeFilesManager {
+    static readonly #categoriesModuleName = 'LostCategories';
+
+    static async createCategories() {
+        
+        let content: string = '';
+        
+        
+        Addon.categories.forEach(c => {
+            const pattern = /static\s*{[\s\S]*?}\s*constructor\s*\([^)]*\)\s*{[\s\S]*?}/g;
+            const classContent = c._module.toString().replace(pattern, '');
+
+            content = content + `export const ${c._lostId} = new ${classContent};\n`;
+            
+        });
+
+        const finalContent = await prettier.format(content, { parser: 'babel' });
+
+        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'categories.js'), finalContent); 
+    }
 
     static async createMain() {
         const config = Addon.getConfig();
@@ -457,7 +487,9 @@ abstract class RuntimeFilesManager {
             `globalThis.C3.Plugins["${config.addonId}"] = ${className};
         `;
 
-        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'plugin.js'), content);
+        const finalContent = await prettier.format(content, { parser: 'babel' });
+
+        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'plugin.js'), finalContent);
     }
 
     static async createBehavior() {
@@ -473,7 +505,9 @@ abstract class RuntimeFilesManager {
             `globalThis.C3.Behaviors["${config.addonId}"] = ${className};
         `;
 
-        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'behavior.js'), content);
+        const finalContent = await prettier.format(content, { parser: 'babel' });
+
+        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'behavior.js'), finalContent);
     }
 
     static async createInstance() {
@@ -499,7 +533,9 @@ abstract class RuntimeFilesManager {
             `globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Instance = ${className};
         `;
 
-        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'instance.js'), content);
+        const finalContent = await prettier.format(content, { parser: 'babel' });
+
+        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'instance.js'), finalContent);
     }
 
     static async createType() {
@@ -519,7 +555,9 @@ abstract class RuntimeFilesManager {
             `globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Type = ${className};
         `;
 
-        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'type.js'), content);
+        const finalContent = await prettier.format(content, { parser: 'babel' });
+
+        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'type.js'), finalContent);
     }
 
     static async createConditions() {
@@ -529,14 +567,19 @@ abstract class RuntimeFilesManager {
         const conditions = Addon.categories.map(c => c._conditions).flat();
 
         conditions.forEach(e => {
-            entities[e._func.name] = e._func;
+            entities[e._func.name] = new Function(`
+                ${this.#categoriesModuleName}["${e._category._lostId}"]["${e._func.name}"].bind(this)()
+            `);
         });
 
-        const content = dedent`
+        const content = `
+            import * as ${this.#categoriesModuleName} from './categories.js';
             globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Cnds = ${serializeEntities(entities)};
         `;
 
-        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'conditions.js'), content);
+        const finalContent = await prettier.format(content, { parser: 'babel' });
+
+        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'conditions.js'), finalContent);
     }
 
     static async createActions() {
@@ -546,14 +589,19 @@ abstract class RuntimeFilesManager {
         const actions = Addon.categories.map(c => c._actions).flat();
 
         actions.forEach(e => {
-            entities[e._func.name] = e._func;
+            entities[e._func.name] = new Function(`
+                ${this.#categoriesModuleName}["${e._category._lostId}"]["${e._func.name}"].bind(this)()
+            `);
         });
 
-        const content = dedent`
+        const content = `
+            import * as ${this.#categoriesModuleName} from './categories.js';
             globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Acts = ${serializeEntities(entities)};
         `;
 
-        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'actions.js'), content);
+        const finalContent = await prettier.format(content, { parser: 'babel' });
+
+        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'actions.js'), finalContent);
     }
 
     static async createExpressions() {
@@ -563,14 +611,19 @@ abstract class RuntimeFilesManager {
         const expressions = Addon.categories.map(c => c._expressions).flat();
 
         expressions.forEach(e => {
-            entities[e._func.name] = e._func;
+            entities[e._func.name] = new Function(`
+                ${this.#categoriesModuleName}["${e._category._lostId}"]["${e._func.name}"].bind(this)()
+            `);
         });
 
-        const content = dedent`
+        const content = `
+            import * as ${this.#categoriesModuleName} from './categories.js';
             globalThis.C3.${(type === 'plugin') ? 'Plugins' : 'Behaviors'}["${config.addonId}"].Exps = ${serializeEntities(entities)};
         `;
 
-        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'expressions.js'), content);
+        const finalContent = await prettier.format(content, { parser: 'babel' });
+        
+        await AddonFileManager.createFile(join(Paths.BuildAddonC3Runtime, 'expressions.js'), finalContent);
     }
 
 }
@@ -597,11 +650,14 @@ function serializeEntities(entities: FunctionsCollection): string {
     for (const key in entities) {
         if (entities.hasOwnProperty(key)) {
             const value = entities[key];
+
             if (typeof value === 'function') {
-                /** Convert function to string */
-                str += `  ${key}: function ${value.toString().replace(/^function\s*\w*\s*/, '')},\n`;
+                str += `  ${key}: function ${(value as Function).toString().replace(/^function\s*\w*\s*/, '')},\n`;
+            } else if (typeof value === 'string' && (value as string).startsWith('LostCategories[')) {
+                /** Directly embed the string without quotes */
+                str += dedent`  ${key}: ${value},\n`;
             } else {
-                str += `  ${key}: ${JSON.stringify(value, null, 2)},\n`;
+                str += dedent`  ${key}: ${JSON.stringify(value, null, 2)},\n`;
             }
         }
     }

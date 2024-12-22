@@ -31,8 +31,8 @@ export abstract class AddonMetadataManager {
         const fileList = await AddonFileManager.getFilesList();
         
         const json: AddonJSON = {
-            "supports-worker-mode": (config.supportWorkerMode) ? config.supportWorkerMode : undefined,
-            "min-construct-version": (config.minConstructVersion) ? config.minConstructVersion : undefined,
+            "supports-worker-mode": config.supportWorkerMode,
+            "min-construct-version": config.minConstructVersion,
             "is-c3-addon": true,
             "sdk-version": 2,
             "type": config.type,

@@ -1,3 +1,4 @@
+import type { ICategory } from "./category.ts";
 import { Entity, type EntityOptions } from './entity.ts';
 
 /**
@@ -6,13 +7,14 @@ import { Entity, type EntityOptions } from './entity.ts';
 export class ExpressionEntity extends Entity<'expression'> {
     readonly _opts?: IExpressionOptions;
     constructor(
+        category: ICategory,
         id: string,
         name: string,
         description: string,
         func: (this: any, ...args: any[]) => void,
         opts?: IExpressionOptions
     ) {
-        super('expression', id, name, description, func, opts?.isDeprecated || false, '', opts?.params);
+        super('expression', category, id, name, description, func, opts?.isDeprecated || false, '', opts?.params);
         this._opts = opts;
     }
 }
@@ -27,7 +29,7 @@ export interface IExpressionOptions extends EntityOptions {
      * *Optional*. Default is **False**. Allow the user to enter any number of parameters beyond those defined. 
      * @description In other words the parameters (if any) listed in "params" are required, but this flag enables adding further "any" type parameters beyond the end.
      */
-    readonly isVariadicParameters?: boolean;
+    readonly isVariadicParameters?: true;
 }
 
 /** Expression return type */
@@ -65,7 +67,7 @@ export function Expression(
             }
 
             this.constructor.prototype._expressions.push(
-                new ExpressionEntity(id, name, description, value, options)
+                new ExpressionEntity(this.constructor.prototype, id, name, description, value, options)
             );
         });
     };

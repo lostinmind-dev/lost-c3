@@ -18,23 +18,10 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
         this._info.SetHelpUrl(globalThis.lang(".help-url"));
         this._info.SetIcon(icon.name, icon.iconType);
 
-        if (config.deprecated) {
-            this._info.SetIsDeprecated(config.deprecated);
-        } else {
-            this._info.SetIsDeprecated(false);
-        }
+        this._info.SetIsDeprecated(config.deprecated || false);
+        this._info.SetCanBeBundled(config.canBeBundled || true);
+        this._info.SetIsOnlyOneAllowed(config.isOnlyOneAllowed || false);
 
-        if (config.canBeBundled) {
-            this._info.SetCanBeBundled(config.canBeBundled);
-        } else {
-            this._info.SetCanBeBundled(true);
-        }
-
-        if (config.isOnlyOneAllowed) {
-            this._info.SetIsOnlyOneAllowed(config.isOnlyOneAllowed);
-        } else {
-            this._info.SetIsOnlyOneAllowed(false);
-        }
 
         SDK.Lang.PushContext(".properties");
 
@@ -50,14 +37,13 @@ const BEHAVIOR_CLASS = SDK.Behaviors[config.addonId] = class LostBehavior extend
     }
 
     private setupUserModules() {
-        const modules = _lostData.files.filter(file => file.type === 'module-script');
-        if (modules.length > 0) {
-            this._info.SetRuntimeModuleMainScript('c3runtime/main.js');
+        this._info.SetRuntimeModuleMainScript('c3runtime/main.js');
+        this._info.AddC3RuntimeScript('c3runtime/categories.js');
 
-            modules.forEach(file => {
-                this._info.AddC3RuntimeScript(file.path);
-            })
-        }
+        const modules = _lostData.files.filter(file => file.type === 'module-script');
+        modules.forEach(file => {
+            this._info.AddC3RuntimeScript(file.path);
+        });
     }
 
     private addRemoteScripts() {

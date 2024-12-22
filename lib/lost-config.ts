@@ -70,7 +70,7 @@ type LostConfigBase<A> = {
      * This will cause worker mode "auto" to switch to DOM mode which may degrade the performance of the project.
      * If the user attempts to switch worker mode to "Yes" in project using the addon, then Construct will show an error message highlighting the addon that does not support the mode, and prevent changing the setting.
      */
-    readonly supportWorkerMode?: true;
+    readonly supportWorkerMode?: false;
     /**
      * *Optional*. Default is ***False***. Set a boolean of whether the addon is deprecated or not. 
      * @description If you wish to replace your addon with another one, the old one can be deprecated with true. 
@@ -92,7 +92,7 @@ type LostConfigBase<A> = {
      * By default all addons may be bundled with a project, and it is recommended to leave this enabled for best user convenience. 
      * However if you publish a commercial addon and want to prevent it being distributed by project-bundling, you may wish to disable this.
      */
-    readonly canBeBundled?: true;
+    readonly canBeBundled?: false;
 }
 
 type PluginCategory =
@@ -143,11 +143,11 @@ interface IWorldPluginConfig extends IPluginConfigBase<'world'> {
     /**
      * *Optional*. Default is ***True***. Pass true to enable resizing instances in the Layout View.
      */
-    readonly isResizable?: true;
+    readonly isResizable?: false;
     /**
      * *Optional*. Default is ***True***. Pass true to enable the Angle property and rotating instances in the Layout View.
      */
-    readonly isRotatable?: true;
+    readonly isRotatable?: false;
     /**
      * *Optional*. Default is ***False***. Pass true to specify that this plugin renders in 3D.
      * @description This will cause the presence of the plugin in a project to enable 3D rendering when the project Rendering mode property is set to Auto (which is the default setting).
@@ -162,22 +162,22 @@ interface IWorldPluginConfig extends IPluginConfigBase<'world'> {
      * *Optional*. Default is ***True***. Pass true to allow using Z elevation with this plugin.
      * @description By default the renderer applies the Z elevation before calling the Draw() method on an instance, which in many cases is sufficient to handle rendering Z elevation correctly, but be sure to take in to account Z elevation in the drawing method if it does more complex rendering.
      */
-    readonly supportsZElevation?: true;
+    readonly supportsZElevation?: false;
     /**
      * *Optional*. Default is ***True***. Pass true to allow using the built-in color property to tint the object appearance.
      * @description By default the renderer sets the color before calling the Draw() method on an instance, which in many cases is sufficient to handle rendering with the applied color, but be sure to take in to account the instance color in the drawing method if it does more complex rendering.
      */
-    readonly supportsColor?: true;
+    readonly supportsColor?: false;
     /**
      * *Optional*. Default is ***True***. Pass true to allow using effects, including the Blend mode property, with this plugin.
      * @description If the plugin does not simply draw a texture the size of the object (as Sprite does), you should also call SetMustPreDraw(true).
      */
-    readonly supportsEffects?: true;
+    readonly supportsEffects?: false;
     /**
      * *Optional*. Default is ***True***. Pass true to disable an optimisation in the effects engine for objects that simply draw a texture the size of the object (e.g. Sprite).
      * @description This is necessary for effects to render correctly if the plugin draws anything other than the equivalent the Sprite plugin would.
      */
-    readonly mustPreDraw?: true;
+    readonly mustPreDraw?: false;
     /**
      * *Optional*. Add common built-in sets of actions, conditions and expressions (ACEs) to the plugin relating to various built-in features.
      * @description If adding common scene graph ACEs, your plugin must be prepared to handle being added in to a scene-graph hierarchy, and having its position, size and angle controlled automatically.

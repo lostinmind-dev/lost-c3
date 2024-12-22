@@ -412,13 +412,16 @@ export abstract class Addon<A extends AddonType = any, P = any> {
                         if (mimeType === MimeType.TS) {
                             try {
                                 const categoryPath = import.meta.resolve(`file://${join(path, entry.name)}`);
-                                const categoryModule = (await import(`${categoryPath}?t=${Date.now()}`)).default;
+
+                                const categoryModule = (await import(`${categoryPath}?t=${Date.now()}`)).default as typeof Object;
+                                
                                 const category = (new categoryModule()).constructor.prototype as ICategory;
 
                                 if (
                                     category &&
                                     '_id' in category
                                 ) {
+                                    category._module = categoryModule;
                                     this.#addCategory(category);
                                 }
                             } catch (e) {
@@ -773,14 +776,15 @@ export abstract class Addon<A extends AddonType = any, P = any> {
     /** Adds addon category */
     static #addCategory(category: ICategory) {
         if (!category._inDevelopment) {
+            
+            
+            this.categories.push(category);
+            
             this.#checkCategory(category);
 
             Logger.Loading(
-                `[${Colors.blue(String(this.categories.length + 1))}] Found category [${Colors.cyan(Colors.bold((category._name)))}]`
+                `[${Colors.blue(String(this.categories.length))}] Found category [${Colors.cyan(Colors.bold((category._name)))}]`
             );
-
-            this.categories.push(category);
-
         }
     }
 

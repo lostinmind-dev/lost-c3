@@ -1,4 +1,5 @@
 import { bold, italic } from '../misc/text-formatting.ts';
+import type { ICategory } from "./category.ts";
 import type { Parameter } from './parameter.ts';
 
 export type EntityType =
@@ -8,6 +9,7 @@ export type EntityType =
     ;
 
 export abstract class Entity<E extends EntityType> {
+    readonly _category: ICategory;
     readonly _type: E;
     readonly _id: string;
     readonly _name: string;
@@ -20,6 +22,7 @@ export abstract class Entity<E extends EntityType> {
 
     constructor(
         type: E,
+        category: ICategory,
         id: string,
         name: string,
         description: string,
@@ -28,6 +31,7 @@ export abstract class Entity<E extends EntityType> {
         displayText?: string,
         params?: Parameter[]
     ) {
+        this._category = category;
         this._id = id;
         this._type = type;
         this._name = name;
@@ -91,9 +95,9 @@ export abstract class Entity<E extends EntityType> {
 /** Object represents base options for each entity type */
 export type EntityOptions = {
     /**
-     * *Optional*. Set to true to mark as deprecated.
+     * *Optional*. Default is **False**. Set to true to mark as deprecated.
      */
-    readonly isDeprecated?: boolean;
+    readonly isDeprecated?: true;
     /**
      * *Optional*. Entity parameters.
      */

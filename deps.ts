@@ -22,3 +22,5 @@ export { Md5 } from 'npm:ts-md5@1.3.1';
 import type { UglifyJSType } from './shared/uglify-js-type.ts';
 import * as uglifyjs from 'npm:uglify-js@3.19.3';
 export const UglifyJS: UglifyJSType = uglifyjs;
+
+export * as prettier from 'npm:prettier@4.0.0-alpha.10'

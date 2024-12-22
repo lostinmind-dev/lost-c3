@@ -22,6 +22,10 @@ export type LostData = {
     readonly files: LostDataFile[];
 }
 
+export type CategoryLinksCollection = {
+    [key: string]: string;
+}
+
 export type FunctionsCollection = {
     [key: string]: Function | ((...args: any[]) => void);
 }

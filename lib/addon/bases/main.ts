@@ -1,4 +1,4 @@
-import { compileTypescript } from "../../../shared/compile.ts";
+import { LostCompiler } from "../../lost-compiler.ts";
 import { Logger } from "../../../shared/logger.ts";
 import { join } from "../../../deps.ts";
 
@@ -17,13 +17,13 @@ async function main() {
 
 
 async function buildPluginBase() {
-    const content = compileTypescript(PluginBaseFilePath) || '';
+    const content = LostCompiler.compile(PluginBaseFilePath) || '';
 
     await Deno.writeTextFile(join(AddonBasesPath, 'plugin.js'), content)
 }
 
 async function buildBehaviorBase() {
-    const content = compileTypescript(BehaviorBaseFilePath) || '';
+    const content = LostCompiler.compile(BehaviorBaseFilePath) || '';
 
     await Deno.writeTextFile(join(AddonBasesPath, 'behavior.js'), content)
 }

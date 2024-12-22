@@ -16,6 +16,8 @@ type CategoryOptions = {
 }
 
 export interface ICategory {
+    _module: typeof Object;
+    readonly _lostId: string;
     readonly _id: string;
     readonly _name: string;
     readonly _isDeprecated: boolean;
@@ -34,7 +36,9 @@ export interface ICategory {
  * @param opts *Optional*. Custom options.
  */
 export function Category<C extends string[]>(id: C[number], name: string, opts?: CategoryOptions) {
-    return function (target: any, context: ClassDecoratorContext) {
+    return function (target: { prototype: any }, context: ClassDecoratorContext) {
+        target.prototype._module = {};
+        target.prototype._lostId = (`${id}_${name}`).replace(/\s+/g, '').toLowerCase();
         target.prototype._id = id;
         target.prototype._name = name;
         if (name.length === 0) {

@@ -97,13 +97,11 @@ export abstract class AddonBuilder {
             await AddonFileManager.createEditorScript('behavior.js');
             await AddonFileManager.createRuntimeScript('behavior.js');
         }
-
-        if (Addon.filesCollection.modules.length > 0) {
-            await AddonFileManager.createRuntimeScript('main.js');
-        }
-
+        
+        await AddonFileManager.createRuntimeScript('main.js');
         await AddonFileManager.createRuntimeScript('type.js');
         await AddonFileManager.createRuntimeScript('instance.js');
+        await AddonFileManager.createRuntimeScript('categories.js');
         await AddonFileManager.createRuntimeScript('actions.js');
         await AddonFileManager.createRuntimeScript('conditions.js');
         await AddonFileManager.createRuntimeScript('expressions.js');

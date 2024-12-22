@@ -1,3 +1,4 @@
+import { ICategory } from "./category.ts";
 import { Entity, type EntityOptions } from "./entity.ts";
 
 /**
@@ -7,6 +8,7 @@ export class ActionEntity extends Entity<'action'> {
     readonly _opts?: IActionOptions;
 
     constructor(
+        category: ICategory,
         id: string,
         name: string,
         displayText: string,
@@ -14,7 +16,7 @@ export class ActionEntity extends Entity<'action'> {
         func: (this: any, ...args: any[]) => void,
         opts?: IActionOptions
     ) {
-        super('action', id, name, description, func, opts?.isDeprecated || false, displayText, opts?.params);
+        super('action', category, id, name, description, func, opts?.isDeprecated || false, displayText, opts?.params);
         this._opts = opts;
 
     }
@@ -26,7 +28,7 @@ interface IActionOptions extends EntityOptions {
      * *Optional*. Default is **False**. Set to true to mark the action as asynchronous. 
      * @description Make the action method an async function, and the system Wait for previous actions to complete action will be able to wait for the action as well.
      */
-    readonly isAsync?: boolean;
+    readonly isAsync?: true;
 }
 
 
@@ -63,7 +65,7 @@ export function Action(
             }
 
             this.constructor.prototype._actions.push(
-                new ActionEntity(id, name, displayText, description, value, options)
+                new ActionEntity(this.constructor.prototype, id, name, displayText, description, value, options)
             );
         });
     };

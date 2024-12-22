@@ -1,3 +1,4 @@
+import type { ICategory } from "./category.ts";
 import { Entity, type EntityOptions } from './entity.ts';
 /**
  * @class represents Condition entity.
@@ -5,6 +6,7 @@ import { Entity, type EntityOptions } from './entity.ts';
 export class ConditionEntity extends Entity<'condition'> {
     readonly _opts?: IConditionOptions;
     constructor(
+        category: ICategory,
         id: string,
         name: string,
         displayText: string,
@@ -12,7 +14,7 @@ export class ConditionEntity extends Entity<'condition'> {
         func: (this: any, ...args: any[]) => void,
         opts?: IConditionOptions
     ) {
-        super('condition', id, name, description, func, opts?.isDeprecated || false, displayText, opts?.params);
+        super('condition', category, id, name, description, func, opts?.isDeprecated || false, displayText, opts?.params);
         this._opts = opts;
     }
 }
@@ -24,35 +26,35 @@ export interface IConditionOptions extends EntityOptions {
      * @description This appears with an arrow in the event sheet. 
      * Instead of being evaluated every tick, triggers only run when they are explicity triggered by a runtime call.
      */
-    readonly isTrigger?: boolean;
+    readonly isTrigger?: false;
     /**
      * *Optional*. Default is **False**. Specifies a fake trigger. 
      * @description This appears identical to a trigger in the event sheet, but is actually evaluated every tick. 
      * This is useful for conditions which are true for a single tick, such as for APIs which must poll a value every tick.
      */
-    readonly isFakeTrigger?: boolean;
+    readonly isFakeTrigger?: true;
     /**
      * *Optional*. Default is **False**. Normally, the condition runtime method is executed once per picked instance. 
      * @description If the condition is marked static, the runtime method is executed once only, on the object type class. 
      * This means the runtime method must also implement the instance picking entirely itself, including respecting negation and OR blocks.
      */
-    readonly isStatic?: boolean;
+    readonly isStatic?: true;
     /**
      * *Optional*. Default is **False**. Display an icon in the event sheet to indicate the condition loops. 
      * @description The condition method should use ILoopingConditionContext to implement its loop.
      * @link https://www.construct.net/en/make-games/manuals/construct-3/scripting/scripting-reference/addon-sdk-interfaces/iloopingconditioncontext
      */
-    readonly isLooping?: boolean;
+    readonly isLooping?: true;
     /**
      * *Optional*. Default is **true**. Allow the condition to be inverted in the event sheet.
      * @description Set to False to disable invert.
      */
-    readonly isInvertible?: boolean;
+    readonly isInvertible?: false;
     /**
      * *Optional*. Default is **True**. Allow the condition to be used in the same branch as a trigger. 
      * @description Set to false if the condition does not make sense when used in a trigger, such as the Trigger once condition.
      */
-    readonly isCompatibleWithTriggers?: boolean;
+    readonly isCompatibleWithTriggers?: false;
 }
 
 
@@ -89,7 +91,7 @@ export function Condition(
             }
 
             this.constructor.prototype._conditions.push(
-                new ConditionEntity(id, name, displayText, description, value, options)
+                new ConditionEntity(this.constructor.prototype, id, name, displayText, description, value, options)
             );
 
         });

@@ -146,7 +146,7 @@ export abstract class LostProject {
         }
 
         const handler = async (req: Request): Promise<Response> => {
-            Logger.Clear();
+            // Logger.Clear();
             try {
                 const url = new URL(req.url);
                 // let filePath = url.pathname;
