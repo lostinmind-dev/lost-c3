@@ -166,7 +166,11 @@ export abstract class AddonBuilder {
 
                 let symbol: StringPropertyType = StringPropertyType.Unknown;
 
-                if (type !== Property.Group) {
+                if (
+                    type !== Property.Group &&
+                    type !== Property.Link &&
+                    type !== Property.Info
+                ) {
                     switch (property.opts.type) {
                         case Property.Integer:
                             symbol = StringPropertyType.Number
@@ -197,12 +201,6 @@ export abstract class AddonBuilder {
                             break;
                         case Property.Object:
                             symbol = StringPropertyType.Number
-                            break;
-                        case Property.Info:
-                            symbol = StringPropertyType.Unknown
-                            break;
-                        case Property.Link:
-                            symbol = StringPropertyType.Unknown
                             break;
                     }
 
