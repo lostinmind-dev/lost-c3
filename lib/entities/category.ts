@@ -38,7 +38,7 @@ export interface ICategory {
 export function Category<C extends string[]>(id: C[number], name: string, opts?: CategoryOptions) {
     return function (target: { prototype: any }, context: ClassDecoratorContext) {
         target.prototype._module = {};
-        target.prototype._lostId = (`${id}_${name}`).replace(/\s+/g, '').toLowerCase();
+        target.prototype._lostId = (`${id}_${name.replace(/\[(.)\](.+?)\[\/\1\]/g, '')}`).replace(/\s+/g, '').toLowerCase();
         target.prototype._id = id;
         target.prototype._name = name;
         if (name.length === 0) {

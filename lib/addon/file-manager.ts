@@ -579,8 +579,8 @@ abstract class RuntimeFilesManager {
         const conditions = Addon.categories.map(c => c._conditions).flat();
 
         conditions.forEach(e => {
-            entities[e._func.name] = new Function(`
-                return ${this.#categoriesModuleName}["${e._category._lostId}"]["${e._func.name}"].bind(this)();
+            entities[e._func.name] = new Function('...args', `
+                return ${this.#categoriesModuleName}["${e._category._lostId}"]["${e._func.name}"].bind(this)(...args);
             `);
         });
 
@@ -601,8 +601,8 @@ abstract class RuntimeFilesManager {
         const actions = Addon.categories.map(c => c._actions).flat();
 
         actions.forEach(e => {
-            entities[e._func.name] = new Function(`
-                ${this.#categoriesModuleName}["${e._category._lostId}"]["${e._func.name}"].bind(this)()
+            entities[e._func.name] = new Function('...args', `
+                ${this.#categoriesModuleName}["${e._category._lostId}"]["${e._func.name}"].bind(this)(...args)
             `);
         });
 
@@ -623,8 +623,8 @@ abstract class RuntimeFilesManager {
         const expressions = Addon.categories.map(c => c._expressions).flat();
 
         expressions.forEach(e => {
-            entities[e._func.name] = new Function(`
-                return ${this.#categoriesModuleName}["${e._category._lostId}"]["${e._func.name}"].bind(this)();
+            entities[e._func.name] = new Function('...args', `
+                return ${this.#categoriesModuleName}["${e._category._lostId}"]["${e._func.name}"].bind(this)(...args);
             `);
         });
 

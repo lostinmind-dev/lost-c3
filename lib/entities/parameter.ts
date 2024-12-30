@@ -16,7 +16,9 @@ export enum Parameter {
     EventVar = 'eventvar',
     EventVarBool = 'eventvarbool',
     Animation = 'animation',
-    ObjInstanceVar = 'objinstancevar'
+    ObjInstanceVar = 'objinstancevar',
+    /** Hidden */
+    Template = 'template'
 }
 
 /**

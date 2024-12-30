@@ -54,7 +54,7 @@ export abstract class AddonBuilder {
                 const elapsedTime = (performance.now()) - startTime;
                 Logger.LogBetweenLines(
                     '✅', `Addon [${Colors.yellow(config.addonId)}] has been ${Colors.green('successfully')} built`,
-                    '\n⏱️ ', `Addon build time: ${Colors.bold(Colors.yellow(String(elapsedTime.toFixed(2))))} ms!`
+                    '\n⏱️ ', `Addon build time: ${Colors.bold(Colors.yellow(String(elapsedTime.toFixed(2))))} ms! [${Colors.bold(new Date().toISOString().replace('T', ' - '))}]`
                 );
 
                 if (LostProject.buildOptions.watch) {

@@ -69,7 +69,12 @@ export abstract class LostProject {
             toplevel: boolean,
         },
         nameCache: {}
-    }
+    } = {
+            mangle: {
+                toplevel: true,
+            },
+            nameCache: {}
+        }
 
 
     static async init(opts: BuildOptions) {

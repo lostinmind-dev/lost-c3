@@ -1,6 +1,6 @@
 {
     "name": "@lost-c3/lib",
-    "version": "4.0.6",
+    "version": "4.1.0",
     "tasks": {
         "publish": "npx jsr publish",
         "uninstall": "deno uninstall lost -g",
@@ -8,6 +8,7 @@
         "build:base": "deno run -A ./lib/addon/bases/main.ts"
     },
     "compilerOptions": {
+        "strict": false,
         "types": [
             "./cli.d.ts",
             "./construct.d.ts",
