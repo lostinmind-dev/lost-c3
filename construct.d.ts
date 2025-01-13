@@ -1,6 +1,5 @@
 export { }
 declare global {
-
 	/** I8DirectionBehaviorInstance.d.ts */
 	type SimulateControlType8Direction = "left" | "right" | "up" | "down";
 
@@ -705,14 +704,14 @@ declare global {
 		}
 	}
 /** IBehaviorInstanceBase.d.ts */ namespace SDK {
-		class IBehaviorInstanceBase {
+		class IBehaviorInstanceBase<M> {
 
-			constructor(sdkBehaviorType: SDK.IBehaviorTypeBase, iBehaviorInstance: SDK.IBehaviorInstance);
+			constructor(sdkBehaviorType: SDK.IBehaviorTypeBase, iBehaviorInstance: SDK.IBehaviorInstance<M>);
 
 			_sdkBehaviorType: SDK.IBehaviorTypeBase;
-			_behaviorInstance: SDK.IBehaviorInstance;
+			_behaviorInstance: SDK.IBehaviorInstance<M>;
 
-			GetBehaviorInstance(): SDK.IBehaviorInstance;
+			GetBehaviorInstance(): SDK.IBehaviorInstance<M>;
 			GetSdkBehaviorType(): SDK.IBehaviorTypeBase;
 
 			Release(): void;
@@ -730,26 +729,26 @@ declare global {
 		}
 	}
 /** IInstanceBase.d.ts */ namespace SDK {
-		class IInstanceBase {
+		class IInstanceBase<M> {
 			static Instance: typeof IInstanceBase;
 			static Type: typeof ITypeBase;
 
-			constructor(sdkType: SDK.ITypeBase, iInstance: SDK.IObjectInstance);
+			constructor(sdkType: SDK.ITypeBase, iInstance: SDK.IObjectInstance<M>);
 
 			_sdkType: SDK.ITypeBase;
-			_inst: SDK.IObjectInstance;
+			_inst: SDK.IObjectInstance<M>;
 
 			Release(): void;
 			OnCreate(): void;
 			OnAfterCreate(): void;
-			OnPropertyChanged(id: string, value: EditorPropertyValueType): void;
+			OnPropertyChanged<K extends keyof M>(id: K, value: M[K]): void;
 			OnTimelinePropertyChanged(id: string, value: number | string, detail: { resultMode: "relative" | "absolute" }): void;
 			OnExitTimelineEditMode(): void;
 
 			LoadC2Property(name: string, valueString: string): boolean;
 			GetObjectType(): SDK.IObjectType;
 			GetProject(): SDK.IProject;
-			GetInstance(): SDK.IObjectInstance;
+			GetInstance(): SDK.IObjectInstance<M>;
 		}
 	}
 
@@ -851,20 +850,19 @@ declare global {
 	/** IPluginProperty.d.ts */
 	type PluginPropertyInitialValueType = number | number[] | string | boolean;
 
-	type PluginPropertyType = "integer" | "float" | "percent" | "text" | "longtext" | "check" | "font" | "combo" | "color" | "object" | "group" | "link" | "info" | "projectfile";
+	type PluginPropertyType = "integer" | "float" | "percent" | "text" | "longtext" | "check" | "font" | "combo" | "color" | "object" | "group" | "link" | "info";
 
 	type PluginPropertyCallbackType = "for-each-instance" | "once-for-type";
 
 	interface PluginPropertyOptions {
-		filter?: string,
 		initialValue?: PluginPropertyInitialValueType,
 		minValue?: number,
 		maxValue?: number,
 		items?: string[],
 		dragSpeedMultiplier?: number,
 		allowedPluginIds?: string[],
-		linkCallback?: (p: SDK.IWorldInstanceBase | SDK.ITypeBase) => void,
-		infoCallback?: (inst: SDK.IInstanceBase) => string,
+		linkCallback?: (p: SDK.IWorldInstanceBase<EditorPropertyValueType> | SDK.ITypeBase) => void,
+		infoCallback?: (inst: SDK.IInstanceBase<EditorPropertyValueType>) => string,
 		callbackType?: PluginPropertyCallbackType,
 		interpolatable?: boolean
 	}
@@ -888,11 +886,11 @@ declare global {
 	}
 	/** IWorldInstanceBase.d.ts */
 	namespace SDK {
-		class IWorldInstanceBase extends SDK.IInstanceBase {
+		class IWorldInstanceBase<M> extends SDK.IInstanceBase<M> {
 
-			constructor(sdkType: SDK.ITypeBase, iInstance: SDK.IWorldInstance);
+			constructor(sdkType: SDK.ITypeBase, iInstance: SDK.IWorldInstance<M>);
 
-			_inst: SDK.IWorldInstance;
+			_inst: SDK.IWorldInstance<M>;
 
 			Draw(iRenderer: SDK.Gfx.IWebGLRenderer, iDrawParams: SDK.Gfx.IDrawParams): void;
 			OnPlacedInLayout(): void;
@@ -1086,7 +1084,7 @@ declare global {
 			GetFamilyByName(name: string): SDK.IFamily | null;
 			GetObjectClassByName(name: string): SDK.IObjectClass | null;
 			GetObjectClassBySID(sid: number): SDK.IObjectClass | null;
-			GetInstanceByUID(uid: number): SDK.IObjectInstance | null;
+			GetInstanceByUID(uid: number): SDK.IObjectInstance<EditorPropertyValueType> | null;
 
 			AddOrReplaceProjectFile(blob: Blob, filename: string, kind?: EditorProjectFileKind): void;
 			GetProjectFileByName(name: string): SDK.IProjectFile | null;
@@ -1095,7 +1093,7 @@ declare global {
 			ShowImportAudioDialog(fileList: Blob[]): void;
 			EnsureFontLoaded(fontName: string): Promise<void>;
 
-			UndoPointChangeObjectInstancesProperty(instances: SDK.IObjectInstance | SDK.IObjectInstance[], propertyId: string): void;
+			UndoPointChangeObjectInstancesProperty(instances: SDK.IObjectInstance<EditorPropertyValueType> | SDK.IObjectInstance<EditorPropertyValueType>[], propertyId: string): void;
 		}
 	}
 /** IProjectFile.d.ts */ namespace SDK {
@@ -1153,16 +1151,17 @@ declare global {
 			Delete(): void;
 		}
 	}
+
 /** IBehaviorInstance.d.ts */ namespace SDK {
-		class IBehaviorInstance {
+		class IBehaviorInstance<M> {
 			GetProject(): SDK.IProject;
 
-			GetPropertyValue(id: string): EditorPropertyValueType;
-			SetPropertyValue(id: string, value: EditorPropertyValueType): void;
+			GetPropertyValue<K extends keyof M>(id: K): M[K];
+			SetPropertyValue<K extends keyof M>(id: K, value: M[K]): void;
 
-			GetObjectInstance(): SDK.IObjectInstance;
+			GetObjectInstance(): SDK.IObjectInstance<M>;
 
-			GetExternalSdkInstance(): SDK.IBehaviorInstanceBase | null;
+			GetExternalSdkInstance(): SDK.IBehaviorInstanceBase<M> | null;
 		}
 	}
 /** IBehaviorType.d.ts */ namespace SDK {
@@ -1219,18 +1218,18 @@ declare global {
 		}
 	}
 /** IObjectInstance.d.ts */ namespace SDK {
-		class IObjectInstance {
+		class IObjectInstance<M> {
 			GetProject(): SDK.IProject;
 			GetObjectType(): SDK.IObjectType;
 
 			GetUID(): number;
 
-			SetPropertyValue(id: string, value: EditorPropertyValueType): void;
-			GetPropertyValue(id: string): EditorPropertyValueType;
+			SetPropertyValue<K extends keyof M>(id: K, value: M[K]): void;
+			GetPropertyValue<K extends keyof M>(id: K): M[K];
 
-			GetTimelinePropertyValue(id: string): EditorPropertyValueType;
+			GetTimelinePropertyValue<K extends keyof M>(id: K): M[K];
 
-			GetExternalSdkInstance(): SDK.IInstanceBase | null;
+			GetExternalSdkInstance(): SDK.IInstanceBase<M> | null;
 		}
 	}
 /** IObjectType.d.ts */ namespace SDK {
@@ -1243,8 +1242,8 @@ declare global {
 
 			AddAnimation(animName: string, frameBlob: Blob, frameWidth: number, frameHeight: number): Promise<SDK.IAnimation>;
 
-			CreateWorldInstance(layer: SDK.ILayer): SDK.IWorldInstance;
-			GetAllInstances(): SDK.IWorldInstance[];
+			CreateWorldInstance(layer: SDK.ILayer): SDK.IWorldInstance<EditorPropertyValueType>;
+			GetAllInstances(): SDK.IWorldInstance<EditorPropertyValueType>[];
 
 			IsInContainer(): boolean;
 			GetContainer(): SDK.IContainer | null;
@@ -1252,7 +1251,7 @@ declare global {
 		}
 	}
 /** IWorldInstance.d.ts */ namespace SDK {
-		class IWorldInstance extends IObjectInstance {
+		class IWorldInstance<M> extends IObjectInstance<M> {
 			GetBoundingBox(): SDK.Rect;
 			GetQuad(): SDK.Quad;
 			GetColor(): SDK.Color;
@@ -2345,15 +2344,21 @@ declare global {
 		isEndingLayout: boolean;
 	}
 
+	interface InstanceHierarchyReadyEvent<InstType> extends InstanceEvent<InstType> {
+		instance: InstType;
+		propagationStopped: boolean;
+	}
+
 	interface InstanceEventMap<InstType> {
 		"destroy": InstanceDestroyEvent<InstType>;
+		"hierarchyready": InstanceHierarchyReadyEvent<InstType>;
 	}
 
 	/** Represents a single instance of an object type.
 	 * @see {@link https://www.construct.net/make-games/manuals/construct-3/scripting/scripting-reference/object-interfaces/iinstance | IInstance documentation } */
 	class IInstance {
 		// Note IInstance does not derive from ConstructEventTargetDispatcher - it implements it
-		// separately to make use of <this> in its type definition.
+		// separately to smake use of <this> in its type definition.
 		addEventListener<K extends keyof InstanceEventMap<this>>(type: K, listener: (ev: InstanceEventMap<this>[K]) => any): void;
 		removeEventListener<K extends keyof InstanceEventMap<this>>(type: K, listener: (ev: InstanceEventMap<this>[K]) => any): void;
 		dispatchEvent(evt: ConstructEvent): void;
@@ -2361,6 +2366,12 @@ declare global {
 		readonly runtime: IRuntime;
 		readonly objectType: IObjectType<this>;
 		readonly plugin: IPlugin_;
+		readonly instVars?: {
+			[key: string]: number | string | boolean;
+		}
+		readonly behaviors?: {
+			[key: string]: IBehaviorInstance<IWorldInstance>;
+		}
 
 		readonly uid: number;
 		readonly templateName: string;
@@ -2535,6 +2546,12 @@ declare global {
 		/** Get the first picked instance of this object type or family when called
 		 * from an event sheet, or null if none is picked. */
 		getFirstPickedInstance<InstT extends InstanceType = InstanceType>(): InstT | null;
+
+		/** 
+		 * Hidden method 
+		 * @override
+		 */
+		createInstance<InstT extends InstanceType = InstanceType>(layerNameOrIndex: string | number, x: number, y: number, createHierarchy?: boolean, templateName?: string): InstT | null;
 	}
 
 	/** Represents a family in the project.
@@ -2551,7 +2568,7 @@ declare global {
 		setInstanceClass(Class: Function): void;
 
 		/** Create a new instance of this object type. */
-		createInstance<InstT extends InstanceType = InstanceType>(layerNameOrIndex: LayerParameter, x: number, y: number, createHierarchy?: boolean, template?: string): InstT;
+		createInstance<InstT extends InstanceType = InstanceType>(layerNameOrIndex: LayerParameter, x: number, y: number, createHierarchy?: boolean, template?: string): InstT | null;
 	}
 	/** IPlatformInfo.d.ts */
 	type PlatformInfoExportType = "preview" | "html5" | "scirra-arcade" | "cordova-android" | "cordova-ios" | "nwjs" | "windows-webview2" | "macos-wkwebview" | "xbox-uwp-webview2" | "instant-games" | "playable-ad" | "linux-cef";
@@ -2785,6 +2802,11 @@ declare global {
 		isEndingLayout: boolean;
 	}
 
+	interface ConstructInstanceHierarchyReadyEvent extends ConstructEvent {
+		instance: IInstance;
+		propagationStopped: boolean;
+	}
+
 	interface RuntimeEventMap {
 		"resize": ConstructResizeEvent;
 		"tick": ConstructEvent;
@@ -2812,6 +2834,7 @@ declare global {
 		"afterload": ConstructEvent;
 		"instancecreate": ConstructInstanceCreateEvent;
 		"instancedestroy": ConstructInstanceDestroyEvent;
+		"hierarchyready": ConstructInstanceHierarchyReadyEvent;
 	}
 
 	/** Represents the Construct engine itself, and is the main entry point in to various Construct APIs.
