@@ -180,31 +180,31 @@ export abstract class AddonBuilder {
             switch (property.opts.type) {
                 case Property.Integer:
                     symbol = StringPropertyType.Number;
-                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Number}`;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Number};`;
                     break;
                 case Property.Float:
                     symbol = StringPropertyType.Number;
-                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Number}`;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Number};`;
                     break;
                 case Property.Percent:
                     symbol = StringPropertyType.Number;
-                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Number}`;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Number};`;
                     break;
                 case Property.Text:
                     symbol = StringPropertyType.String;
-                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.String}`;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.String};`;
                     break;
                 case Property.LongText:
                     symbol = StringPropertyType.String;
-                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.String}`;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.String};`;
                     break;
                 case Property.Checkbox:
                     symbol = StringPropertyType.Boolean;
-                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Boolean}`;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Boolean};`;
                     break;
                 case Property.Font:
                     symbol = StringPropertyType.String;
-                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.String}`;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.String};`;
                     break;
                 // deno-lint-ignore no-case-declarations
                 case Property.Combo:
@@ -216,7 +216,7 @@ export abstract class AddonBuilder {
                     for (const item of items) {
                         editorPropertyValuesMap += `"${item}"`;
                         if (i < items.length - 1) {
-                            editorPropertyValuesMap += ` |`;
+                            editorPropertyValuesMap += ` | `;
                         }
                         i++;
                     }
@@ -224,11 +224,11 @@ export abstract class AddonBuilder {
                     break;
                 case Property.Color:
                     symbol = StringPropertyType.Color;
-                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Color}`;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Color};`;
                     break;
                 case Property.Object:
                     symbol = StringPropertyType.Number;
-                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Number}`;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Number};`;
                     break;
             }
 
