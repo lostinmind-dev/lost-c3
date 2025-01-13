@@ -6,7 +6,6 @@ import { LostProject } from "../lost-project.ts";
 import { AddonFileManager } from "./file-manager.ts";
 import { Addon } from "./index.ts";
 import { ComboPropertyOptions, Property } from "../entities/property.ts";
-import { dedent } from "../../shared/misc.ts";
 
 type StartOptions = {
 

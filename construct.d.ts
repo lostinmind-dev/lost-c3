@@ -717,7 +717,7 @@ declare global {
 			Release(): void;
 			OnCreate(): void;
 
-			OnPropertyChanged(id: string, value: EditorPropertyValueType): void;
+			OnPropertyChanged<K extends keyof M>(id: K, value: M[K]): void;
 		}
 	}
 /** IBehaviorTypeBase.d.ts */ namespace SDK {
