@@ -130,7 +130,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
      * @param name The name of the group.
      */
     createGroup<C extends string[]>(id: C[number], name: string): this {
-        if (!this.isPropertyExists(id)) {
+        if (!this.#isPropertyExists(id)) {
             if (
                 id.length > 0 &&
                 name.length > 0
@@ -189,7 +189,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
         descriptionOrOpts: string | AddonPropertyOptions<A, P, I, T>,
         opts?: AddonPropertyOptions<A, P, I, T>
     ) {
-        if (!this.isPropertyExists(id)) {
+        if (!this.#isPropertyExists(id)) {
             let description: string = 'There is no any description yet...';
             let options: AddonPropertyOptions<A, P, I, T>;
             if (typeof descriptionOrOpts === 'string' && opts) {
@@ -223,7 +223,7 @@ export abstract class Addon<A extends AddonType = any, P = any> {
         }
     }
 
-    isPropertyExists(id: string): boolean {
+    #isPropertyExists(id: string): boolean {
         const isExists = this.properties.find(p => p.id === id);
         return (isExists) ? true : false;
     }

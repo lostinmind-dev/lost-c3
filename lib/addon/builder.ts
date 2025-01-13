@@ -1,11 +1,11 @@
-import { Colors, join } from "../../deps.ts";
+import { Colors, join, prettier } from "../../deps.ts";
 import { LostCompiler } from "../lost-compiler.ts";
 import { Logger } from "../../shared/logger.ts";
 import { Paths, ProjectPaths } from "../../shared/paths.ts";
 import { LostProject } from "../lost-project.ts";
 import { AddonFileManager } from "./file-manager.ts";
 import { Addon } from "./index.ts";
-import { Property } from "../entities/property.ts";
+import { ComboPropertyOptions, Property } from "../entities/property.ts";
 import { dedent } from "../../shared/misc.ts";
 
 type StartOptions = {
@@ -44,7 +44,7 @@ export abstract class AddonBuilder {
 
                 await AddonFileManager.clear();
 
-                await this.#createPropertiesDeclaration();
+                await this.#createDeclarations();
 
                 const startTime = performance.now();
                 Logger.LogBetweenLines('🚀 Starting build process...');
@@ -148,76 +148,120 @@ export abstract class AddonBuilder {
     }
 
     /** Creates *properties.d.ts* of user plugin properties */
-    static async #createPropertiesDeclaration() {
+    static async #createDeclarations() {
         enum StringPropertyType {
             Boolean = 'boolean',
             Number = 'number',
             String = 'string',
-            Color = '[number, number, number]',
-            Unknown = 'unknown'
+            Color = 'SDK.Color'
         }
         const properties = Addon.getProperties();
 
-        if (properties.length > 0) {
-            const types: string[] = [];
+        let propertiesReturnTypesContent = `
+            declare type Properties = [
+        `;
 
-            properties.forEach((property, i) => {
-                const type = property.opts.type;
+        let editorPropertyValuesMap = `
+            type EditorPropertyValuesMap = {
+        `;
 
-                let symbol: StringPropertyType = StringPropertyType.Unknown;
+        const propertiesIdsContent = `
+            declare type PropertyId = keyof EditorPropertyValuesMap;
+        `;
 
-                if (
-                    type !== Property.Group &&
-                    type !== Property.Link &&
-                    type !== Property.Info
-                ) {
-                    switch (property.opts.type) {
-                        case Property.Integer:
-                            symbol = StringPropertyType.Number
-                            break;
-                        case Property.Float:
-                            symbol = StringPropertyType.Number
-                            break;
-                        case Property.Percent:
-                            symbol = StringPropertyType.Number
-                            break;
-                        case Property.Text:
-                            symbol = StringPropertyType.String
-                            break;
-                        case Property.LongText:
-                            symbol = StringPropertyType.String
-                            break;
-                        case Property.Checkbox:
-                            symbol = StringPropertyType.Boolean
-                            break;
-                        case Property.Font:
-                            symbol = StringPropertyType.String
-                            break;
-                        case Property.Combo:
-                            symbol = StringPropertyType.Number
-                            break;
-                        case Property.Color:
-                            symbol = StringPropertyType.Color
-                            break;
-                        case Property.Object:
-                            symbol = StringPropertyType.Number
-                            break;
+        const editorPropertyValue = `
+            declare type EditorPropertyValue<K extends PropertyId> = EditorPropertyValuesMap[K];
+        `;
+
+        let index: number = 0;
+        for (const property of properties) {
+            let symbol: StringPropertyType | null = null;
+
+            switch (property.opts.type) {
+                case Property.Integer:
+                    symbol = StringPropertyType.Number;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Number}`;
+                    break;
+                case Property.Float:
+                    symbol = StringPropertyType.Number;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Number}`;
+                    break;
+                case Property.Percent:
+                    symbol = StringPropertyType.Number;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Number}`;
+                    break;
+                case Property.Text:
+                    symbol = StringPropertyType.String;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.String}`;
+                    break;
+                case Property.LongText:
+                    symbol = StringPropertyType.String;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.String}`;
+                    break;
+                case Property.Checkbox:
+                    symbol = StringPropertyType.Boolean;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Boolean}`;
+                    break;
+                case Property.Font:
+                    symbol = StringPropertyType.String;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.String}`;
+                    break;
+                // deno-lint-ignore no-case-declarations
+                case Property.Combo:
+                    symbol = StringPropertyType.Number
+                    const opts = property.opts as ComboPropertyOptions;
+                    const items = opts.items.map(i => i[0]);
+                    editorPropertyValuesMap += `'${property.id}':`
+                    let i = 0;
+                    for (const item of items) {
+                        editorPropertyValuesMap += `"${item}"`;
+                        if (i < items.length - 1) {
+                            editorPropertyValuesMap += ` |`;
+                        }
+                        i++;
                     }
+                    editorPropertyValuesMap += `;`;
+                    break;
+                case Property.Color:
+                    symbol = StringPropertyType.Color;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Color}`;
+                    break;
+                case Property.Object:
+                    symbol = StringPropertyType.Number;
+                    editorPropertyValuesMap += `'${property.id}': ${StringPropertyType.Number}`;
+                    break;
+            }
 
-                    types.push(symbol);
-                }
-            })
-
-            const content = dedent`
-                declare type PluginProperties = [
-                    ${types.join(', ')}
-                ]
-            `
-
-            await Deno.mkdir(Paths.AddonTypes, { recursive: true });
-
-            await Deno.writeTextFile(Paths.PluginPropertiesTypesFile, content);
+            if (symbol) {
+                propertiesReturnTypesContent += `${symbol},`
+            }
         }
+
+        editorPropertyValuesMap += `};`
+        propertiesReturnTypesContent += `];`
+
+        const content = 
+            propertiesReturnTypesContent +
+            propertiesIdsContent +
+            editorPropertyValuesMap +
+            editorPropertyValue
+        ;
+
+        const finalContent = await prettier.format(content, { parser: 'babel-ts' });
+
+        await Deno.mkdir(Paths.AddonTypes, { recursive: true });
+
+        await Deno.writeTextFile(Paths.PluginPropertiesTypesFile, finalContent);
     }
 
 }
+
+// type PropertyId = keyof EditorPropertyValuesMap;
+
+// type EditorPropertyValuesMap = {
+//     'myId': string;
+// }
+
+// type EditorPropertyValue<K extends PropertyId> = EditorPropertyValuesMap[K];
+
+// const a: EditorPropertyValue<'myId'> = 

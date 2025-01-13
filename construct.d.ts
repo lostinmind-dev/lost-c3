@@ -851,11 +851,12 @@ declare global {
 	/** IPluginProperty.d.ts */
 	type PluginPropertyInitialValueType = number | number[] | string | boolean;
 
-	type PluginPropertyType = "integer" | "float" | "percent" | "text" | "longtext" | "check" | "font" | "combo" | "color" | "object" | "group" | "link" | "info";
+	type PluginPropertyType = "integer" | "float" | "percent" | "text" | "longtext" | "check" | "font" | "combo" | "color" | "object" | "group" | "link" | "info" | "projectfile";
 
 	type PluginPropertyCallbackType = "for-each-instance" | "once-for-type";
 
 	interface PluginPropertyOptions {
+		filter?: string,
 		initialValue?: PluginPropertyInitialValueType,
 		minValue?: number,
 		maxValue?: number,

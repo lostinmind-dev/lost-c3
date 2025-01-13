@@ -319,6 +319,13 @@ const PLUGIN_CLASS = SDK.Plugins[config.addonId] = class LostPlugin extends SDK.
                             )
                         }
                         break;
+                    case Property.ProjectFile:
+                        properties.push(
+                            new SDK.PluginProperty(opts.type, id, {
+                                filter: opts.filter
+                            })
+                        )
+                        break;
                 }
             })
         }

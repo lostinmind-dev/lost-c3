@@ -13,6 +13,7 @@ export enum Property {
     Group = 'group',
     Info = 'info',
     Link = 'link',
+    /** Hidden */
     // ProjectFile = 'projectfile'
 }
 
@@ -82,8 +83,6 @@ export type BehaviorPropertyOptions =
     | FontPropertyOptions
     | ComboPropertyOptions
     | ColorPropertyOptions
-    | ObjectPropertyOptions
-    | GroupPropertyOptions
     ;
 
 type ObjectPluginPropertyOptions<I, T> =
@@ -98,6 +97,7 @@ type ObjectPluginPropertyOptions<I, T> =
     | ColorPropertyOptions
     | ObjectPropertyOptions
     | GroupPropertyOptions
+    | ProjectFilePropertyOptions
     | InfoPropertyOptions<I>
     | LinkPropertyOnceForTypeOptions<T>
     ;
@@ -114,10 +114,20 @@ type WorldPluginPropertyOptions<I, T> =
     | ColorPropertyOptions
     | ObjectPropertyOptions
     | GroupPropertyOptions
+    | ProjectFilePropertyOptions
     | InfoPropertyOptions<I>
     | LinkPropertyForEachInstance<I>
     | LinkPropertyOnceForTypeOptions<T>
     ;
+
+type ProjectFilePropertyOptions = {
+    readonly type: Property.ProjectFile,
+    /**
+     * Specify extenstion for files to be filtered
+     * @example '.svg'
+     */
+    readonly filter: string;
+}
 
 type IntegerPropertyOptions = {
     readonly type: Property.Integer;
@@ -202,7 +212,7 @@ type FontPropertyOptions = {
 }
 
 /** Object represents 'combo' plugin property */
-type ComboPropertyOptions = {
+export type ComboPropertyOptions = {
     readonly type: Property.Combo;
     /**
      * Must be used to specify the available items.
