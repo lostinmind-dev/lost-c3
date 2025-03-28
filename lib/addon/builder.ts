@@ -173,7 +173,6 @@ export abstract class Builder {
         if (this.#building) return;
 
         compiler.init(this.#opts?.compiler);
-        await this.#clear();
 
         this.#startTime = performance.now();
         this.#building = true;
@@ -196,7 +195,6 @@ export abstract class Builder {
        /** Create base folders and files */
        await fileManager.createIcon();
        await fileManager.createFolders(['c3runtime'], ['lang']);
-
 
        const config = await configLoader.load();
        await config.loadCategories();
@@ -410,7 +408,7 @@ export abstract class Builder {
             } else {
                 await Deno.copyFile(
                     join(script.path, script.name),
-                    join(Deno.cwd(), ...buildPath, 'c3runtime', ...script.c3Path.split('/'))
+                    join(Deno.cwd(), ...buildPath, ...script.c3Path.split('/'))
                 );
             }
         }
@@ -474,7 +472,11 @@ export abstract class Builder {
                 if (this.#rebuildTimeout) {
                     clearTimeout(this.#rebuildTimeout);
                 }
-                this.#rebuildTimeout = setTimeout(() => this.#start(), 250);
+                this.#rebuildTimeout = setTimeout(async () => {
+                    await this.#clear();
+                    
+                    setTimeout(() => this.#start(), 500);
+                }, 250);
             }
         }
     }

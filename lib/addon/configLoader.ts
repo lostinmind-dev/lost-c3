@@ -6,9 +6,8 @@ const configPath = ['addon.config.ts'];
 export class ConfigLoader {
     async load() {
         try {
-            const path = join(Deno.cwd(), ...configPath);
-
-            const data = await import(`file://${path}?t=${Date.now()}`);
+            const path = `file://${join(Deno.cwd(), ...configPath)}`;
+            const data = await import(`${path}?t=${Date.now()}`);
 
             let config: Addon | null = null;
             for (const [prop, value] of Object.entries(data)) {

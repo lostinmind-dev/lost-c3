@@ -278,7 +278,10 @@ export class Addon<Type extends keyof Addons = keyof Addons> {
     }
 
     getFilesList() {
-        return Array.from(this.scripts).map(script => script.c3Path);
+        return [
+            ...Array.from(this.scripts).map(script => script.c3Path),
+            ...Array.from(this.modules).map(module => module.c3Path)
+        ];;
     }
 
     constructor(type: Type, info: Addons[Type]) {
@@ -371,13 +374,19 @@ export class Addon<Type extends keyof Addons = keyof Addons> {
 
                     if (!entry.isFile || !entry.name.endsWith('.ts')) continue;
 
-                    const module = await import(`file://${join(path, entry.name)}?t=${Date.now()}`);
+                    const modulePath = `file://${join(path, entry.name)}`;
+
+                    const module = await import(`${modulePath}?t=${Date.now()}`);
 
                     for (const part of Object.values(module)) {
                         if (typeof (part as any)[IDENTIFIER] === 'undefined') continue;
 
-                        const userCategory = part as CategoryConstructor;
-                        this.categories.add(new userCategory());
+                        const UserCategory = part as CategoryConstructor;
+                        const category = new UserCategory();
+
+                        if (category.aces.length > 0) {
+                            this.categories.add(category);
+                        }
                     }
                 }
             }

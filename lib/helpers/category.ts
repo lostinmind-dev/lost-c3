@@ -59,13 +59,16 @@ export abstract class Category {
             for (const ace of this.instance._$aces$_) {
                 ace.category = this;
                 this.aces.push(ace);
-
+                
                 if (!this.instance._$parameters$_) continue;
-
+                
                 const parameters = this.instance._$parameters$_.get(ace.method.name);
                 if (!parameters) continue;
-
-                ace.parameters.push(...parameters);
+                
+                ace.parameters.push(...parameters.reverse());
+                if (ace.type === 'action' || ace.type === 'condition') {
+                    ace.displayText = ace.checkDisplayText(ace.displayText);
+                }
             }
         }
 

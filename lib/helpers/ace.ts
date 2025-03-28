@@ -11,6 +11,7 @@ import type {
 } from "../addon/languageManager.ts";
 
 import type { Category, UserClass } from './category.ts';
+import { formatter } from "./formatter.ts";
 import type { Parameters } from "./parameter.ts";
 
 export type Aces = {
@@ -69,6 +70,48 @@ export abstract class Ace<Type extends keyof Aces> {
         this.deprecated = deprecated;
         this.highlight = highlight;
     }
+
+    private getDefaultDisplayText(displayText: string) {
+        const _: string = this.removePlaceholders(displayText);
+
+        const params: string[] = [];
+
+        this.parameters.forEach((parameter, i) => {
+            if (i === this.parameters.length - 1) {
+                params.push(`${formatter.italic(parameter.name)}: ${formatter.bold(`{${i}}`)}`);
+            } else {
+                params.push(`${formatter.italic(parameter.name)}: ${formatter.bold(`{${i}}`)}` + ', ');
+            }
+        })
+
+        const finalDisplayText = `${_} (${params.join('')})`;
+        return finalDisplayText;
+    }
+
+    private isDisplayTextCorrect(displayText: string): boolean {
+        for (let i = 0; i < this.parameters.length; i++) {
+            if (!displayText.includes(`{${i}}`)) return false;
+        }
+        return true;
+    }
+
+    private removePlaceholders(str: string) {
+        return str.replace(/,\s*\{\d+\}|\{\d+\},?|\s*,\s*$|\s*\(.*?\)/g, '').trim();
+    }
+
+    checkDisplayText(displayText: string) {
+        if (displayText.length === 0) {
+            return this.name;
+        }
+
+        if (this.parameters.length > 0) {
+            if (!this.isDisplayTextCorrect(displayText)) {
+                return this.getDefaultDisplayText(displayText);
+            }
+        }
+
+        return displayText;
+    }
 }
 
 type ActionMethod = (this: any, ...args: any[]) => void | Promise<void>;
@@ -82,7 +125,7 @@ type ActionOptions = {
 }
 
 class Action extends Ace<'action'> {
-    readonly displayText: string;
+    displayText: string;
 
     get async() {
         if (this.method.constructor.name === 'AsyncFunction') {
@@ -153,7 +196,7 @@ type ConditionOptions = {
 };
 
 class Condition extends Ace<'condition'> {
-    readonly displayText: string;
+    displayText: string;
     readonly trigger: boolean;
     readonly fakeTrigger?: boolean;
     readonly static?: boolean;

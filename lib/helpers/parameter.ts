@@ -381,7 +381,7 @@ export function parameter<Type extends keyof Parameters>(
                 parameters = this._$parameters$_.get(method.name)!;
             }
 
-            const index = parameters.length - 1;
+            const index = parameters.length;
 
             if (type === 'number') {
                 parameters.push(

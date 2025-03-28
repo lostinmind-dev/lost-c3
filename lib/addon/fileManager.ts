@@ -1,5 +1,5 @@
 import { isDirectoryExists, isFileExists } from "../misc.ts";
-import { colors, join, zipJs } from "../deps.ts";
+import { colors, join, walk, zipJs } from "../deps.ts";
 import { Logger } from "../utils/logger.ts";
 
 const projectIconPath = ['addon', 'icon.svg'] as const;
@@ -64,15 +64,14 @@ export class FileManager {
         const zipWriter = new zipJs.ZipWriter(new zipJs.BlobWriter('application/zip'));
         const buildPath = join(Deno.cwd(), 'build');
 
-        for await (const entry of Deno.readDir(buildPath)) {
-            if (!entry.isFile) continue;
+        for await (const entry of walk(buildPath)) {
+            const { isFile, path } = entry;
+            if (isFile) {
+                const data = await Deno.readTextFile(path);
+                const relativePath = path.substring(buildPath.length + 1).replace(/\\/g, "/");;
 
-            const filePath = join(buildPath, entry.name);
-
-            const data = await Deno.readTextFile(filePath);
-            
-            const relativePath = filePath.substring(buildPath.length + 1).replace(/\\/g, "/");
-            zipWriter.add(relativePath, new zipJs.TextReader(data));
+                zipWriter.add(relativePath, new zipJs.TextReader(data))
+            }
         }
 
         const blob = await zipWriter.close();

@@ -1,8 +1,9 @@
 {
     "name": "@lost-c3/lib",
-    "version": "5.0.0",
+    "version": "5.0.10",
     "tasks": {
-        "publish": "npx jsr publish"
+        "publish": "npx jsr publish",
+        "fast:publish": "deno task publish --no-check --allow-slow-types --allow-dirty"
     },
     "compilerOptions": {
         "types": [
