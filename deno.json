@@ -8,27 +8,19 @@
         "build:base": "deno run -A ./lib/addon/bases/main.ts"
     },
     "compilerOptions": {
-        "strict": false,
         "types": [
-            "./cli.d.ts",
-            "./construct.d.ts",
-            "./lost.d.ts"
+            "./construct.d.ts"
         ],
         "lib": [
             "deno.window",
             "dom",
             "deno.ns"
-        ],
-        "noImplicitOverride": false
+        ]
     },
-    "exports": {
-        ".": "./mod.ts",
-        "./cli": "./cli.ts",
-        "./misc": "./misc.ts"
-    },
+    "exports": "./mod.ts",
     "publish": {
         "exclude": [
-            "tests",
+            "test",
             ".github"
         ]
     }
