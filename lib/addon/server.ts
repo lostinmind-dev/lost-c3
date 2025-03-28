@@ -1,6 +1,6 @@
 import { buildPath } from './builder.ts';
 import { colors, join } from "../deps.ts";
-import { getFileType } from "../../shared/mime.ts";
+import { getFileType } from "../utils/mime.ts";
 import { Logger } from "../utils/logger.ts";
 
 export function serve(opts?: ServeOptions) {

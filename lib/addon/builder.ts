@@ -129,6 +129,17 @@ export abstract class Builder {
      * @returns BuildResult
      */
     static async start(opts?: BuildOptions, watch?: true) {
+        Logger.clear();
+        Logger.line();
+
+        Logger.log(`👾 ${colors.bold(`Lost ➜  ${colors.yellow('5.0.0')} by ${colors.italic(colors.magenta('lostinmind.'))}`)}`);
+        Logger.line();
+        Logger.log(`🌐 ${colors.bold(`[GitHub] https://github.com/lostinmind-dev/lost-c3`)}`);
+        Logger.log(`📦 ${colors.bold(`[JSR] https://jsr.io/@lost-c3/lib`)}`);
+        Logger.log(`💵 ${colors.bold(`[Support project] https://www.paypal.com/paypalme/daklnn`)}`)
+
+        Logger.line();
+
         this.#opts = opts;
         this.#watch = watch || false;
 
@@ -162,7 +173,6 @@ export abstract class Builder {
         if (this.#building) return;
 
         compiler.init(this.#opts?.compiler);
-        Logger.clear();
         await this.#clear();
 
         this.#startTime = performance.now();

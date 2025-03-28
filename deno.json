@@ -1,11 +1,8 @@
 {
     "name": "@lost-c3/lib",
-    "version": "4.1.1",
+    "version": "5.0.0",
     "tasks": {
-        "publish": "npx jsr publish",
-        "uninstall": "deno uninstall lost -g",
-        "install": "deno install --name lost ./cli.ts --global -f -A",
-        "build:base": "deno run -A ./lib/addon/bases/main.ts"
+        "publish": "npx jsr publish"
     },
     "compilerOptions": {
         "types": [

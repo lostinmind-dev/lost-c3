@@ -81,6 +81,6 @@ export class FileManager {
         const zipPath = `${join(Deno.cwd(), 'builds', fileName)}`;
 
         await Deno.writeFile(`${zipPath}.zip`, new Uint8Array(await blob.arrayBuffer()))
-        // await Deno.rename(`${zipPath}.zip`, `${zipPath}.c3addon`);
+        await Deno.rename(`${zipPath}.zip`, `${zipPath}.c3addon`);
     }
 }
