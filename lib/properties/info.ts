@@ -1,22 +1,15 @@
-import { 
-    type TextProperties,
-    Property
-} from "../property.ts";
+import { Property } from "./index.ts";
 
 export type Options = {
     readonly id: string;
     readonly name: string;
     readonly desc: string;
-    readonly value: string;
+    /** Creates a read-only string that cannot be edited. */
+    callback<EditorInstance>(instance: EditorInstance): string;
 }
 
-export class Text<
-    Type extends keyof TextProperties = keyof TextProperties
-> extends Property<Type> {
-    readonly value: string;
-
+export var InfoProperty = class extends Property<'info'> {
     constructor(
-        type: Type,
         opts?: Partial<Options>
     ) {
         if (!opts?.id || !opts?.name) {
@@ -24,12 +17,10 @@ export class Text<
         }
 
         super(
-            type,
+            'info',
             opts.id,
             opts.name,
             opts.desc
         );
-
-        this.value = opts.value || '';
     }
 }

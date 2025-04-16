@@ -1,4 +1,4 @@
-import { Property } from "../property.ts";
+import { Property } from "./index.ts";
 
 export type Options<T extends keyof CallbackTypes = keyof CallbackTypes> = {
     readonly id: string;
@@ -30,7 +30,7 @@ type CallbackTypes = {
     };
 }
 
-export class Link extends Property<'link'> {
+export var LinkProperty = class extends Property<'link'> {
     readonly callbackType: keyof CallbackTypes;
     readonly linkText: string;
     readonly callback?: CallbackTypes[keyof CallbackTypes]['callback'];

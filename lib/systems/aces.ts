@@ -81,8 +81,9 @@ interface IObject extends IParameter {
     type: 'object';
     allowedPluginIds?: string[];
 }
+type AcesCollection = Record<string, Function>;
 
-export class AcesManager {
+export class AcesSystem {
     private parametersToJson(parameters: Category['aces'][0]['parameters']): IAce['params'] {
         const params: IAce['params'] = [];
 
@@ -140,24 +141,24 @@ export class AcesManager {
                 _aces.push({
                     id: ace.id,
                     scriptName: ace.method.name,
-    
+
                     isDeprecated: ace.deprecated,
                     highlight: ace.highlight,
-                    
+
                     params: this.parametersToJson(ace.parameters),
-                    
+
                     isAsync: ace.async,
                 });
             } else if (ace.type === 'condition') {
                 _aces.push({
                     id: ace.id,
                     scriptName: ace.method.name,
-    
+
                     isDeprecated: ace.deprecated,
                     highlight: ace.highlight,
-                    
+
                     params: this.parametersToJson(ace.parameters),
-    
+
                     isTrigger: ace.trigger,
                     isFakeTrigger: ace.fakeTrigger,
                     isStatic: ace.static,
@@ -169,12 +170,12 @@ export class AcesManager {
                 _aces.push({
                     id: ace.id,
                     expressionName: ace.method.name,
-    
+
                     isDeprecated: ace.deprecated,
                     highlight: ace.highlight,
-                    
+
                     params: this.parametersToJson(ace.parameters),
-    
+
                     returnType: ace.returnType,
                     isVariadicParameters: ace.variadicParameters
                 });
@@ -202,5 +203,39 @@ export class AcesManager {
         }
 
         return data;
+    }
+
+    serialize<Type extends keyof Aces>(type: Type, categories: Category[]) {
+        const aces: AcesCollection = {};
+
+        categories.flatMap(category => category.aces.filter(ace => ace.type === type))
+            .forEach(action => {
+                aces[action.method.name] = new Function('...args', `
+                        categories.${action.category.id}.${action.method.name}.bind(this)(...args);
+                    `);
+            });
+
+        return this.#serialize(aces);
+    }
+
+    #serialize(aces: AcesCollection) {
+        let str = '{\n';
+        for (const key in aces) {
+            if (aces.hasOwnProperty(key)) {
+                const value = aces[key];
+
+                if (typeof value === 'function') {
+                    str += `  ${key}: function ${(value as Function).toString().replace(/^function\s*\w*\s*/, '')},\n`;
+                } else if (typeof value === 'string' && (value as string).startsWith('LostCategories[')) {
+                    /** Directly embed the string without quotes */
+                    str += `  ${key}: ${value},\n`;
+                } else {
+                    str += `  ${key}: ${JSON.stringify(value, null, 2)},\n`;
+                }
+            }
+        }
+        str = str.replace(/,\n$/, '\n'); /** Delete last comma */
+        str += '}';
+        return str;
     }
 }

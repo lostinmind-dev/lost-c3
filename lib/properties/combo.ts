@@ -1,4 +1,4 @@
-import { Property } from "../property.ts";
+import { Property } from "./index.ts";
 
 export type Options = {
     readonly id: string;
@@ -17,7 +17,7 @@ export type Options = {
     readonly initialValue: string;
 }
 
-export class Combo extends Property<'combo'> {
+export var ComboProperty = class extends Property<'combo'> {
     readonly items: Record<string, string>;
     readonly initialValue: keyof this['items'];
 

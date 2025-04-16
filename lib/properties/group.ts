@@ -1,14 +1,12 @@
-import { Property } from "../property.ts";
+import { Property } from "./index.ts";
 
 export type Options = {
     readonly id: string;
     readonly name: string;
     readonly desc: string;
-    /** Creates a read-only string that cannot be edited. */
-    callback<EditorInstance>(instance: EditorInstance): string;
 }
 
-export class Info extends Property<'info'> {
+export var GroupProperty = class extends Property<'group'> {
     constructor(
         opts?: Partial<Options>
     ) {
@@ -17,7 +15,7 @@ export class Info extends Property<'info'> {
         }
 
         super(
-            'info',
+            'group',
             opts.id,
             opts.name,
             opts.desc

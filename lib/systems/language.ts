@@ -3,7 +3,7 @@ import type { Category } from "../helpers/category.ts";
 import type {
     Addons,
     Addon,
-} from "./config/index.ts";
+} from "../config.ts";
 
 type LanguageJson = {
     languageTag: 'en-US';
@@ -65,7 +65,7 @@ export interface IExpression extends IAce {
     "display-text": string;
 }
 
-export class LanguageManager {
+export class LanguageSystem {
 
     private propertiesToJson(properties: Addon['properties']) {
         const data: Record<string, IProperty | IComboProperty | ILinkProperty> = {};

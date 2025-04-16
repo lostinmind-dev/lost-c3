@@ -1,7 +1,7 @@
 import { 
     type NumericProperties, 
     Property
-} from "../property.ts";
+} from "./index.ts";
 
 export type Options = {
     readonly id: string;
@@ -16,7 +16,7 @@ export type Options = {
     readonly max: number;
 }
 
-export class Numeric<
+export var NumericProperty = class <
     Type extends keyof NumericProperties = keyof NumericProperties
 > extends Property<Type> {
     readonly value: number;

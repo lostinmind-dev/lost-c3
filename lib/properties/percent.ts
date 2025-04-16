@@ -1,12 +1,19 @@
-import { Property } from "../property.ts";
+import { Property } from "./index.ts";
 
 export type Options = {
     readonly id: string;
     readonly name: string;
     readonly desc: string;
+    /** 
+     * Percent value
+     * @example 0.5 -> 50%
+     */
+    readonly value: number;
 }
 
-export class Group extends Property<'group'> {
+export var PercentProperty = class extends Property<'percent'> {
+    readonly value: number;
+
     constructor(
         opts?: Partial<Options>
     ) {
@@ -15,10 +22,12 @@ export class Group extends Property<'group'> {
         }
 
         super(
-            'group',
+            'percent',
             opts.id,
             opts.name,
             opts.desc
         );
+
+        this.value = opts.value || 0;
     }
 }

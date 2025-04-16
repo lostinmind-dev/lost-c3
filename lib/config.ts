@@ -1,30 +1,19 @@
-import type { PluginInfo } from "./plugin.ts";
-import type { BehaviorInfo } from "./behavior.ts";
-import type { Properties } from "./property.ts";
+import type { PluginInfo } from "./configs/plugin.ts";
+import type { BehaviorInfo } from "./configs/behavior.ts";
 import {
     type Category,
     type CategoryConstructor,
     IDENTIFIER
-} from "../../helpers/category.ts";
+} from "./helpers/category.ts";
 import {
     isDirectoryExists,
     isFileExists
-} from "../../misc.ts";
-import { join } from "../../deps.ts";
-import { fileManager } from "../builder.ts";
+} from "./misc.ts";
+import { path } from "./deps.ts";
+import { PATHS } from "./main.ts";
 
 /** Properties */
-import { Numeric, } from "./properties/numeric.ts";
-import { Percent } from "./properties/percent.ts";
-import { Text } from "./properties/text.ts";
-import { Check } from "./properties/check.ts";
-import { Font } from "./properties/font.ts";
-import { Combo } from "./properties/combo.ts";
-import { Color } from "./properties/color.ts";
-import { Object as ObjectProperty } from "./properties/object.ts";
-import { Group } from "./properties/group.ts";
-import { Info } from "./properties/info.ts";
-import { Link } from "./properties/link.ts";
+import * as properties from './properties/index.ts';
 
 type AddonInfo = {
     /**
@@ -247,11 +236,11 @@ class AddonModule {
     //     return data;
     // }
 }
-
+type PropertyInstance = InstanceType<properties.Properties[keyof properties.Properties]['klass']>;
 export class Addon<Type extends keyof Addons = keyof Addons> {
     readonly type: Type;
     readonly info: Addons[Type];
-    readonly properties: Array<Properties[keyof Properties]['klass']> = [];
+    readonly properties: Array<PropertyInstance> = [];
 
     readonly categories = new Set<Category>();
     readonly remoteScripts = new Set<RemoteScript>();
@@ -289,92 +278,91 @@ export class Addon<Type extends keyof Addons = keyof Addons> {
         this.info = info;
     }
 
-    async loadScripts() {
-        const scriptsPath = ['addon', 'scripts'];
+    // async loadScripts() {
+    //     const scriptsPath = ['addon', 'scripts'];
 
-        if (!await isDirectoryExists(join(Deno.cwd(), ...scriptsPath))) return;
+    //     if (!await isDirectoryExists(join(Deno.cwd(), ...scriptsPath))) return;
 
-        await fileManager.createFolders(['scripts']);
+    //     await fileManager.createFolders(['scripts']);
 
-        try {
-            const readDir = async (path: string) => {
-                for await (const entry of Deno.readDir(path)) {
+    //     try {
+    //         const readDir = async (path: string) => {
+    //             for await (const entry of Deno.readDir(path)) {
 
-                    if (entry.isDirectory) {
-                        await fileManager.createFolders(['scripts', entry.name]);
-                        await readDir(join(path, entry.name));
-                    } else if (entry.isFile) {
+    //                 if (entry.isDirectory) {
+    //                     await fileManager.createFolders(['scripts', entry.name]);
+    //                     await readDir(join(path, entry.name));
+    //                 } else if (entry.isFile) {
 
-                        if (entry.name.endsWith('.js')) {
-                            const script = new AddonScript(path, entry.name);
-                            script.editor = this.editorScripts.has(script.c3Path);
+    //                     if (entry.name.endsWith('.js')) {
+    //                         const script = new AddonScript(path, entry.name);
+    //                         script.editor = this.editorScripts.has(script.c3Path);
 
-                            this.scripts.add(script);
-                        } else if (entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts')) {
-                            const script = new AddonScript(path, entry.name);
-                            script.editor = this.editorScripts.has(script.c3Path);
+    //                         this.scripts.add(script);
+    //                     } else if (entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts')) {
+    //                         const script = new AddonScript(path, entry.name);
+    //                         script.editor = this.editorScripts.has(script.c3Path);
 
-                            this.scripts.add(script);
-                        }
-                    }
-                }
-            }
+    //                         this.scripts.add(script);
+    //                     }
+    //                 }
+    //             }
+    //         }
 
-            await readDir(join(Deno.cwd(), ...scriptsPath));
-        } catch (e) {
-            console.error(
-                `Error while loading addon scripts`, e
-            );
-            Deno.exit(1);
-        }
-    }
+    //         await readDir(join(Deno.cwd(), ...scriptsPath));
+    //     } catch (e) {
+    //         console.error(
+    //             `Error while loading addon scripts`, e
+    //         );
+    //         Deno.exit(1);
+    //     }
+    // }
 
-    async loadModules() {
-        const modulesPath = ['addon', 'runtime', 'modules'];
+    // async loadModules() {
+    //     const modulesPath = ['addon', 'runtime', 'modules'];
 
-        if (!await isDirectoryExists(join(Deno.cwd(), ...modulesPath))) return;
+    //     if (!await isDirectoryExists(join(Deno.cwd(), ...modulesPath))) return;
 
-        await fileManager.createFolders(['c3runtime', 'modules']);
+    //     await fileManager.createFolders(['c3runtime', 'modules']);
 
-        try {
-            const readDir = async (path: string) => {
-                for await (const entry of Deno.readDir(path)) {
+    //     try {
+    //         const readDir = async (path: string) => {
+    //             for await (const entry of Deno.readDir(path)) {
 
-                    if (entry.isDirectory) {
-                        await fileManager.createFolders(['c3runtime', 'modules', entry.name]);
-                        await readDir(join(path, entry.name));
-                    } else if (entry.isFile) {
+    //                 if (entry.isDirectory) {
+    //                     await fileManager.createFolders(['c3runtime', 'modules', entry.name]);
+    //                     await readDir(join(path, entry.name));
+    //                 } else if (entry.isFile) {
 
-                        if (entry.name.endsWith('.js')) {
-                            this.modules.add(new AddonModule(path, entry.name));
-                        } else if (entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts')) {
-                            this.modules.add(new AddonModule(path, entry.name));
-                        }
-                    }
-                }
-            }
+    //                     if (entry.name.endsWith('.js')) {
+    //                         this.modules.add(new AddonModule(path, entry.name));
+    //                     } else if (entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts')) {
+    //                         this.modules.add(new AddonModule(path, entry.name));
+    //                     }
+    //                 }
+    //             }
+    //         }
 
-            await readDir(join(Deno.cwd(), ...modulesPath));
-        } catch (e) {
-            console.error(
-                `Error while loading addon modules`, e
-            );
-            Deno.exit(1);
-        }
-    }
+    //         await readDir(join(Deno.cwd(), ...modulesPath));
+    //     } catch (e) {
+    //         console.error(
+    //             `Error while loading addon modules`, e
+    //         );
+    //         Deno.exit(1);
+    //     }
+    // }
 
     async loadCategories() {
         try {
-            const categoriesPath = ['addon', 'categories'];
-            const readDir = async (path: string) => {
-                for await (const entry of Deno.readDir(path)) {
+            const readDir = async (_path: string) => {
+                for await (const entry of Deno.readDir(_path)) {
                     if (entry.isDirectory) {
-                        await readDir(join(path, entry.name));
+                        await readDir(path.join(_path, entry.name));
                     }
 
                     if (!entry.isFile || !entry.name.endsWith('.ts')) continue;
 
-                    const modulePath = `file://${join(path, entry.name)}`;
+                    const modulePath = `file://${path.join(_path, entry.name)}`;
 
                     const module = await import(`${modulePath}?t=${Date.now()}`);
 
@@ -391,7 +379,7 @@ export class Addon<Type extends keyof Addons = keyof Addons> {
                 }
             }
 
-            await readDir(join(Deno.cwd(), ...categoriesPath));
+            await readDir(path.join(PATHS.ADDON, 'categories'));
         } catch (e) {
             console.error(
                 `Error while importing categories`, e
@@ -400,40 +388,40 @@ export class Addon<Type extends keyof Addons = keyof Addons> {
         }
     }
 
-    /**
-     * Adds editor scripts to *addon.json* file
-     * @param target Folder where the script exists
-     * @param scripts *Optional* editor scripts collection
-     * @returns 
-     */
-    async addEditorScripts(...scripts: EditorScriptSetting[]) {
-        for (const script of scripts) {
-            if (script.target === 'file') {
-                const path = join(Deno.cwd(), 'addon', 'scripts', ...script.path.split('/'));
+    // /**
+    //  * Adds editor scripts to *addon.json* file
+    //  * @param target Folder where the script exists
+    //  * @param scripts *Optional* editor scripts collection
+    //  * @returns 
+    //  */
+    // async addEditorScripts(...scripts: EditorScriptSetting[]) {
+    //     for (const script of scripts) {
+    //         if (script.target === 'file') {
+    //             const path = join(Deno.cwd(), 'addon', 'scripts', ...script.path.split('/'));
 
-                if (await isFileExists(path)) {
-                    this.editorScripts.add(`scripts/${script.path.replace('.ts', '.js')}`)
-                }
-            } else if (script.target === 'directory') {
-                const dirPath = join(Deno.cwd(), 'addon', 'scripts', ...script.path.split('/'));
+    //             if (await isFileExists(path)) {
+    //                 this.editorScripts.add(`scripts/${script.path.replace('.ts', '.js')}`)
+    //             }
+    //         } else if (script.target === 'directory') {
+    //             const dirPath = join(Deno.cwd(), 'addon', 'scripts', ...script.path.split('/'));
 
-                const readDir = async (path: string) => {
-                    for await (const entry of Deno.readDir(path)) {
-                        if (entry.isDirectory) {
-                            await readDir(join(path, entry.name));
-                        } else if (
-                            entry.isFile &&
-                            entry.name.endsWith('.js') ||
-                            (entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts'))
-                        ) {
-                            this.editorScripts.add(`${script.path}/${entry.name}`);
-                        }
-                    }
-                }
-                await readDir(dirPath);
-            }
-        }
-    }
+    //             const readDir = async (path: string) => {
+    //                 for await (const entry of Deno.readDir(path)) {
+    //                     if (entry.isDirectory) {
+    //                         await readDir(join(path, entry.name));
+    //                     } else if (
+    //                         entry.isFile &&
+    //                         entry.name.endsWith('.js') ||
+    //                         (entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts'))
+    //                     ) {
+    //                         this.editorScripts.add(`${script.path}/${entry.name}`);
+    //                     }
+    //                 }
+    //             }
+    //             await readDir(dirPath);
+    //         }
+    //     }
+    // }
 
     /**
      * Adds a remote URL to load a script from.
@@ -453,7 +441,7 @@ export class Addon<Type extends keyof Addons = keyof Addons> {
      * @param type Plugin property type
      * @param opts Plugin property options
      */
-    addProperty<Type extends keyof Properties>(type: Type, opts: Partial<Properties[Type]['opts']>) {
+    addProperty<Type extends keyof properties.Properties>(type: Type, opts: Partial<properties.Properties[Type]['opts']>) {
         if (
             type === 'integer' ||
             type === 'float'
@@ -465,29 +453,29 @@ export class Addon<Type extends keyof Addons = keyof Addons> {
             type === 'longtext'
         ) {
             //@ts-ignore opts type
-            this.properties.push(new Text(type, opts));
+            this.properties.push(new properties.text.TextProperty(type, opts));
         } else if (type === 'percent') {
             //@ts-ignore opts type
-            this.properties.push(new Percent(opts));
+            this.properties.push(new properties.percent.PercentProperty(opts));
         } else if (type === 'check') {
-            this.properties.push(new Check(opts));
+            this.properties.push(new properties.check.CheckProperty(opts));
         } else if (type === 'font') {
-            this.properties.push(new Font(opts));
+            this.properties.push(new properties.font.FontProperty(opts));
         } else if (type === 'combo') {
             //@ts-ignore opts type
-            this.properties.push(new Combo(opts));
+            this.properties.push(new properties.combo.ComboProperty(opts));
         } else if (type === 'color') {
             //@ts-ignore opts type
-            this.properties.push(new Color(opts));
+            this.properties.push(new properties.color.ColorProperty(opts));
         } else if (type === 'object') {
-            this.properties.push(new ObjectProperty(opts));
+            this.properties.push(new properties.object.ObjectProperty(opts));
         } else if (type === 'group') {
-            this.properties.push(new Group(opts));
+            this.properties.push(new properties.group.GroupProperty(opts));
         } else if (type === 'info') {
             //@ts-ignore opts type
-            this.properties.push(new Info(opts));
+            this.properties.push(new properties.info.InfoProperty(opts));
         } else if (type === 'link') {
-            this.properties.push(new Link(opts));
+            this.properties.push(new properties.link.LinkProperty(opts));
         }
     }
 
@@ -510,20 +498,20 @@ export class Addon<Type extends keyof Addons = keyof Addons> {
 type InitMethods = {
     addProperty: Addon['addProperty'];
     addRemoteScripts: Addon['addRemoteScripts'];
-    addEditorScripts: Addon['addEditorScripts'];
+    // addEditorScripts: Addon['addEditorScripts'];
 }
 
 type Config = {
     init?: (addon: InitMethods) => void | Promise<void>;
 }
 
-export async function config<Type extends keyof Addons>(type: Type, info: Addons[Type], opts?: Config) {
+export function config<Type extends keyof Addons>(type: Type, info: Addons[Type], opts?: Config) {
     const addon = new Addon(type, info);
 
-    await opts?.init?.({
+    opts?.init?.({
         addProperty: addon.addProperty.bind(addon),
         addRemoteScripts: addon.addRemoteScripts.bind(addon),
-        addEditorScripts: addon.addEditorScripts.bind(addon)
+        // addEditorScripts: addon.addEditorScripts.bind(addon)
     });
 
     return addon;

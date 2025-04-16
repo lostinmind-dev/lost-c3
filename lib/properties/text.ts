@@ -1,16 +1,22 @@
-import { Property } from "../property.ts";
+import { 
+    type TextProperties,
+    Property
+} from "./index.ts";
 
 export type Options = {
     readonly id: string;
     readonly name: string;
     readonly desc: string;
-    readonly checked: boolean;
+    readonly value: string;
 }
 
-export class Check extends Property<'check'> {
-    readonly checked: boolean;
+export var TextProperty = class <
+    Type extends keyof TextProperties = keyof TextProperties
+> extends Property<Type> {
+    readonly value: string;
 
     constructor(
+        type: Type,
         opts?: Partial<Options>
     ) {
         if (!opts?.id || !opts?.name) {
@@ -18,12 +24,12 @@ export class Check extends Property<'check'> {
         }
 
         super(
-            'check',
+            type,
             opts.id,
             opts.name,
             opts.desc
         );
 
-        this.checked = opts.checked || false;
+        this.value = opts.value || '';
     }
 }

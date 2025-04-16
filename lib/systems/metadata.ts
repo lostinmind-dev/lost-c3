@@ -1,8 +1,7 @@
 import type {
     Addons,
     Addon,
-} from "./config/index.ts";
-
+} from "../config.ts";
 
 type MetadataJson = {
     "supports-worker-mode"?: boolean;
@@ -21,7 +20,7 @@ type MetadataJson = {
     "file-list": string[];
 }
 
-export class MetadataManager {
+export class MetadataSystem {
     createJson<Type extends keyof Addons>(config: Addon<Type>): MetadataJson {
         const data: MetadataJson = {
             "supports-worker-mode": config.info.supportWorkerMode,

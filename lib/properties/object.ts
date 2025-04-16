@@ -1,4 +1,4 @@
-import { Property } from "../property.ts";
+import { Property } from "./index.ts";
 
 export type Options = {
     readonly id: string;
@@ -13,7 +13,7 @@ export type Options = {
     readonly allowedPluginIds: string[];
 }
 
-export class Object extends Property<'object'> {
+export var ObjectProperty = class extends Property<'object'> {
     readonly allowedPluginIds?: string[];
 
     constructor(

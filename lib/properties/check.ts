@@ -1,14 +1,14 @@
-import { Property } from "../property.ts";
+import { Property } from "./index.ts";
 
 export type Options = {
     readonly id: string;
     readonly name: string;
     readonly desc: string;
-    readonly fontName: string;
+    readonly checked: boolean;
 }
 
-export class Font extends Property<'font'> {
-    readonly fontName: string;
+export var CheckProperty = class extends Property<'check'> {
+    readonly checked: boolean;
 
     constructor(
         opts?: Partial<Options>
@@ -18,12 +18,12 @@ export class Font extends Property<'font'> {
         }
 
         super(
-            'font',
+            'check',
             opts.id,
             opts.name,
             opts.desc
         );
 
-        this.fontName = opts.fontName || 'Arial';
+        this.checked = opts.checked || false;
     }
 }

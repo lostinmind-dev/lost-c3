@@ -1,16 +1,16 @@
 // deno-lint-ignore-file no-explicit-any
-import { colors } from "../deps.ts";
+import { colors } from "./deps.ts";
 
-export abstract class Logger {
-    static readonly #DefaultLineLength = 20;
+const defaultLineLength = 20;
 
-    static line(length?: number) {
+export class Logger {
+    line(length?: number) {
         const line = this.getLineString(length);
         console.log(line);
     };
 
-    static getLineString(length?: number) {
-        const enteredLenght = (length) ? length : this.#DefaultLineLength;
+    getLineString(length?: number) {
+        const enteredLenght = (length) ? length : defaultLineLength;
         let line = '';
         for (let i = 0; i < enteredLenght; i++) {
             line += '----'
@@ -18,22 +18,22 @@ export abstract class Logger {
         return line;
     }
 
-    static clear() {
+    clear() {
         console.clear();
     };
 
     /**
      * ⏱️
      */
-    static timer(...data: any[]) {
+    timer(...data: any[]) {
         console.log('⏱️', ...data);
     }
 
-    static log(...data: any[]) {
+    log(...data: any[]) {
         console.log(...data);
     };
 
-    static logBetweenLines(...data: any[]) {
+    logBetweenLines(...data: any[]) {
         this.line();
         console.log(...data);
         this.line();
@@ -42,7 +42,7 @@ export abstract class Logger {
     /**
      * ⏳
      */
-    static process(...data: any[]) {
+    process(...data: any[]) {
         data.forEach(entry => {
             console.log('⏳', (typeof entry === 'string') ? colors.bold(colors.yellow((colors.italic(entry)))) : entry, '...');
         })
@@ -51,7 +51,7 @@ export abstract class Logger {
     /**
      * 🔃
      */
-    static load(...data: any[]) {
+    load(...data: any[]) {
         data.forEach(entry => {
             console.log('🔃', entry, '...');
         })
@@ -60,13 +60,13 @@ export abstract class Logger {
     /**
      * 🔎
      */
-    static search(...data: any[]) {
+    search(...data: any[]) {
         data.forEach(entry => {
             console.log('🔎', (typeof entry === 'string') ? colors.bold(colors.blue(colors.italic(entry))) : entry, '...');
         })
     };
 
-    static error(type: 'serve' | 'build' | 'cli' | 'bundle', errorMessage: string, ...data: any[]) {
+    error(type: 'serve' | 'build' | 'cli' | 'bundle', errorMessage: string, ...data: any[]) {
         this.line();
         console.log('⛔', colors.bold(colors.red(`Lost [${type}] error.`)));
         this.info(colors.italic(errorMessage));
@@ -79,7 +79,7 @@ export abstract class Logger {
     /**
      * 📃
      */
-    static info(...data: any[]) {
+    info(...data: any[]) {
         data.forEach(entry => {
             console.log('📃', (typeof entry === 'object') ? entry : colors.italic(entry));
         })
@@ -88,7 +88,7 @@ export abstract class Logger {
     /**
      * ⚠️
      */
-    static warn(...data: any[]) {
+    warn(...data: any[]) {
         this.line();
         data.forEach(entry => {
             console.log('⚠️ ', colors.bold(colors.yellow('Warning:')), (typeof entry === 'string') ? colors.italic(entry) : entry);
@@ -99,7 +99,7 @@ export abstract class Logger {
     /**
      * ✅
      */
-    static success(...data: any[]) {
+    success(...data: any[]) {
         data.forEach(entry => {
             console.log('✅', entry, '!');
         })

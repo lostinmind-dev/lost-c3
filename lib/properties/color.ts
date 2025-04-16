@@ -1,4 +1,4 @@
-import { Property } from "../property.ts";
+import { Property } from "./index.ts";
 
 export type Options = {
     readonly id: string;
@@ -8,7 +8,7 @@ export type Options = {
     readonly value: [red: number, green: number, blue: number, alpha?: number];
 }
 
-export class Color extends Property<'color'> {
+export var ColorProperty = class extends Property<'color'> {
     readonly value: [red: number, green: number, blue: number, alpha?: number];
 
     constructor(

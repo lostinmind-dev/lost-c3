@@ -1,6 +1,6 @@
 {
-    "name": "@lost-c3/lib",
-    "version": "5.0.10",
+    "name": "@lostinmind/c3-lost",
+    "version": "5.0.13",
     "tasks": {
         "publish": "npx jsr publish",
         "fast:publish": "deno task publish --no-check --allow-slow-types --allow-dirty"
