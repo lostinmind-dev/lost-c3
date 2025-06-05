@@ -1,0 +1,24 @@
+{
+    "name": "@c3-lost/core",
+    "version": "1.0.0",
+    "tasks": {
+        "publish": "npx jsr publish",
+        "publish:ignore-all": "deno task publish --no-check --allow-slow-types --allow-dirty"
+    },
+    "compilerOptions": {
+        "lib": [
+            "deno.window",
+            "dom",
+            "deno.ns",
+            "dom.asynciterable",
+            "dom.iterable"
+        ]
+    },
+    "exclude": [
+        "test"
+    ],
+    "imports": {},
+    "exports": {
+        ".": "./mod.ts"
+    }
+}

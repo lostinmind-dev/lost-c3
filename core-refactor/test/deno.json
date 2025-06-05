@@ -1,0 +1,20 @@
+{
+    "name": "@lostinmind/c3-lost-test",
+    "version": "1.0.0",
+    "tasks": {
+        "build": "deno run -A main.ts"
+    },
+    "compilerOptions": {
+        "types": [
+            "./ts-defs/"
+        ],
+        "lib": [
+            "dom",
+            "dom.asynciterable",
+            "dom.iterable"
+        ]
+    },
+    "imports": {
+        "@c3-lost/core": "../mod.ts"
+    }
+}
